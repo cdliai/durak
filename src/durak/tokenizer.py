@@ -46,15 +46,30 @@ SENTENCE_SPLITTER_REGISTRY: dict[str, SentenceSplitter] = {}
 
 
 def register_tokenizer(name: str, func: Tokenizer) -> None:
+    """Register a new tokenizer strategy.
+    Args:
+        name: The name of the tokenizer strategy.
+        func: The tokenizer function.
+    """
     TOKENIZER_REGISTRY[name] = func
 
 
 def register_sentence_splitter(name: str, func: SentenceSplitter) -> None:
+    """Register a new sentence splitter strategy.
+    Args:
+        name: The name of the sentence splitter strategy.
+        func: The sentence splitter function.
+    """
     SENTENCE_SPLITTER_REGISTRY[name] = func
 
 
 def regex_tokenize(text: str) -> list[str]:
-    """Tokenize text using regex patterns."""
+    """Tokenize text using regex patterns.
+    Args:
+        text: The text to tokenize.
+    Returns:
+        A list of tokens.
+    """
     matches = REGEX_TOKEN_PATTERN.findall(text)
     return [match for match in matches if match.strip()]
 
@@ -62,9 +77,9 @@ def regex_tokenize(text: str) -> list[str]:
 def regex_sentence_split(text: str | None) -> list[str]:
     """Split text into sentences using regex patterns.
     Args:
-        text: Input text to split, can be None
+        text: Input text to split.
     Returns:
-        List of sentences
+        A list of sentences.
     """
     if text is None:
         return []
@@ -99,7 +114,14 @@ def tokenize(
     strip_punct: bool = False,
 ) -> list[str]:
     """Tokenize text with optional punctuation stripping.
-
+    Args:
+        text: The text to tokenize.
+        strategy: The tokenization strategy to use. Defaults to "regex".
+        strip_punct: Whether to strip punctuation tokens. Defaults to False.
+    Returns:
+        A list of tokens.
+    Raises:
+        TokenizationError: If the specified tokenizer strategy is unknown.
     Examples:
         >>> tokenize("Durak, kolay mı?", strip_punct=True)
         ['Durak', 'kolay', 'mı']
@@ -122,7 +144,12 @@ def tokenize_text(
     strip_punct: bool = False,
 ) -> list[str]:
     """Backward-compatible wrapper around :func:`tokenize`.
-
+    Args:
+        text: The text to tokenize.
+        strategy: The tokenization strategy to use. Defaults to "regex".
+        strip_punct: Whether to strip punctuation tokens. Defaults to False.
+    Returns:
+        A list of tokens.
     Examples:
         >>> tokenize_text("Durak, kolay mı?", strip_punct=True)
         ['Durak', 'kolay', 'mı']
@@ -131,6 +158,15 @@ def tokenize_text(
 
 
 def split_sentences(text: str, strategy: str = "regex") -> list[str]:
+    """Split text into sentences.
+    Args:
+        text: The text to split.
+        strategy: The sentence splitting strategy to use. Defaults to "regex".
+    Returns:
+        A list of sentences.
+    Raises:
+        TokenizationError: If the specified sentence splitter strategy is unknown.
+    """
     splitter = SENTENCE_SPLITTER_REGISTRY.get(strategy)
     if splitter is None:
         raise TokenizationError(f"Unknown sentence splitter strategy '{strategy}'.")
@@ -143,6 +179,14 @@ def normalize_tokens(
     lower: bool = True,
     strip_punct: bool = False,
 ) -> list[str]:
+    """Normalize tokens by lowercasing and optionally stripping punctuation.
+    Args:
+        tokens: An iterable of tokens.
+        lower: Whether to lowercase the tokens. Defaults to True.
+        strip_punct: Whether to strip punctuation tokens. Defaults to False.
+    Returns:
+        A list of normalized tokens.
+    """
     normalized: list[str] = []
     for token in tokens:
         if strip_punct and re.fullmatch(PUNCT_TOKEN, token):
@@ -154,9 +198,20 @@ def normalize_tokens(
 
 @dataclass
 class SubwordTokenizer:
-    """Placeholder interface for future subword tokenizers."""
+    """Placeholder interface for future subword tokenizers.
+    Attributes:
+        name: The name of the subword tokenizer.
+    """
 
     name: str
 
     def tokenize(self, tokens: Sequence[str]) -> Sequence[str]:
+        """Tokenize a sequence of tokens into subwords.
+        Args:
+            tokens: A sequence of tokens.
+        Returns:
+            A sequence of subword tokens.
+        Raises:
+            NotImplementedError: This method is not yet implemented.
+        """
         raise NotImplementedError("Subword tokenizers are not implemented yet.")

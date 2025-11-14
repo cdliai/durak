@@ -29,7 +29,28 @@ def process_text(
     rejoin_suffix_allow_without_apostrophe: bool = True,
 ) -> list[str]:
     """Clean, tokenize, and optionally remove stopwords from text.
-
+    Args:
+        text: The text to process.
+        clean: Whether to clean the text. Defaults to True.
+        tokenizer: The tokenizer strategy to use. Defaults to "regex".
+        remove_stopwords: Whether to remove stopwords. Defaults to False.
+        stopword_manager: A StopwordManager instance to use. If not provided,
+            a default one will be created.
+        stopword_base: A base set of stopwords to use.
+        stopword_additions: A set of stopwords to add to the base set.
+        stopword_keep: A set of stopwords to keep.
+        stopword_case_sensitive: Whether stopword matching should be case
+            sensitive.
+        rejoin_suffixes: Whether to rejoin detached suffixes. Defaults to
+            False.
+        rejoin_suffix_list: A list of suffixes to rejoin.
+        rejoin_suffix_allow_without_apostrophe: Whether to allow rejoining
+            suffixes without an apostrophe. Defaults to True.
+    Returns:
+        A list of processed tokens.
+    Raises:
+        ValueError: If stopword or suffix rejoin configuration is provided
+            but the corresponding feature is disabled.
     Examples:
         >>> process_text("Bu bir test!", remove_stopwords=True)
         ['test', '!']

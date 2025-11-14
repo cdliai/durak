@@ -85,6 +85,9 @@ print(filtered)
 - Regex-based tokenizer and sentence splitter with clitic and diacritic preservation.
 - Lightweight corpus validator to guard Turkish-specific artefacts.
 - Ready for extension with future lemmatization and subword adapters.
+- Comprehensive inline documentation. All public functions, classes, and
+  methods have complete docstrings, which can be accessed via `help()` or
+  by reading the source code.
 
 ## Development Setup
 

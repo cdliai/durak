@@ -46,7 +46,16 @@ def attach_detached_suffixes(
     apostrophes: Iterable[str] | None = None,
 ) -> list[str]:
     """Join detached suffix tokens with their preceding base token.
-
+    Args:
+        tokens: The tokens to process.
+        suffixes: The set of suffixes to consider. Defaults to
+            `DEFAULT_DETACHED_SUFFIXES`.
+        allow_without_apostrophe: Whether to join suffixes that are not
+            preceded by an apostrophe. Defaults to True.
+        apostrophes: The set of apostrophe tokens to consider. Defaults to
+            `APOSTROPHE_TOKENS`.
+    Returns:
+        A list of tokens with detached suffixes attached.
     Examples:
         >>> attach_detached_suffixes(["ankara", "'", "da"])
         ["ankara'da"]

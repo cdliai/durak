@@ -34,7 +34,12 @@ TRAILING_PUNCTUATION = {".", ",", "!", "?", ";", ":"}
 
 
 def normalize_unicode(text: str) -> str:
-    """Apply NFC normalization and map variants to standard characters."""
+    """Apply NFC normalization and map variants to standard characters.
+    Args:
+        text: The text to normalize.
+    Returns:
+        The normalized text.
+    """
     if not text:
         return ""
     normalized = unicodedata.normalize("NFC", text)
@@ -43,7 +48,12 @@ def normalize_unicode(text: str) -> str:
 
 
 def strip_html(text: str) -> str:
-    """Remove HTML tags, script/style content, and unescape HTML entities."""
+    """Remove HTML tags, script/style content, and unescape HTML entities.
+    Args:
+        text: The text to strip HTML from.
+    Returns:
+        The text with HTML removed.
+    """
     if not text:
         return ""
     without_blocks = SCRIPT_STYLE_PATTERN.sub(" ", text)
@@ -53,7 +63,12 @@ def strip_html(text: str) -> str:
 
 
 def collapse_whitespace(text: str) -> str:
-    """Collapse consecutive whitespace characters into a single space."""
+    """Collapse consecutive whitespace characters into a single space.
+    Args:
+        text: The text to collapse whitespace in.
+    Returns:
+        The text with whitespace collapsed.
+    """
     if not text:
         return ""
     collapsed = WHITESPACE_PATTERN.sub(" ", text).strip()
@@ -61,7 +76,16 @@ def collapse_whitespace(text: str) -> str:
 
 
 def normalize_case(text: str, mode: str = "lower") -> str:
-    """Normalize text casing with Turkish dotted/undotted I awareness."""
+    """Normalize text casing with Turkish dotted/undotted I awareness.
+    Args:
+        text: The text to normalize.
+        mode: The normalization mode. Can be "lower", "upper", or "none".
+            Defaults to "lower".
+    Returns:
+        The normalized text.
+    Raises:
+        ValueError: If an unsupported mode is provided.
+    """
     if not text or mode == "none":
         return text
 
@@ -100,7 +124,12 @@ def _strip_trailing_punctuation(match: re.Match[str]) -> str:
 
 
 def remove_urls(text: str) -> str:
-    """Remove HTTP(S) and www-prefixed URLs while keeping trailing punctuation."""
+    """Remove HTTP(S) and www-prefixed URLs while keeping trailing punctuation.
+    Args:
+        text: The text to remove URLs from.
+    Returns:
+        The text with URLs removed.
+    """
     if not text:
         return ""
     cleaned = URL_PATTERN.sub(_strip_trailing_punctuation, text)
@@ -108,7 +137,13 @@ def remove_urls(text: str) -> str:
 
 
 def remove_mentions_hashtags(text: str, *, keep_hash: bool = False) -> str:
-    """Remove @mentions and hashtags"""
+    """Remove @mentions and hashtags.
+    Args:
+        text: The text to remove mentions and hashtags from.
+        keep_hash: Whether to keep the hashtag symbol. Defaults to False.
+    Returns:
+        The text with mentions and hashtags removed.
+    """
     if not text:
         return ""
     without_mentions = MENTION_PATTERN.sub(" ", text)
@@ -122,7 +157,16 @@ def remove_mentions_hashtags(text: str, *, keep_hash: bool = False) -> str:
 
 
 def remove_repeated_chars(text: str, *, max_repeats: int = 2) -> str:
-    """Limit elongated characters and emojis to a maximum repeat threshold."""
+    """Limit elongated characters and emojis to a maximum repeat threshold.
+    Args:
+        text: The text to remove repeated characters from.
+        max_repeats: The maximum number of times a character can be repeated.
+            Defaults to 2.
+    Returns:
+        The text with repeated characters removed.
+    Raises:
+        ValueError: If max_repeats is less than 1.
+    """
     if not text:
         return ""
     if max_repeats < 1:
@@ -151,7 +195,14 @@ DEFAULT_CLEANING_STEPS: tuple[Callable[[str], str], ...] = (
 def clean_text(
     text: str | None, *, steps: Iterable[Callable[[str], str]] | None = None
 ) -> str:
-    """Apply the configured cleaning steps sequentially."""
+    """Apply the configured cleaning steps sequentially.
+    Args:
+        text: The text to clean.
+        steps: An iterable of cleaning functions to apply. Defaults to
+            `DEFAULT_CLEANING_STEPS`.
+    Returns:
+        The cleaned text.
+    """
     if not text:
         return ""
     pipeline = tuple(steps) if steps is not None else DEFAULT_CLEANING_STEPS

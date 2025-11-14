@@ -1,4 +1,8 @@
-"""Durak Turkish NLP toolkit."""
+"""Durak: A Turkish Natural Language Processing Toolkit.
+
+Durak is a comprehensive toolkit for Turkish NLP, providing essential tools for
+text cleaning, tokenization, stopword removal, and more.
+"""
 
 from __future__ import annotations
 
@@ -53,5 +57,7 @@ __all__ = [
 
 try:
     __version__ = metadata.version("durak-nlp")
+    """The version of the Durak package."""
 except metadata.PackageNotFoundError:  # pragma: no cover - fallback during dev installs
     __version__ = "0.2.0"
+    """The version of the Durak package."""

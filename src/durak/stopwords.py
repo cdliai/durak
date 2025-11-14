@@ -199,7 +199,16 @@ def load_stopword_resource(
     metadata_path: Path | str | None = None,
     case_sensitive: bool = False,
 ) -> set[str]:
-    """Load a stopword resource defined in metadata, applying inheritance."""
+    """Load a stopword resource defined in metadata, applying inheritance.
+    Args:
+        resource_name: The name of the stopword resource to load.
+        metadata_path: The path to the stopword metadata file. Defaults to
+            the path of the default metadata file.
+        case_sensitive: Whether to treat stopwords as case-sensitive.
+            Defaults to False.
+    Returns:
+        A set of stopwords.
+    """
     metadata = _resolve_metadata_path(metadata_path).resolve()
     words = _load_stopword_resource_cached(
         str(metadata),
@@ -215,7 +224,16 @@ def load_stopword_resources(
     metadata_path: Path | str | None = None,
     case_sensitive: bool = False,
 ) -> set[str]:
-    """Load and merge multiple stopword resources."""
+    """Load and merge multiple stopword resources.
+    Args:
+        resource_names: An iterable of stopword resource names to load.
+        metadata_path: The path to the stopword metadata file. Defaults to
+            the path of the default metadata file.
+        case_sensitive: Whether to treat stopwords as case-sensitive.
+            Defaults to False.
+    Returns:
+        A set of merged stopwords.
+    """
     merged: set[str] = set()
     for name in resource_names:
         merged.update(
@@ -233,7 +251,14 @@ def _normalize(token: str, *, case_sensitive: bool) -> str:
 
 
 def load_stopwords(path: Path | str, *, case_sensitive: bool = False) -> set[str]:
-    """Load newline-delimited stopwords from a file."""
+    """Load newline-delimited stopwords from a file.
+    Args:
+        path: The path to the stopword file.
+        case_sensitive: Whether to treat stopwords as case-sensitive.
+            Defaults to False.
+    Returns:
+        A set of stopwords.
+    """
     entries: set[str] = set()
     raw_text = Path(path).read_text(encoding="utf-8")
     for line in raw_text.splitlines():
@@ -259,7 +284,19 @@ def remove_stopwords(
     case_sensitive: bool | None = None,
 ) -> list[str]:
     """Return tokens that are not stopwords.
-
+    Args:
+        tokens: The tokens to filter.
+        manager: A `StopwordManager` instance to use.
+        base: The base set of stopwords to use.
+        additions: A set of stopwords to add to the base set.
+        keep: A set of words to keep, even if they are in the stopword list.
+        case_sensitive: Whether to treat stopwords as case-sensitive.
+    Returns:
+        A list of tokens with stopwords removed.
+    Raises:
+        ValueError: If a manager is provided along with base, additions, or
+            keep, or if case_sensitive is provided and does not match the
+            manager's case_sensitive setting.
     Examples:
         >>> remove_stopwords(["bu", "bir", "test"])
         ['test']
@@ -334,7 +371,15 @@ def is_stopword(
     case_sensitive: bool = False,
 ) -> bool:
     """Return True if the token is present in the selected stopword set.
-
+    Args:
+        token: The token to check.
+        resource: The stopword resource to use. Defaults to the base resource.
+        metadata_path: The path to the stopword metadata file. Defaults to
+            the path of the default metadata file.
+        case_sensitive: Whether to treat stopwords as case-sensitive.
+            Defaults to False.
+    Returns:
+        True if the token is a stopword, False otherwise.
     Examples:
         >>> is_stopword("ve")
         True
@@ -362,7 +407,16 @@ def list_stopwords(
     sort: bool = True,
 ) -> list[str]:
     """Return the stopword list for the selected resource(s).
-
+    Args:
+        resource: The stopword resource to use. Defaults to the base resource.
+        metadata_path: The path to the stopword metadata file. Defaults to
+            the path of the default metadata file.
+        case_sensitive: Whether to treat stopwords as case-sensitive.
+            Defaults to False.
+        sort: Whether to sort the returned list of stopwords. Defaults to
+            True.
+    Returns:
+        A list of stopwords.
     Examples:
         >>> list_stopwords()[:3]
         ['acaba', 'ama', 'aslında']
@@ -377,13 +431,26 @@ def list_stopwords(
 
 @dataclass(frozen=True)
 class StopwordSnapshot:
+    """A snapshot of the state of a `StopwordManager`.
+    Attributes:
+        stopwords: A frozenset of the stopwords.
+        keep_words: A frozenset of the words to keep.
+        case_sensitive: Whether the stopword manager is case-sensitive.
+    """
+
     stopwords: frozenset[str]
     keep_words: frozenset[str]
     case_sensitive: bool
 
 
 class StopwordManager:
-    """Manage stopword sets with extension and keep-list support."""
+    """Manage stopword sets with extension and keep-list support.
+    Args:
+        base: The base set of stopwords to use.
+        additions: A set of stopwords to add to the base set.
+        keep: A set of words to keep, even if they are in the stopword list.
+        case_sensitive: Whether to treat stopwords as case-sensitive.
+    """
 
     def __init__(
         self,
@@ -407,16 +474,25 @@ class StopwordManager:
 
     @property
     def stopwords(self) -> frozenset[str]:
+        """The current set of stopwords."""
         return frozenset(self._stopwords)
 
     @property
     def keep_words(self) -> frozenset[str]:
+        """The current set of words to keep."""
         return frozenset(self._keep_words)
 
     def snapshot(self) -> StopwordSnapshot:
+        """Return a snapshot of the current state of the manager."""
         return StopwordSnapshot(self.stopwords, self.keep_words, self.case_sensitive)
 
     def is_stopword(self, token: str | None) -> bool:
+        """Return True if the token is a stopword.
+        Args:
+            token: The token to check.
+        Returns:
+            True if the token is a stopword, False otherwise.
+        """
         if token is None:
             return False
         normalized = _normalize(token, case_sensitive=self.case_sensitive)
@@ -425,17 +501,29 @@ class StopwordManager:
         return normalized in self._stopwords
 
     def add(self, words: Iterable[str]) -> None:
+        """Add words to the stopword list.
+        Args:
+            words: An iterable of words to add.
+        """
         for word in words:
             normalized = _normalize(word, case_sensitive=self.case_sensitive)
             if normalized and normalized not in self._keep_words:
                 self._stopwords.add(normalized)
 
     def remove(self, words: Iterable[str]) -> None:
+        """Remove words from the stopword list.
+        Args:
+            words: An iterable of words to remove.
+        """
         for word in words:
             normalized = _normalize(word, case_sensitive=self.case_sensitive)
             self._stopwords.discard(normalized)
 
     def add_keep_words(self, words: Iterable[str]) -> None:
+        """Add words to the keep list.
+        Args:
+            words: An iterable of words to add to the keep list.
+        """
         for word in words:
             normalized = _normalize(word, case_sensitive=self.case_sensitive)
             if normalized:
@@ -443,9 +531,21 @@ class StopwordManager:
                 self._stopwords.discard(normalized)
 
     def load_additions(self, path: Path | str) -> None:
+        """Load stopwords from a file and add them to the stopword list.
+        Args:
+            path: The path to the file containing the stopwords.
+        """
         self.add(load_stopwords(path, case_sensitive=self.case_sensitive))
 
     def export(self, path: Path | str, *, fmt: str = "txt") -> None:
+        """Export the stopword list to a file.
+        Args:
+            path: The path to the file to export the stopwords to.
+            fmt: The format to export the stopwords in. Can be "txt" or "json".
+                Defaults to "txt".
+        Raises:
+            ValueError: If an unsupported format is provided.
+        """
         dest = Path(path)
         words = sorted(self.stopwords)
         if fmt == "txt":
@@ -458,6 +558,7 @@ class StopwordManager:
             raise ValueError("Unsupported fmt; use 'txt' or 'json'.")
 
     def to_dict(self) -> dict[str, object]:
+        """Return a dictionary representation of the stopword manager."""
         return {
             "stopwords": sorted(self.stopwords),
             "keep_words": sorted(self.keep_words),
@@ -472,6 +573,16 @@ class StopwordManager:
         keep: Iterable[Path | str] = (),
         case_sensitive: bool = False,
     ) -> StopwordManager:
+        """Create a `StopwordManager` from files.
+        Args:
+            additions: An iterable of paths to files containing stopwords to
+                add.
+            keep: An iterable of paths to files containing words to keep.
+            case_sensitive: Whether to treat stopwords as case-sensitive.
+                Defaults to False.
+        Returns:
+            A `StopwordManager` instance.
+        """
         manager = cls(case_sensitive=case_sensitive)
         for addition_path in additions:
             manager.load_additions(addition_path)
@@ -490,7 +601,18 @@ class StopwordManager:
         keep: Iterable[str] | None = None,
         case_sensitive: bool = False,
     ) -> StopwordManager:
-        """Factory that loads base words from metadata-defined resources."""
+        """Factory that loads base words from metadata-defined resources.
+        Args:
+            resource_names: An iterable of stopword resource names to load.
+            metadata_path: The path to the stopword metadata file. Defaults to
+                the path of the default metadata file.
+            additions: A set of stopwords to add to the base set.
+            keep: A set of words to keep, even if they are in the stopword list.
+            case_sensitive: Whether to treat stopwords as case-sensitive.
+                Defaults to False.
+        Returns:
+            A `StopwordManager` instance.
+        """
         names = (
             tuple(resource_names)
             if resource_names
