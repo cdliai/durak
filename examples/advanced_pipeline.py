@@ -4,6 +4,8 @@ Demonstrates creating custom text processing pipelines with
 domain-specific stopwords, suffix attachment, and lemmatization.
 """
 
+from __future__ import annotations
+
 import durak
 from durak import StopwordManager
 
@@ -59,11 +61,11 @@ def main():
 
         def __init__(
             self,
-            attach_suffixes=True,
-            remove_stopwords=True,
-            normalize=True,
-            custom_stopwords=None,
-        ):
+            attach_suffixes: bool = True,
+            remove_stopwords: bool = True,
+            normalize: bool = True,
+            custom_stopwords: list[str] | None = None,
+        ) -> None:
             self.attach_suffixes = attach_suffixes
             self.remove_stopwords = remove_stopwords
             self.normalize = normalize
@@ -73,7 +75,7 @@ def main():
             else:
                 self.stopword_mgr = StopwordManager()
 
-        def __call__(self, text):
+        def __call__(self, text: str) -> list[str]:
             """Process text through the pipeline."""
             # Clean and normalize
             processed = durak.clean_text(text)
