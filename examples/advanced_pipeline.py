@@ -4,7 +4,7 @@ Demonstrates creating custom text processing pipelines with
 domain-specific stopwords, suffix attachment, and lemmatization.
 """
 
-from typing import Optional
+from __future__ import annotations
 
 import durak
 from durak import StopwordManager
@@ -64,7 +64,7 @@ def main():
             attach_suffixes: bool = True,
             remove_stopwords: bool = True,
             normalize: bool = True,
-            custom_stopwords: Optional[list[str]] = None,
+            custom_stopwords: list[str] | None = None,
         ) -> None:
             self.attach_suffixes = attach_suffixes
             self.remove_stopwords = remove_stopwords
