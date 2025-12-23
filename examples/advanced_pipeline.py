@@ -5,7 +5,6 @@ domain-specific stopwords, suffix attachment, and lemmatization.
 """
 
 import durak
-from durak import StopwordManager
 
 
 def main():
@@ -26,7 +25,7 @@ def main():
     print("-" * 60)
 
     # Create a stopword manager with custom additions
-    stopword_mgr = StopwordManager(
+    stopword_mgr = durak.StopwordManager(
         additions=["bugün", "çok"],  # Add custom stopwords
         keep=["var", "git"],  # Keep these even if they're stopwords
     )
@@ -69,9 +68,9 @@ def main():
             self.normalize = normalize
 
             if custom_stopwords:
-                self.stopword_mgr = StopwordManager(additions=custom_stopwords)
+                self.stopword_mgr = durak.StopwordManager(additions=custom_stopwords)
             else:
-                self.stopword_mgr = StopwordManager()
+                self.stopword_mgr = durak.StopwordManager()
 
         def __call__(self, text):
             """Process text through the pipeline."""
