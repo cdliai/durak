@@ -189,6 +189,7 @@ stripped = _durak_core.strip_suffixes("kitaplardan")  # "kitap"
 # Option 3: Stanza Turkish model
 
 # Then integrate with Durak pipeline:
+import durak
 from durak import Pipeline
 
 pipeline = Pipeline([
