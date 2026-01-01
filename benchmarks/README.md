@@ -67,6 +67,15 @@ print(f"Average: {result_ms:.4f} ms per call")
 
 4. **Pre-compile pipelines** outside loops:
    ```python
-   pipeline = durak.Pipeline(...)
+   from durak import Pipeline, Normalizer, StopwordManager
+   
+   # Pipeline expects callable objects
+   normalizer = Normalizer()
+   stopword_mgr = StopwordManager()
+   
+   pipeline = Pipeline([
+       normalizer,
+       lambda tokens: [t for t in tokens if not stopword_mgr.is_stopword(t)]
+   ])
    results = [pipeline(text) for text in texts]
    ```
