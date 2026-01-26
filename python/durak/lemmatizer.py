@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Literal
 
 try:
-    from _durak_core import lookup_lemma, strip_suffixes
+    from durak._durak_core import lookup_lemma, strip_suffixes
 except ImportError:
     def lookup_lemma(word: str) -> str | None:
         raise ImportError("Rust extension not installed")

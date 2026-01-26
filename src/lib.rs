@@ -9,6 +9,7 @@ static DETACHED_SUFFIXES_DATA: &str = include_str!("../resources/tr/labels/DETAC
 static STOPWORDS_TR_DATA: &str = include_str!("../resources/tr/stopwords/base/turkish.txt");
 static STOPWORDS_METADATA_DATA: &str = include_str!("../resources/tr/stopwords/metadata.json");
 static STOPWORDS_SOCIAL_MEDIA_DATA: &str = include_str!("../resources/tr/stopwords/domains/social_media.txt");
+static LEMMA_DICT_DATA: &str = include_str!("../resources/tr/lemmas/turkish_lemma_dict.txt");
 
 static LEMMA_DICT: OnceLock<HashMap<&'static str, &'static str>> = OnceLock::new();
 static TOKEN_REGEX: OnceLock<Regex> = OnceLock::new();
@@ -17,11 +18,21 @@ static STOPWORDS_BASE: OnceLock<Vec<&'static str>> = OnceLock::new();
 
 fn get_lemma_dict() -> &'static HashMap<&'static str, &'static str> {
     LEMMA_DICT.get_or_init(|| {
+        // Load Turkish lemma dictionary from embedded TSV resource
+        // Format: inflected_form<TAB>lemma
         let mut m = HashMap::new();
-        // Tier 1: Dictionary Lookup (Mock Data for PoC)
-        m.insert("kitaplar", "kitap");
-        m.insert("geliyorum", "gel");
-        m.insert("gittim", "git");
+        
+        for line in LEMMA_DICT_DATA.lines() {
+            let line = line.trim();
+            if line.is_empty() || line.starts_with('#') {
+                continue;
+            }
+            
+            if let Some((inflected, lemma)) = line.split_once('\t') {
+                m.insert(inflected.trim(), lemma.trim());
+            }
+        }
+        
         m
     })
 }
