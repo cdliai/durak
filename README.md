@@ -116,6 +116,42 @@ suffixes = _durak_core.get_detached_suffixes()
 - **Offset tracking**: Character-accurate positions for NER and span tasks
 - **Embedded resources**: Zero file I/O, compiled directly into binary
 - **Type-safe**: Complete `.pyi` stubs for IDE support and static analysis
+- **Standalone CLI**: Command-line interface for shell scripting and pipelines
+
+## Command-Line Interface
+
+Durak includes a standalone CLI binary for Turkish text processing without Python dependencies.
+
+### Quick Start
+
+```bash
+# Build the CLI (requires Rust toolchain)
+cargo build --release --bin durak
+
+# Tokenize text
+./target/release/durak tokenize "İstanbul'a gittim"
+
+# Normalize text
+./target/release/durak normalize "TÜRKÇE"
+
+# JSON output for scripting
+./target/release/durak tokenize --json "Merhaba dünya!"
+```
+
+### Shell Pipelines
+
+```bash
+# Process files with Unix pipes
+cat corpus.txt | durak tokenize > tokens.txt
+
+# Count unique tokens
+durak tokenize < input.txt | sort | uniq -c | sort -rn
+
+# JSON processing with jq
+durak tokenize --json "Test" | jq '.tokens | length'
+```
+
+**See [CLI.md](docs/CLI.md) for complete documentation, examples, and advanced usage.**
 
 ## Development Setup
 
@@ -175,6 +211,7 @@ durak/
 
 ## Documentation
 
+- **[CLI Guide](docs/CLI.md)**: Command-line interface usage and examples
 - **[Architecture Guide](docs/ARCHITECTURE.md)**: Design principles and component architecture
 - **[Examples](examples/)**: Basic and advanced usage demonstrations
 - **[Benchmarks](benchmarks/)**: Performance comparison and optimization tips

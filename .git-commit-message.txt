@@ -1,0 +1,60 @@
+feat: Add standalone CLI interface for Turkish text processing (#26)
+
+Implements Issue #26: CLI Interface for Terminal Usage
+
+## What's New
+- **Standalone CLI binary** (`durak`) for Turkish NLP without Python dependencies
+- **Core functionality:**
+  - `durak tokenize` - Turkish-aware tokenization with apostrophe/clitic preservation
+  - `durak normalize` - Unicode-aware normalization (İ/ı, I/i handling)
+  - `durak version` - Build and version information
+- **JSON output** (`--json` flag) for scripting and pipelines
+- **Stdin support** for Unix-style text processing workflows
+
+## Architecture Changes
+- Refactored Rust core into `src/core.rs` (shared between Python bindings and CLI)
+- Updated `src/lib.rs` to use core module (maintains Python API compatibility)
+- Added `src/bin/durak.rs` - standalone CLI binary
+
+## Testing
+- Comprehensive CLI integration tests (`tests/cli_tests.rs`)
+- Tests cover Turkish character handling, JSON output, stdin/stdout, edge cases
+- All tests pass (`cargo test`)
+
+## Documentation
+- Created `docs/CLI.md` - complete CLI usage guide with examples
+- Updated `README.md` with CLI section and quick-start examples
+- Added shell pipeline examples and scripting patterns
+
+## Dependencies
+- Added `clap` (4.5) - CLI argument parsing
+- Added `atty` (0.2) - stdin detection
+- Added dev-dependencies: `assert_cmd`, `predicates` for integration testing
+
+## Features
+✅ Turkish morphology preservation (İstanbul'a, Ankara'da)
+✅ Correct İ/ı, I/i normalization
+✅ JSON output for scripting
+✅ Stdin/stdout support for Unix pipelines
+✅ Zero-dependency binary (embedded resources)
+✅ Production-ready error handling
+
+## Usage Examples
+
+```bash
+# Basic tokenization
+durak tokenize "İstanbul'a gittik"
+
+# JSON output
+durak tokenize --json "Merhaba dünya!"
+
+# Normalization
+durak normalize "TÜRKÇE"
+
+# Unix pipelines
+cat corpus.txt | durak tokenize | sort | uniq -c
+```
+
+See `docs/CLI.md` for complete documentation.
+
+Resolves #26
