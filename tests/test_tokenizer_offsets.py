@@ -1,11 +1,10 @@
 import pytest
-
 from durak.tokenizer import tokenize_with_offsets
 
 
 def test_offset_mapping():
     try:
-        import _durak_core  # noqa: F401
+        from durak import _durak_core  # noqa: F401
     except ImportError:
         pytest.skip("Rust extension not installed")
         
@@ -36,7 +35,7 @@ def test_offset_mapping():
 
 def test_turkish_offsets():
     try:
-        import _durak_core  # noqa: F401
+        from durak import _durak_core  # noqa: F401
     except ImportError:
         pytest.skip("Rust extension not installed")
         
@@ -56,7 +55,7 @@ def test_turkish_offsets():
     
 def test_mixed_content():
     try:
-        import _durak_core  # noqa: F401
+        from durak import _durak_core  # noqa: F401
     except ImportError:
         pytest.skip("Rust extension not installed")
         

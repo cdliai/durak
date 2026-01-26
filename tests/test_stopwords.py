@@ -2,7 +2,6 @@ import json
 from pathlib import Path
 
 import pytest
-
 from durak import (
     BASE_STOPWORDS,
     DEFAULT_STOPWORD_RESOURCE,

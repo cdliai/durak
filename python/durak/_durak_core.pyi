@@ -6,6 +6,51 @@ for Turkish text processing.
 
 from __future__ import annotations
 
+class Token:
+    """Token with offset mapping to original text.
+
+    Used for NER and other tasks requiring exact alignment with raw input.
+    The start and end attributes are CHARACTER offsets (not byte offsets) for
+    Python compatibility, ensuring text[start:end] correctly extracts the
+    original token from the raw text.
+
+    Attributes:
+        text: The token text (may be normalized, e.g., lowercased)
+        start: Start character offset in the original raw text
+        end: End character offset in the original raw text
+
+    Examples:
+        >>> token = Token("merhaba", 0, 7)
+        >>> token.text
+        'merhaba'
+        >>> token.start
+        0
+        >>> token.end
+        7
+    """
+
+    text: str
+    start: int
+    end: int
+
+    def __init__(self, text: str, start: int, end: int) -> None:
+        """Create a new Token.
+
+        Args:
+            text: The token text (may be normalized)
+            start: Start character offset in the original text
+            end: End character offset in the original text
+        """
+        ...
+
+    def __repr__(self) -> str:
+        """Return string representation of the token.
+
+        Returns:
+            String in format: Token(text='...', start=N, end=M)
+        """
+        ...
+
 def fast_normalize(text: str) -> str:
     """Fast normalization for Turkish text.
 
@@ -165,9 +210,49 @@ def get_stopwords_social_media() -> list[str]:
     """
     ...
 
+def tokenize_normalized(text: str) -> list[Token]:
+    """Tokenize text with normalization and return Token objects with offsets.
+
+    This function combines tokenization and normalization in a single pass,
+    returning Token objects that contain the normalized text along with
+    character offsets pointing to the original positions in the raw input.
+
+    This is essential for NER and other sequence labeling tasks where you need:
+    1. Normalized tokens for model input
+    2. Original character positions for label alignment
+
+    The normalization applies Turkish-specific lowercase conversion (İ→i, I→ı)
+    while preserving exact offset mapping to the raw text.
+
+    Args:
+        text: The text to tokenize and normalize
+
+    Returns:
+        List of Token objects with normalized text and original character offsets
+
+    Examples:
+        >>> tokens = tokenize_normalized("Ankara'da İstanbul'a gittim.")
+        >>> tokens[0].text
+        'ankara'
+        >>> tokens[0].start
+        0
+        >>> tokens[0].end
+        6
+        >>> # Original text can be recovered:
+        >>> # text[tokens[0].start:tokens[0].end] == "Ankara"
+
+        >>> # Use case: NER training with normalized input
+        >>> tokens = tokenize_normalized("İBB Başkanı Ekrem İmamoğlu")
+        >>> # Model sees: ['ibb', 'başkanı', 'ekrem', 'imamoğlu']
+        >>> # But labels align with: [(0,3), (4,11), (12,17), (18,26)]
+    """
+    ...
+
 __all__ = [
+    "Token",
     "fast_normalize",
     "tokenize_with_offsets",
+    "tokenize_normalized",
     "lookup_lemma",
     "strip_suffixes",
     "get_detached_suffixes",

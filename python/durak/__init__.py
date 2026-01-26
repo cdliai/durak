@@ -73,5 +73,11 @@ except metadata.PackageNotFoundError:  # pragma: no cover - fallback during dev 
 # Import Rust extension - gracefully degrade if not available
 try:
     from . import _durak_core
+    from ._durak_core import Token, tokenize_normalized
+    
+    # Add to __all__
+    __all__.extend(["Token", "tokenize_normalized"])
 except ImportError:
     _durak_core = None  # type: ignore[assignment]
+    Token = None  # type: ignore[assignment]
+    tokenize_normalized = None  # type: ignore[assignment]
