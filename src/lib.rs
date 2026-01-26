@@ -2,6 +2,7 @@ use pyo3::prelude::*;
 use std::collections::HashMap;
 use std::sync::OnceLock;
 use regex::Regex;
+use serde::{Deserialize, Serialize};
 
 // Embedded resources using include_str! for zero-overhead loading
 // Resources are compiled directly into the binary at build time
@@ -9,6 +10,7 @@ static DETACHED_SUFFIXES_DATA: &str = include_str!("../resources/tr/labels/DETAC
 static STOPWORDS_TR_DATA: &str = include_str!("../resources/tr/stopwords/base/turkish.txt");
 static STOPWORDS_METADATA_DATA: &str = include_str!("../resources/tr/stopwords/metadata.json");
 static STOPWORDS_SOCIAL_MEDIA_DATA: &str = include_str!("../resources/tr/stopwords/domains/social_media.txt");
+static RESOURCE_METADATA: &str = include_str!("../resources/metadata.json");
 
 static LEMMA_DICT: OnceLock<HashMap<&'static str, &'static str>> = OnceLock::new();
 static TOKEN_REGEX: OnceLock<Regex> = OnceLock::new();
@@ -86,6 +88,39 @@ fn tokenize_with_offsets(text: &str) -> Vec<(String, usize, usize)> {
             let char_end = char_start + char_len;
             
             results.push((token, char_start, char_end));
+        }
+    }
+    results
+}
+
+/// Tokenize text and return normalized tokens with offsets pointing to original text.
+/// This is the NER-friendly version: tokens are normalized but offsets reference the raw input.
+/// 
+/// # Example
+/// ```rust
+/// let text = "İstanbul'a gittim";
+/// let tokens = tokenize_with_normalized_offsets(text);
+/// // Returns: [("istanbul'a", 0, 10), ("gittim", 11, 17)]
+/// // Note: tokens are lowercased but offsets still point to "İstanbul'a" in original
+/// ```
+#[pyfunction]
+fn tokenize_with_normalized_offsets(text: &str) -> Vec<(String, usize, usize)> {
+    let re = get_token_regex();
+    let mut results = Vec::new();
+
+    for caps in re.captures_iter(text) {
+        if let Some(mat) = caps.get(0) {
+            let token = mat.as_str();
+            let normalized_token = fast_normalize(token);
+            
+            let byte_start = mat.start();
+            let byte_end = mat.end();
+            
+            let char_start = text[..byte_start].chars().count();
+            let char_len = text[byte_start..byte_end].chars().count();
+            let char_end = char_start + char_len;
+            
+            results.push((normalized_token, char_start, char_end));
         }
     }
     results
@@ -169,6 +204,85 @@ fn get_stopwords_social_media() -> Vec<String> {
         .collect()
 }
 
+// ============================================================================
+// Reproducibility & Versioning API
+// ============================================================================
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+struct ResourceInfo {
+    name: String,
+    version: String,
+    source: String,
+    checksum: String,
+    item_count: usize,
+    last_updated: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct ResourceMetadata {
+    version: String,
+    build_date: String,
+    resources: HashMap<String, ResourceInfo>,
+}
+
+/// Get build information for reproducibility tracking.
+/// Returns a dictionary with Durak version, build date, and Rust compiler version.
+///
+/// # Example
+/// ```python
+/// from durak import get_build_info
+/// info = get_build_info()
+/// print(info['durak_version'])  # '0.4.0'
+/// ```
+#[pyfunction]
+fn get_build_info() -> HashMap<String, String> {
+    let mut info = HashMap::new();
+    info.insert("durak_version".to_string(), env!("CARGO_PKG_VERSION").to_string());
+    info.insert("package_name".to_string(), env!("CARGO_PKG_NAME").to_string());
+    
+    // Build date would need to be set via build.rs or env vars
+    // For now, we'll use the embedded metadata's build_date
+    if let Ok(metadata) = serde_json::from_str::<ResourceMetadata>(RESOURCE_METADATA) {
+        info.insert("build_date".to_string(), metadata.build_date);
+    }
+    
+    // Rust version (optional, may not be available in all builds)
+    #[cfg(feature = "rust_version")]
+    info.insert("rust_version".to_string(), env!("CARGO_PKG_RUST_VERSION").to_string());
+    
+    info
+}
+
+/// Get embedded resource versions and checksums for reproducibility.
+/// Returns a dictionary mapping resource names to their metadata (version, checksum, item count, etc.)
+///
+/// # Example
+/// ```python
+/// from durak import get_resource_info
+/// resources = get_resource_info()
+/// print(resources['stopwords_base']['checksum'])  # 'a3f5b8c9d2e1f4a7...'
+/// print(resources['stopwords_base']['item_count'])  # 442
+/// ```
+#[pyfunction]
+fn get_resource_info() -> HashMap<String, HashMap<String, String>> {
+    let metadata: ResourceMetadata = serde_json::from_str(RESOURCE_METADATA)
+        .expect("Failed to parse embedded resource metadata");
+    
+    // Convert to Python-friendly format (all strings for simplicity)
+    let mut result = HashMap::new();
+    for (key, info) in metadata.resources {
+        let mut resource_map = HashMap::new();
+        resource_map.insert("name".to_string(), info.name);
+        resource_map.insert("version".to_string(), info.version);
+        resource_map.insert("source".to_string(), info.source);
+        resource_map.insert("checksum".to_string(), info.checksum);
+        resource_map.insert("item_count".to_string(), info.item_count.to_string());
+        resource_map.insert("last_updated".to_string(), info.last_updated);
+        result.insert(key, resource_map);
+    }
+    result
+}
+
 /// The internal Rust part of the Durak library.
 /// High-performance Turkish NLP operations with embedded resources.
 #[pymodule]
@@ -176,6 +290,7 @@ fn _durak_core(_py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {
     // Core text processing functions
     m.add_function(wrap_pyfunction!(fast_normalize, m)?)?;
     m.add_function(wrap_pyfunction!(tokenize_with_offsets, m)?)?;
+    m.add_function(wrap_pyfunction!(tokenize_with_normalized_offsets, m)?)?;
 
     // Lemmatization functions
     m.add_function(wrap_pyfunction!(lookup_lemma, m)?)?;
@@ -186,6 +301,10 @@ fn _durak_core(_py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(get_stopwords_base, m)?)?;
     m.add_function(wrap_pyfunction!(get_stopwords_metadata, m)?)?;
     m.add_function(wrap_pyfunction!(get_stopwords_social_media, m)?)?;
+
+    // Reproducibility & versioning API
+    m.add_function(wrap_pyfunction!(get_build_info, m)?)?;
+    m.add_function(wrap_pyfunction!(get_resource_info, m)?)?;
 
     Ok(())
 }

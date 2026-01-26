@@ -174,4 +174,42 @@ __all__ = [
     "get_stopwords_base",
     "get_stopwords_metadata",
     "get_stopwords_social_media",
+    "get_build_info",
+    "get_resource_info",
+    "get_build_info",
+    "get_resource_info",
 ]
+
+def get_build_info() -> Dict[str, str]:
+    """Get Durak build information for reproducibility.
+    
+    Returns build metadata including package version, build date, and
+    package name for research reproducibility tracking.
+    
+    Returns:
+        Dictionary with keys: durak_version, build_date, package_name
+    
+    Examples:
+        >>> info = get_build_info()
+        >>> print(info['durak_version'])
+        '0.4.0'
+    """
+    ...
+
+def get_resource_info() -> Dict[str, Dict[str, str]]:
+    """Get embedded resource versions and checksums.
+    
+    Returns metadata for all linguistic resources embedded in the binary,
+    including versions, SHA256 checksums, item counts, and update dates.
+    
+    Returns:
+        Dictionary mapping resource names to their metadata
+    
+    Examples:
+        >>> resources = get_resource_info()
+        >>> print(resources['stopwords_base']['checksum'][:12])
+        '361908bbb0a4'
+        >>> print(resources['stopwords_base']['item_count'])
+        '118'
+    """
+    ...
