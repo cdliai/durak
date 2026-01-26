@@ -1,0 +1,46 @@
+{
+  "version": "0.4.0",
+  "build_date": "2026-01-26T08:30:51.849239Z",
+  "resources": {
+    "stopwords_base": {
+      "name": "Turkish Stopwords (Base)",
+      "version": "1.0.0",
+      "source": "Curated by Durak team",
+      "checksum": "361908bbb0a44efc7dcb2dfb600d13a64d3982623701bd4057e0af69ca6d0b04",
+      "item_count": 118,
+      "last_updated": "2026-01-26"
+    },
+    "stopwords_social_media": {
+      "name": "Turkish Stopwords (Social Media)",
+      "version": "1.0.0",
+      "source": "Social media corpus analysis",
+      "checksum": "1469b2b0cf2a83dfe18eb6e9d7043e639f301b5a03473fa22f9d39f326ebc5d4",
+      "item_count": 11,
+      "last_updated": "2026-01-26"
+    },
+    "detached_suffixes": {
+      "name": "Turkish Detached Suffixes",
+      "version": "1.0.0",
+      "source": "Turkish grammar rules",
+      "checksum": "b4d672bec0fca3ac87835a19095698c7080fff7bf96bbf67b3e4e1aa6bbbaea7",
+      "item_count": 14,
+      "last_updated": "2026-01-26"
+    },
+    "apostrophes": {
+      "name": "Turkish Apostrophe Rules",
+      "version": "1.0.0",
+      "source": "Turkish orthography standards",
+      "checksum": "6166a0447c04ffdfad71f7882ef83a916e3debc51ab8639392603f50106dea05",
+      "item_count": 2,
+      "last_updated": "2026-01-26"
+    },
+    "lemma_suffixes": {
+      "name": "Turkish Lemmatization Suffixes",
+      "version": "1.0.0",
+      "source": "Turkish morphology rules",
+      "checksum": "2e5aeb7f0aeb3608fdd00530bba8f7ad827bde91ee0044688e3d1d80936be8bc",
+      "item_count": 30,
+      "last_updated": "2026-01-26"
+    }
+  }
+}
