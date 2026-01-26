@@ -238,7 +238,8 @@ def tokenize_normalized(text: str) -> list[Token]:
         0
         >>> tokens[0].end
         6
-        >>> # Original text can be recovered: text[tokens[0].start:tokens[0].end] == "Ankara"
+        >>> # Original text can be recovered:
+        >>> # text[tokens[0].start:tokens[0].end] == "Ankara"
 
         >>> # Use case: NER training with normalized input
         >>> tokens = tokenize_normalized("İBB Başkanı Ekrem İmamoğlu")

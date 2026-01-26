@@ -5,7 +5,8 @@ This example demonstrates how to use Durak's offset mapping feature
 to perform NER while preserving the exact positions in the original text.
 """
 
-from durak import tokenize_normalized, Token
+from durak import tokenize_normalized
+
 
 def extract_entities_with_positions(text: str) -> list[tuple[str, int, int, str]]:
     """
@@ -51,7 +52,10 @@ def main():
     tokens = tokenize_normalized(text2)
     for token in tokens:
         original = text2[token.start:token.end]
-        print(f"  Normalized: '{token.text}' | Original: '{original}' | Position: [{token.start}:{token.end}]")
+        print(
+            f"  Normalized: '{token.text}' | Original: '{original}' "
+            f"| Position: [{token.start}:{token.end}]"
+        )
     
     print()
     
@@ -73,8 +77,14 @@ def main():
     print("Integration with transformers:")
     print("You can now pass these offsets directly to BERT/Transformers:")
     print("  tokens = [token.text for token in tokenize_normalized(text)]")
-    print("  offsets = [(token.start, token.end) for token in tokenize_normalized(text)]")
-    print("  # Use offsets to align BERT predictions with original text positions")
+    print(
+        "  offsets = [(token.start, token.end) "
+        "for token in tokenize_normalized(text)]"
+    )
+    print(
+        "  # Use offsets to align BERT predictions "
+        "with original text positions"
+    )
 
 if __name__ == "__main__":
     main()
