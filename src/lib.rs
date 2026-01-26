@@ -3,6 +3,36 @@ use std::collections::HashMap;
 use std::sync::OnceLock;
 use regex::Regex;
 
+/// Token with offset mapping to original text.
+/// Used for NER and other tasks requiring exact alignment with raw input.
+/// Note: start and end are BYTE offsets (not character offsets) for efficiency.
+/// This matches how Rust string slicing works and is compatible with modern NLP tools.
+#[pyclass]
+#[derive(Debug, Clone)]
+pub struct Token {
+    /// The token text (may be normalized)
+    #[pyo3(get)]
+    pub text: String,
+    /// Start byte offset in the original raw text
+    #[pyo3(get)]
+    pub start: usize,
+    /// End byte offset in the original raw text
+    #[pyo3(get)]
+    pub end: usize,
+}
+
+#[pymethods]
+impl Token {
+    #[new]
+    fn new(text: String, start: usize, end: usize) -> Self {
+        Token { text, start, end }
+    }
+
+    fn __repr__(&self) -> String {
+        format!("Token(text='{}', start={}, end={})", self.text, self.start, self.end)
+    }
+}
+
 // Embedded resources using include_str! for zero-overhead loading
 // Resources are compiled directly into the binary at build time
 static DETACHED_SUFFIXES_DATA: &str = include_str!("../resources/tr/labels/DETACHED_SUFFIXES.txt");
@@ -91,6 +121,37 @@ fn tokenize_with_offsets(text: &str) -> Vec<(String, usize, usize)> {
     results
 }
 
+/// Tokenize and normalize text while preserving offset mapping to the original raw text.
+/// This is the key function for NER and other research tasks where you need both
+/// normalized tokens AND their exact position in the original input.
+/// Returns a list of Token objects with { text: normalized_token, start, end }.
+/// Note: start/end are BYTE offsets (compatible with Rust slicing and modern NLP tools).
+#[pyfunction]
+fn tokenize_normalized(text: &str) -> Vec<Token> {
+    let re = get_token_regex();
+    let mut results = Vec::new();
+
+    for caps in re.captures_iter(text) {
+        if let Some(mat) = caps.get(0) {
+            let original_token = mat.as_str();
+            
+            // Normalize the token text while keeping original byte offsets
+            let normalized_text = fast_normalize(original_token);
+            
+            // Use byte offsets directly from regex (efficient and correct for Rust slicing)
+            let byte_start = mat.start();
+            let byte_end = mat.end();
+            
+            results.push(Token {
+                text: normalized_text,
+                start: byte_start,
+                end: byte_end,
+            });
+        }
+    }
+    results
+}
+
 /// Tier 1: Exact Lookup
 #[pyfunction]
 fn lookup_lemma(word: &str) -> Option<String> {
@@ -173,9 +234,13 @@ fn get_stopwords_social_media() -> Vec<String> {
 /// High-performance Turkish NLP operations with embedded resources.
 #[pymodule]
 fn _durak_core(_py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {
+    // Token class
+    m.add_class::<Token>()?;
+
     // Core text processing functions
     m.add_function(wrap_pyfunction!(fast_normalize, m)?)?;
     m.add_function(wrap_pyfunction!(tokenize_with_offsets, m)?)?;
+    m.add_function(wrap_pyfunction!(tokenize_normalized, m)?)?;
 
     // Lemmatization functions
     m.add_function(wrap_pyfunction!(lookup_lemma, m)?)?;
@@ -188,4 +253,99 @@ fn _durak_core(_py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(get_stopwords_social_media, m)?)?;
 
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_tokenize_normalized_preserves_offsets() {
+        // Test case: "İstanbul'da" should normalize to "istanbul'da"
+        // but keep original byte offsets pointing to raw text
+        let text = "İstanbul'da güzel";
+        let tokens = tokenize_normalized(text);
+        
+        assert_eq!(tokens.len(), 2);
+        
+        // First token: "İstanbul'da" → "istanbul'da"
+        assert_eq!(tokens[0].text, "istanbul'da");
+        assert_eq!(tokens[0].start, 0);
+        // "İstanbul'da" = İ(2) + s(1) + t(1) + a(1) + n(1) + b(1) + u(1) + l(1) + '(1) + d(1) + a(1) = 12 bytes
+        assert_eq!(tokens[0].end, 12);
+        
+        // Verify we can extract original from byte offsets
+        let original_token = &text[tokens[0].start..tokens[0].end];
+        assert_eq!(original_token, "İstanbul'da");
+        
+        // Second token: "güzel" → "güzel"
+        assert_eq!(tokens[1].text, "güzel");
+        assert_eq!(tokens[1].start, 13); // After space (byte 12)
+        // "güzel" = g(1) + ü(2) + z(1) + e(1) + l(1) = 6 bytes
+        assert_eq!(tokens[1].end, 19);
+    }
+
+    #[test]
+    fn test_turkish_i_normalization_with_offsets() {
+        // Critical test: Turkish I/İ and i/ı handling
+        let text = "IŞIK İNSAN";
+        let tokens = tokenize_normalized(text);
+        
+        assert_eq!(tokens.len(), 2);
+        
+        // "IŞIK" should normalize to "ışık"
+        assert_eq!(tokens[0].text, "ışık");
+        assert_eq!(tokens[0].start, 0);
+        // I=1, Ş=2, I=1, K=1 = 5 bytes
+        assert_eq!(tokens[0].end, 5);
+        
+        // "İNSAN" should normalize to "insan"
+        assert_eq!(tokens[1].text, "insan");
+        assert_eq!(tokens[1].start, 6); // After space
+        // İ=2, N=1, S=1, A=1, N=1 = 6 bytes
+        assert_eq!(tokens[1].end, 12);
+        
+        // Verify original extraction using byte offsets
+        assert_eq!(&text[tokens[0].start..tokens[0].end], "IŞIK");
+        assert_eq!(&text[tokens[1].start..tokens[1].end], "İNSAN");
+    }
+
+    #[test]
+    fn test_offset_mapping_with_whitespace() {
+        // Whitespace should not be tokenized, byte offsets should skip it correctly
+        let text = "  Merhaba   dünya  ";
+        let tokens = tokenize_normalized(text);
+        
+        assert_eq!(tokens.len(), 2);
+        assert_eq!(tokens[0].text, "merhaba");
+        assert_eq!(tokens[0].start, 2); // Skips leading whitespace
+        assert_eq!(tokens[0].end, 9); // "Merhaba" = 7 bytes
+        
+        assert_eq!(tokens[1].text, "dünya");
+        assert_eq!(tokens[1].start, 12); // Accounts for whitespace between tokens
+        // "dünya" = d(1) + ü(2) + n(1) + y(1) + a(1) = 6 bytes
+        assert_eq!(tokens[1].end, 18);
+    }
+
+    #[test]
+    fn test_ner_use_case() {
+        // Realistic NER scenario: extract entities with their byte positions
+        let text = "Ahmet İstanbul'a gitti.";
+        let tokens = tokenize_normalized(text);
+        
+        // Should tokenize: ["ahmet", "istanbul'a", "gitti", "."]
+        assert_eq!(tokens.len(), 4);
+        
+        // Entity: "Ahmet" at byte position 0-5
+        assert_eq!(tokens[0].text, "ahmet");
+        assert_eq!(&text[tokens[0].start..tokens[0].end], "Ahmet");
+        
+        // Entity: "İstanbul'a" 
+        assert_eq!(tokens[1].text, "istanbul'a");
+        assert_eq!(&text[tokens[1].start..tokens[1].end], "İstanbul'a");
+        
+        // Verify we can label entities with original case preserved
+        let entity_label = format!("{} (PER)", &text[tokens[0].start..tokens[0].end]);
+        assert_eq!(entity_label, "Ahmet (PER)");
+    }
 }
