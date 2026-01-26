@@ -25,6 +25,7 @@ from .suffixes import (
     DEFAULT_DETACHED_SUFFIXES,
     attach_detached_suffixes,
 )
+from .syllabification import Syllabifier, SyllableInfo, syllabify
 from .tokenizer import (
     normalize_tokens,
     split_sentences,
@@ -44,6 +45,8 @@ __all__ = [
     "Pipeline",
     "StopwordManager",
     "StopwordSnapshot",
+    "SyllableInfo",
+    "Syllabifier",
     "attach_detached_suffixes",
     "clean_text",
     "collapse_whitespace",
@@ -58,11 +61,10 @@ __all__ = [
     "process_text",
     "remove_stopwords",
     "split_sentences",
+    "syllabify",
     "tokenize",
     "tokenize_text",
     "tokenize_with_offsets",
-    "Tokenizer",
-    "TokenizationError",
 ]
 
 try:

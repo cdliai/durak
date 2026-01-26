@@ -169,6 +169,174 @@ fn get_stopwords_social_media() -> Vec<String> {
         .collect()
 }
 
+// ========== Turkish Syllabification ==========
+
+/// Check if a character is a Turkish vowel
+fn is_vowel(c: char) -> bool {
+    matches!(
+        c.to_lowercase().next().unwrap_or(c),
+        'a' | 'e' | 'ı' | 'i' | 'o' | 'ö' | 'u' | 'ü' | 'â' | 'î' | 'û'
+    )
+}
+
+/// Check if a character is a Turkish consonant
+fn is_consonant(c: char) -> bool {
+    c.is_alphabetic() && !is_vowel(c)
+}
+
+/// Syllabify a Turkish word according to linguistic rules.
+/// Returns a vector of syllables.
+/// 
+/// Turkish syllable structure follows (C)(C)V(C)(C) where V is mandatory.
+/// 
+/// Rules (based on Turkish phonotactics):
+/// - V.V       → always break between vowels (o-ku)
+/// - V.CV      → break before consonant (a-çık)
+/// - VC.CV     → break between consonants (kit-ap, mer-ha-ba)
+/// - VCC.V     → take first consonant (an-la-mak, İs-tan-bul)
+/// - VCCC.V    → split at sonority boundary (typically VC.CCV)
+/// 
+/// # Examples
+/// ```
+/// syllabify("kitap")    → ["ki", "tap"]
+/// syllabify("merhaba")  → ["mer", "ha", "ba"]
+/// syllabify("okul")     → ["o", "kul"]
+/// syllabify("İstanbul") → ["İs", "tan", "bul"]
+/// syllabify("anlamak")  → ["an", "la", "mak"]
+/// ```
+#[pyfunction]
+fn syllabify(word: &str) -> Vec<String> {
+    if word.is_empty() {
+        return vec![];
+    }
+
+    let chars: Vec<char> = word.chars().collect();
+    let len = chars.len();
+    
+    if len == 0 {
+        return vec![];
+    }
+    
+    // Single character words return as-is
+    if len == 1 {
+        return vec![word.to_string()];
+    }
+
+    let mut syllables: Vec<String> = Vec::new();
+    let mut current = String::new();
+    let mut i = 0;
+
+    while i < len {
+        current.push(chars[i]);
+        
+        // Check if current character is a vowel
+        if is_vowel(chars[i]) {
+            // Look ahead to determine syllable boundary
+            if i + 1 >= len {
+                // End of word, close syllable
+                syllables.push(current.clone());
+                current.clear();
+                break;
+            }
+            
+            let next_char = chars[i + 1];
+            
+            // V.V pattern: always break after current vowel
+            if is_vowel(next_char) {
+                syllables.push(current.clone());
+                current.clear();
+                i += 1;
+                continue;
+            }
+            
+            // Next is consonant, need to look further
+            if is_consonant(next_char) {
+                // Count consecutive consonants ahead
+                let mut consonant_count = 0;
+                let mut j = i + 1;
+                while j < len && is_consonant(chars[j]) {
+                    consonant_count += 1;
+                    j += 1;
+                }
+                
+                // If no vowel after consonants, take all remaining
+                if j >= len {
+                    // Reached end, add all remaining consonants to current syllable
+                    while i + 1 < len {
+                        i += 1;
+                        current.push(chars[i]);
+                    }
+                    syllables.push(current.clone());
+                    current.clear();
+                    break;
+                }
+                
+                // There's a vowel after consonants
+                // Apply Turkish syllabification rules:
+                match consonant_count {
+                    1 => {
+                        // VCV pattern → V.CV (break before consonant)
+                        // The consonant goes with the next syllable
+                        syllables.push(current.clone());
+                        current.clear();
+                    }
+                    2 => {
+                        // VCCV pattern → VC.CV (split between consonants)
+                        // Take first consonant with current syllable
+                        i += 1;
+                        current.push(chars[i]);
+                        syllables.push(current.clone());
+                        current.clear();
+                    }
+                    _ => {
+                        // VCC...V pattern (3+ consonants) → VC.C...V
+                        // Take first consonant with current syllable
+                        i += 1;
+                        current.push(chars[i]);
+                        syllables.push(current.clone());
+                        current.clear();
+                    }
+                }
+            }
+        }
+        
+        i += 1;
+    }
+    
+    // Add any remaining characters
+    if !current.is_empty() {
+        syllables.push(current);
+    }
+
+    syllables
+}
+
+/// Syllabify a Turkish word and join with a separator.
+/// 
+/// # Examples
+/// ```
+/// syllabify_with_separator("merhaba", "-")  → "mer-ha-ba"
+/// syllabify_with_separator("kitap", "·")    → "ki·tap"
+/// ```
+#[pyfunction]
+fn syllabify_with_separator(word: &str, separator: &str) -> String {
+    syllabify(word).join(separator)
+}
+
+/// Count syllables in a Turkish word.
+/// Useful for poetry analysis and filtering.
+/// 
+/// # Examples
+/// ```
+/// syllable_count("ev")       → 1
+/// syllable_count("kitap")    → 2
+/// syllable_count("merhaba")  → 3
+/// ```
+#[pyfunction]
+fn syllable_count(word: &str) -> usize {
+    syllabify(word).len()
+}
+
 /// The internal Rust part of the Durak library.
 /// High-performance Turkish NLP operations with embedded resources.
 #[pymodule]
@@ -180,6 +348,11 @@ fn _durak_core(_py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {
     // Lemmatization functions
     m.add_function(wrap_pyfunction!(lookup_lemma, m)?)?;
     m.add_function(wrap_pyfunction!(strip_suffixes, m)?)?;
+
+    // Syllabification functions
+    m.add_function(wrap_pyfunction!(syllabify, m)?)?;
+    m.add_function(wrap_pyfunction!(syllabify_with_separator, m)?)?;
+    m.add_function(wrap_pyfunction!(syllable_count, m)?)?;
 
     // Embedded resource accessors
     m.add_function(wrap_pyfunction!(get_detached_suffixes, m)?)?;
