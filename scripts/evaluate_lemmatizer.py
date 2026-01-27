@@ -6,15 +6,13 @@ Evaluates precision, recall, and F1 scores for different lemmatization strategie
 against gold-standard test sets.
 
 Usage:
-    python scripts/evaluate_lemmatizer.py [--test-set PATH] [--strategy lookup|heuristic|hybrid]
+    python scripts/evaluate_lemmatizer.py [--test-set PATH] [--strategy STRATEGY]
     python scripts/evaluate_lemmatizer.py --all  # Compare all strategies
 """
 
 import argparse
-import csv
 import json
 from pathlib import Path
-from typing import Dict, List, Tuple
 
 try:
     from durak.lemmatizer import Lemmatizer
@@ -23,7 +21,7 @@ except ImportError:
     exit(1)
 
 
-def load_test_set(test_set_path: Path) -> List[Tuple[str, str, str]]:
+def load_test_set(test_set_path: Path) -> list[tuple[str, str, str]]:
     """
     Load gold-standard test set from TSV file.
     
@@ -53,7 +51,7 @@ def evaluate_strategy(
     strategy: str,
     test_set_path: Path,
     verbose: bool = False
-) -> Dict:
+) -> dict:
     """
     Evaluate a single lemmatization strategy.
     
@@ -154,7 +152,7 @@ def compare_strategies(test_set_path: Path, show_errors: bool = False):
     return all_results
 
 
-def save_baseline(results: List[Dict], baseline_path: Path):
+def save_baseline(results: list[Dict], baseline_path: Path):
     """Save evaluation results as baseline for regression detection"""
     baseline_data = {
         "baseline_version": "0.4.0",
@@ -176,7 +174,7 @@ def save_baseline(results: List[Dict], baseline_path: Path):
     print(f"\n✅ Baseline saved to {baseline_path}")
 
 
-def check_regression(results: List[Dict], baseline_path: Path, threshold: float = 0.05):
+def check_regression(results: list[Dict], baseline_path: Path, threshold: float = 0.05):
     """Check if accuracy dropped significantly from baseline"""
     if not baseline_path.exists():
         print(f"\n⚠️  No baseline found at {baseline_path}")

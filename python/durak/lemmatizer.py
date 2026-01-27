@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from time import perf_counter
-from typing import Literal, Optional
+from typing import Literal
 
 try:
     from durak._durak_core import lookup_lemma, strip_suffixes
@@ -38,7 +38,9 @@ class LemmatizerMetrics:
     @property
     def avg_call_time_ms(self) -> float:
         """Average time per call in milliseconds."""
-        return (self.total_time / self.total_calls * 1000) if self.total_calls > 0 else 0.0
+        if self.total_calls > 0:
+            return (self.total_time / self.total_calls * 1000)
+        return 0.0
     
     @property
     def lookup_hit_rate(self) -> float:
@@ -169,5 +171,5 @@ class Lemmatizer:
             self._metrics = LemmatizerMetrics()
 
     def __repr__(self) -> str:
-        metrics_status = "metrics_enabled" if self.collect_metrics else "metrics_disabled"
-        return f"Lemmatizer(strategy='{self.strategy}', {metrics_status})"
+        status = "metrics_enabled" if self.collect_metrics else "metrics_disabled"
+        return f"Lemmatizer(strategy='{self.strategy}', {status})"

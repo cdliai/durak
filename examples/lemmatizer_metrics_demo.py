@@ -100,11 +100,13 @@ def demo_large_corpus():
     metrics = lemmatizer.get_metrics()
     
     print(f"\nProcessed {metrics.total_calls:,} words")
-    print(f"Lookup Hits:         {metrics.lookup_hits:,} ({metrics.cache_hit_rate:.1%})")
+    hit_pct = metrics.cache_hit_rate
+    print(f"Lookup Hits:         {metrics.lookup_hits:,} ({hit_pct:.1%})")
     print(f"Heuristic Fallbacks: {metrics.heuristic_calls:,}")
     print(f"Total Time:          {metrics.total_time:.3f}s")
     print(f"Avg Call Time:       {metrics.avg_call_time_ms:.4f}ms")
-    print(f"Throughput:          {metrics.total_calls / metrics.total_time:,.0f} words/sec")
+    throughput = metrics.total_calls / metrics.total_time
+    print(f"Throughput:          {throughput:,.0f} words/sec")
 
 
 def demo_incremental_monitoring():
