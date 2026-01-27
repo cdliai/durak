@@ -312,3 +312,168 @@ def test_lemmatizer_repr_without_validation():
     
     repr_str = repr(lemmatizer)
     assert repr_str == "Lemmatizer(strategy='lookup')"
+
+
+def test_lru_cache_enabled():
+    """Test LRU cache is enabled by default"""
+    try:
+        from durak import _durak_core  # noqa: F401
+    except ImportError:
+        pytest.skip("Rust extension not installed")
+    
+    lemmatizer = Lemmatizer()  # default cache_size=10_000
+    
+    # First call - cache miss
+    lemmatizer("kitaplar")
+    info = lemmatizer.get_cache_info()
+    assert info.misses == 1
+    assert info.hits == 0
+    
+    # Second call - cache hit
+    lemmatizer("kitaplar")
+    info = lemmatizer.get_cache_info()
+    assert info.misses == 1
+    assert info.hits == 1
+    
+    # Different word - cache miss
+    lemmatizer("evler")
+    info = lemmatizer.get_cache_info()
+    assert info.misses == 2
+    assert info.hits == 1
+
+
+def test_lru_cache_disabled():
+    """Test LRU cache can be disabled"""
+    try:
+        from durak import _durak_core  # noqa: F401
+    except ImportError:
+        pytest.skip("Rust extension not installed")
+    
+    lemmatizer = Lemmatizer(cache_size=0)
+    
+    # Cache info should be None when disabled
+    assert lemmatizer.get_cache_info() is None
+    
+    # Lemmatization should still work
+    assert lemmatizer("kitaplar") == "kitap"
+    assert lemmatizer("kitaplar") == "kitap"
+
+
+def test_lru_cache_clear():
+    """Test LRU cache can be cleared"""
+    try:
+        from durak import _durak_core  # noqa: F401
+    except ImportError:
+        pytest.skip("Rust extension not installed")
+    
+    lemmatizer = Lemmatizer(cache_size=100)
+    
+    # Build cache
+    lemmatizer("kitaplar")
+    lemmatizer("kitaplar")
+    info = lemmatizer.get_cache_info()
+    assert info.hits == 1
+    
+    # Clear cache
+    lemmatizer.clear_cache()
+    info = lemmatizer.get_cache_info()
+    assert info.hits == 0
+    assert info.misses == 0
+    
+    # Next call should be cache miss
+    lemmatizer("kitaplar")
+    info = lemmatizer.get_cache_info()
+    assert info.misses == 1
+    assert info.hits == 0
+
+
+def test_lru_cache_size_limit():
+    """Test LRU cache respects maxsize"""
+    try:
+        from durak import _durak_core  # noqa: F401
+    except ImportError:
+        pytest.skip("Rust extension not installed")
+    
+    lemmatizer = Lemmatizer(cache_size=2)
+    
+    # Fill cache
+    lemmatizer("kitaplar")  # miss
+    lemmatizer("evler")     # miss
+    
+    # Both in cache
+    lemmatizer("kitaplar")  # hit
+    lemmatizer("evler")     # hit
+    
+    info = lemmatizer.get_cache_info()
+    assert info.currsize == 2
+    assert info.maxsize == 2
+    assert info.hits == 2
+    
+    # Add third word - should evict oldest
+    lemmatizer("arabalar")  # miss
+    
+    info = lemmatizer.get_cache_info()
+    assert info.currsize == 2  # Still 2 (evicted one)
+    assert info.misses == 3
+
+
+def test_lru_cache_with_metrics():
+    """Test LRU cache works alongside metrics collection
+    
+    Note: Metrics count FFI calls (actual Rust invocations), not total calls.
+    This is by design - cache hits don't cross FFI boundary.
+    """
+    try:
+        from durak import _durak_core  # noqa: F401
+    except ImportError:
+        pytest.skip("Rust extension not installed")
+    
+    lemmatizer = Lemmatizer(
+        strategy="hybrid",
+        collect_metrics=True,
+        cache_size=100,
+    )
+    
+    # Process same word multiple times
+    for _ in range(10):
+        lemmatizer("kitaplar")
+    
+    # Metrics count only FFI calls (not cached calls)
+    metrics = lemmatizer.get_metrics()
+    assert metrics.total_calls == 1  # Only first call crossed FFI
+    assert metrics.lookup_hits == 1  # Dictionary hit
+    
+    # Cache shows total call pattern
+    cache_info = lemmatizer.get_cache_info()
+    assert cache_info.misses == 1  # First call
+    assert cache_info.hits == 9    # Next 9 calls
+
+
+def test_lru_cache_empty_string():
+    """Test LRU cache handles empty strings correctly"""
+    try:
+        from durak import _durak_core  # noqa: F401
+    except ImportError:
+        pytest.skip("Rust extension not installed")
+    
+    lemmatizer = Lemmatizer(cache_size=100)
+    
+    # Empty string should return immediately (bypass cache)
+    assert lemmatizer("") == ""
+    
+    # Should not count in cache stats
+    info = lemmatizer.get_cache_info()
+    assert info.misses == 0
+    assert info.hits == 0
+
+
+def test_lru_cache_repr():
+    """Test __repr__ shows cache_size when non-default"""
+    lemmatizer_default = Lemmatizer()
+    assert "cache_size" not in repr(lemmatizer_default)
+    
+    lemmatizer_custom = Lemmatizer(cache_size=1000)
+    assert "cache_size=1000" in repr(lemmatizer_custom)
+    
+    lemmatizer_disabled = Lemmatizer(cache_size=0)
+    assert "cache_size=0" in repr(lemmatizer_disabled)

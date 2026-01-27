@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from functools import lru_cache
 from time import perf_counter
 from typing import Literal
 
@@ -108,6 +109,7 @@ class Lemmatizer:
         strict_validation: Require roots to be in lemma dictionary
         min_root_length: Minimum acceptable root length (characters)
         collect_metrics: Enable performance metrics collection (adds ~5-10% overhead)
+        cache_size: LRU cache size for repeated words (0=disabled, default=10_000)
     """
     def __init__(
         self, 
@@ -116,18 +118,24 @@ class Lemmatizer:
         strict_validation: bool = False,
         min_root_length: int = 2,
         collect_metrics: bool = False,
+        cache_size: int = 10_000,
     ):
         self.strategy = strategy
         self.validate_roots = validate_roots
         self.strict_validation = strict_validation
         self.min_root_length = min_root_length
         self.collect_metrics = collect_metrics
+        self.cache_size = cache_size
         self._metrics = LemmatizerMetrics() if collect_metrics else None
-
-    def __call__(self, word: str) -> str:
-        if not word:
-            return ""
         
+        # Setup LRU cache if enabled
+        if cache_size > 0:
+            self._cached_call = lru_cache(maxsize=cache_size)(self._raw_call)
+        else:
+            self._cached_call = self._raw_call
+
+    def _raw_call(self, word: str) -> str:
+        """Core lemmatization logic (bypasses cache)."""
         start_time = perf_counter() if self.collect_metrics else None
             
         # Tier 1: Lookup
@@ -177,6 +185,12 @@ class Lemmatizer:
             
         return word
 
+    def __call__(self, word: str) -> str:
+        """Lemmatize a word (with LRU caching if enabled)."""
+        if not word:
+            return ""
+        return self._cached_call(word)
+
     def get_metrics(self) -> LemmatizerMetrics:
         """Return collected metrics.
         
@@ -211,6 +225,42 @@ class Lemmatizer:
             )
         self._metrics = LemmatizerMetrics()
 
+    def get_cache_info(self):
+        """Return LRU cache statistics if caching is enabled.
+        
+        Returns:
+            CacheInfo: Named tuple with hits, misses, maxsize, currsize
+            None: If caching is disabled (cache_size=0)
+        
+        Example:
+            >>> lemmatizer = Lemmatizer(cache_size=1000)
+            >>> for word in ["kitap", "kitaplar", "kitap"]:
+            ...     lemmatizer(word)
+            >>> info = lemmatizer.get_cache_info()
+            >>> print(f"Cache hit rate: {info.hits / (info.hits + info.misses):.2%}")
+        """
+        if self.cache_size > 0:
+            return self._cached_call.cache_info()
+        return None
+
+    def clear_cache(self) -> None:
+        """Clear the LRU cache if caching is enabled.
+        
+        Useful for:
+        - Benchmarking without cache warmup
+        - Measuring cold-start performance
+        - Memory management in long-running processes
+        
+        Example:
+            >>> lemmatizer = Lemmatizer(cache_size=1000)
+            >>> lemmatizer("kitaplar")  # Cache miss
+            >>> lemmatizer("kitaplar")  # Cache hit
+            >>> lemmatizer.clear_cache()
+            >>> lemmatizer("kitaplar")  # Cache miss again
+        """
+        if self.cache_size > 0:
+            self._cached_call.cache_clear()
+
     def __repr__(self) -> str:
         parts = [f"strategy='{self.strategy}'"]
         if self.validate_roots:
@@ -221,4 +271,6 @@ class Lemmatizer:
                 parts.append(f"min_root_length={self.min_root_length}")
         if self.collect_metrics:
             parts.append("collect_metrics=True")
+        if self.cache_size != 10_000:  # Only show if non-default
+            parts.append(f"cache_size={self.cache_size}")
         return f"Lemmatizer({', '.join(parts)})"
