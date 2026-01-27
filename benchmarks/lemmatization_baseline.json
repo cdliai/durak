@@ -1,0 +1,21 @@
+{
+  "baseline_version": "0.4.0",
+  "test_set": "gold_standard.tsv",
+  "strategies": {
+    "lookup": {
+      "accuracy": 0.6880733944954128,
+      "correct": 75,
+      "total": 109
+    },
+    "heuristic": {
+      "accuracy": 0.1834862385321101,
+      "correct": 20,
+      "total": 109
+    },
+    "hybrid": {
+      "accuracy": 0.6972477064220184,
+      "correct": 76,
+      "total": 109
+    }
+  }
+}

@@ -38,6 +38,11 @@ jobs:
       - name: Run tests with coverage
         run: pytest --cov=durak --cov-report=xml --cov-report=term
 
+      - name: Evaluate Lemmatizer Quality
+        if: matrix.python-version == '3.11'
+        run: |
+          python scripts/evaluate_lemmatizer.py --all --check-regression
+          
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
         if: matrix.python-version == '3.11'
