@@ -200,3 +200,113 @@ fn _durak_core(_py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {
 
     Ok(())
 }
+
+// ============================================================================
+// UNIT TESTS
+// ============================================================================
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_lemma_dict_loading() {
+        let dict = get_lemma_dict();
+        
+        // Verify dictionary is not empty
+        assert!(!dict.is_empty(), "Lemma dictionary should not be empty");
+        
+        // Verify we have more than mock data (original had 3 entries)
+        assert!(dict.len() > 100, "Dictionary should contain more than 100 entries, got {}", dict.len());
+        
+        println!("✓ Loaded {} lemma entries", dict.len());
+    }
+
+    #[test]
+    fn test_lookup_lemma_high_frequency_nouns() {
+        // Test common noun inflections
+        let test_cases = vec![
+            ("kitaplar", Some("kitap")),
+            ("evler", Some("ev")),
+            ("insanlar", Some("insan")),
+            ("arabalar", Some("araba")),
+            ("çocuklar", Some("çocuk")),
+            ("adamlar", Some("adam")),
+            ("şehirler", Some("şehir")),
+        ];
+
+        for (inflected, expected) in test_cases {
+            let result = lookup_lemma(inflected);
+            let expected_str = expected.map(|s| s.to_string());
+            assert_eq!(result, expected_str, 
+                "Failed: {} -> {:?} (expected: {:?})", 
+                inflected, result, expected_str
+            );
+        }
+    }
+
+    #[test]
+    fn test_lookup_lemma_high_frequency_verbs() {
+        // Test common verb inflections
+        let test_cases = vec![
+            ("geliyorum", Some("gel")),
+            ("gittim", Some("git")),
+            ("yapıyorum", Some("yap")),
+            ("söyledi", Some("söyle")),
+        ];
+
+        for (inflected, expected) in test_cases {
+            let result = lookup_lemma(inflected);
+            let expected_str = expected.map(|s| s.to_string());
+            assert_eq!(result, expected_str,
+                "Failed: {} -> {:?} (expected: {:?})",
+                inflected, result, expected_str
+            );
+        }
+    }
+
+    #[test]
+    fn test_lookup_lemma_oov_words() {
+        // Out-of-vocabulary words should return None
+        let oov_words = vec!["bilgisayar", "internet", "xyz123", "nonexistent"];
+
+        for word in oov_words {
+            let result = lookup_lemma(word);
+            assert_eq!(result, None,
+                "OOV word '{}' should return None, got: {:?}",
+                word, result
+            );
+        }
+    }
+
+    #[test]
+    fn test_lemma_dict_format_validation() {
+        let dict = get_lemma_dict();
+        
+        // Check a few entries to ensure proper format
+        for (inflected, lemma) in dict.iter().take(10) {
+            assert!(!inflected.is_empty(), "Inflected form should not be empty");
+            assert!(!lemma.is_empty(), "Lemma should not be empty");
+            assert!(!inflected.contains('\t'), "Inflected form should not contain tabs");
+            assert!(!lemma.contains('\t'), "Lemma should not contain tabs");
+        }
+    }
+
+    #[test]
+    fn test_strip_suffixes_basic() {
+        // Test basic suffix stripping (heuristic fallback)
+        let test_cases = vec![
+            ("kitaplar", "kitap"),
+            ("evler", "ev"),
+            ("insanlar", "insan"),
+        ];
+
+        for (word, expected_contains) in test_cases {
+            let result = strip_suffixes(word);
+            assert!(result.contains(expected_contains),
+                "strip_suffixes({}) = '{}' should contain '{}'",
+                word, result, expected_contains
+            );
+        }
+    }
+}
