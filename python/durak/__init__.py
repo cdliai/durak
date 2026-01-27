@@ -5,7 +5,7 @@ from __future__ import annotations
 from importlib import metadata
 
 from .cleaning import clean_text, collapse_whitespace, normalize_case, normalize_unicode
-from .lemmatizer import Lemmatizer
+from .lemmatizer import Lemmatizer, LemmatizerMetrics
 from .normalizer import Normalizer
 from .pipeline import Pipeline, process_text
 from .stopwords import (
@@ -40,6 +40,7 @@ __all__ = [
     "DEFAULT_STOPWORD_RESOURCE",
     "DEFAULT_DETACHED_SUFFIXES",
     "Lemmatizer",
+    "LemmatizerMetrics",
     "Normalizer",
     "Pipeline",
     "StopwordManager",

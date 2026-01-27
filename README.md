@@ -113,9 +113,79 @@ suffixes = _durak_core.get_detached_suffixes()
 - **Unicode-aware cleaning**: Turkish-specific normalization (İ/ı, I/i handling)
 - **Configurable stopword management**: Keep-lists, custom additions, domain-specific sets
 - **Regex-based tokenizer**: Preserves Turkish morphology (clitics, suffixes, apostrophes)
+- **Tiered lemmatization**: Dictionary lookup + heuristic fallback with performance metrics
 - **Offset tracking**: Character-accurate positions for NER and span tasks
 - **Embedded resources**: Zero file I/O, compiled directly into binary
 - **Type-safe**: Complete `.pyi` stubs for IDE support and static analysis
+
+## Lemmatization
+
+Durak provides a **tiered lemmatizer** that combines dictionary lookup with heuristic suffix stripping. Three strategies are available:
+
+- **`lookup`**: Fast exact dictionary matches (high precision, lower recall)
+- **`heuristic`**: Rule-based suffix stripping (handles OOV words)
+- **`hybrid`**: Lookup first, fallback to heuristic (default, best balance)
+
+### Basic Usage
+
+```python
+from durak import Lemmatizer
+
+lemmatizer = Lemmatizer(strategy="hybrid")
+
+print(lemmatizer("kitaplar"))    # "kitap" (plural → singular)
+print(lemmatizer("geliyorum"))   # "gel" (conjugated → root)
+print(lemmatizer("evleri"))      # "ev" (possessive + plural → root)
+```
+
+### Performance Metrics
+
+Enable metrics collection to compare strategies and monitor performance:
+
+```python
+lemmatizer = Lemmatizer(strategy="hybrid", collect_metrics=True)
+
+# Process your corpus
+for word in corpus:
+    lemma = lemmatizer(word)
+
+# View detailed metrics
+print(lemmatizer.get_metrics())
+```
+
+**Output:**
+```
+Lemmatizer Metrics:
+  Total Calls:         10,000
+  Lookup Hits:         7,234 (72.3% of all calls)
+  Lookup Hit Rate:     72.3%
+  Heuristic Fallbacks: 2,766
+  Avg Call Time:       0.042ms
+  Total Time:          0.420s
+  Lookup Time:         0.274s
+  Heuristic Time:      0.146s
+```
+
+### Strategy Comparison
+
+Compare all three strategies empirically:
+
+```python
+corpus = load_your_corpus()
+strategies = ["lookup", "heuristic", "hybrid"]
+
+for strategy in strategies:
+    lemmatizer = Lemmatizer(strategy=strategy, collect_metrics=True)
+    
+    for word in corpus:
+        lemmatizer(word)
+    
+    metrics = lemmatizer.get_metrics()
+    print(f"\n{strategy.upper()}: {metrics.cache_hit_rate:.1%} hit rate, "
+          f"{metrics.avg_call_time_ms:.3f}ms avg")
+```
+
+See [`examples/lemmatizer_metrics_demo.py`](examples/lemmatizer_metrics_demo.py) for comprehensive usage examples.
 
 ## Development Setup
 

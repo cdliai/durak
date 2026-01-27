@@ -24,6 +24,15 @@ jobs:
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
 
+      - name: Run Rust unit tests
+        run: cargo test --all-features
+
+      - name: Lint Rust code with Clippy
+        run: cargo clippy -- -D warnings
+
+      - name: Check Rust formatting
+        run: cargo fmt --check
+
       - name: Install dependencies and build package
         run: |
           python -m pip install --upgrade pip
@@ -38,6 +47,11 @@ jobs:
       - name: Run tests with coverage
         run: pytest --cov=durak --cov-report=xml --cov-report=term
 
+      - name: Evaluate Lemmatizer Quality
+        if: matrix.python-version == '3.11'
+        run: |
+          python scripts/evaluate_lemmatizer.py --all --check-regression
+          
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
         if: matrix.python-version == '3.11'
