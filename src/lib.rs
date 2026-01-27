@@ -1,6 +1,7 @@
 mod root_validator;
 
 use pyo3::prelude::*;
+use pyo3::exceptions::PyValueError;
 use std::collections::HashMap;
 use std::sync::OnceLock;
 use regex::Regex;
@@ -58,21 +59,60 @@ fn get_token_regex() -> &'static Regex {
 
 /// Fast normalization for Turkish text.
 /// Handles I/ı and İ/i conversion correctly and lowercases the rest.
+///
+/// # Arguments
+///
+/// * `text` - Input text to normalize (must not be empty)
+///
+/// # Returns
+///
+/// Normalized text with Turkish-specific case conversions applied
+///
+/// # Errors
+///
+/// Returns `PyValueError` if the input text is empty
 #[pyfunction]
-fn fast_normalize(text: &str) -> String {
+fn fast_normalize(text: &str) -> PyResult<String> {
+    if text.is_empty() {
+        return Err(PyValueError::new_err("Input text cannot be empty"));
+    }
+    
     // Rust handles Turkish I/ı conversion correctly and instantly
     // "Single Pass" allocation for maximum speed
-    text.chars().map(|c| match c {
+    Ok(text.chars().map(|c| match c {
         'İ' => 'i',
         'I' => 'ı',
         _ => c.to_lowercase().next().unwrap_or(c)
-    }).collect()
+    }).collect())
 }
 
 /// Tokenize text and return tokens with their start and end character offsets.
 /// Returns a list of (token, start, end).
+///
+/// # Arguments
+///
+/// * `text` - Input text to tokenize
+///
+/// # Returns
+///
+/// A vector of tuples containing (token, char_start, char_end).
+/// Returns an empty vector if the input is empty.
+///
+/// # Examples
+///
+/// ```python
+/// from durak import tokenize_with_offsets
+///
+/// tokens = tokenize_with_offsets("Merhaba dünya!")
+/// # [("Merhaba", 0, 7), ("dünya", 8, 13), ("!", 13, 14)]
+/// ```
 #[pyfunction]
-fn tokenize_with_offsets(text: &str) -> Vec<(String, usize, usize)> {
+fn tokenize_with_offsets(text: &str) -> PyResult<Vec<(String, usize, usize)>> {
+    // Empty input → empty output (graceful handling)
+    if text.is_empty() {
+        return Ok(Vec::new());
+    }
+    
     let re = get_token_regex();
     let mut results = Vec::new();
 
@@ -102,21 +142,53 @@ fn tokenize_with_offsets(text: &str) -> Vec<(String, usize, usize)> {
             results.push((token, char_start, char_end));
         }
     }
-    results
+    Ok(results)
 }
 
 /// Tier 1: Exact Lookup
+///
+/// # Arguments
+///
+/// * `word` - Word to look up in the lemma dictionary
+///
+/// # Returns
+///
+/// The lemma if found in the dictionary, `None` otherwise
+///
+/// # Errors
+///
+/// Returns `PyValueError` if the input word is empty
 #[pyfunction]
-fn lookup_lemma(word: &str) -> Option<String> {
+fn lookup_lemma(word: &str) -> PyResult<Option<String>> {
+    if word.is_empty() {
+        return Err(PyValueError::new_err("Input word cannot be empty"));
+    }
+    
     let dict = get_lemma_dict();
-    dict.get(word).map(|s| s.to_string())
+    Ok(dict.get(word).map(|s| s.to_string()))
 }
 
 /// Tier 2: Heuristic Suffix Stripping
 /// Simple rule-based stripper for demonstration.
 /// In production, this would use a more complex state machine and vowel harmony checks.
+///
+/// # Arguments
+///
+/// * `word` - Word to strip suffixes from
+///
+/// # Returns
+///
+/// The word with common Turkish suffixes removed
+///
+/// # Errors
+///
+/// Returns `PyValueError` if the input word is empty
 #[pyfunction]
-fn strip_suffixes(word: &str) -> String {
+fn strip_suffixes(word: &str) -> PyResult<String> {
+    if word.is_empty() {
+        return Err(PyValueError::new_err("Input word cannot be empty"));
+    }
+    
     let suffixes = ["lar", "ler", "nin", "nın", "den", "dan", "du", "dün"];
     let mut current = word.to_string();
     
@@ -133,26 +205,37 @@ fn strip_suffixes(word: &str) -> String {
             }
         }
     }
-    current
+    Ok(current)
 }
 
 /// Strip suffixes with root validity checking
 /// Prevents over-stripping by validating candidate roots
 /// 
 /// # Arguments
-/// * `word` - The word to process
+/// * `word` - The word to process (must not be empty)
 /// * `strict` - If true, check dictionary first, then validate; if false, use phonotactic rules only
 /// * `min_root_length` - Minimum acceptable root length (default: 2)
 /// 
 /// # Returns
 /// The word with suffixes stripped, validated to prevent over-stripping
+///
+/// # Errors
+/// Returns `PyValueError` if the input word is empty or min_root_length is 0
 #[pyfunction]
 #[pyo3(signature = (word, strict=false, min_root_length=2))]
-fn strip_suffixes_validated(word: &str, strict: bool, min_root_length: usize) -> String {
+fn strip_suffixes_validated(word: &str, strict: bool, min_root_length: usize) -> PyResult<String> {
+    if word.is_empty() {
+        return Err(PyValueError::new_err("Input word cannot be empty"));
+    }
+    
+    if min_root_length == 0 {
+        return Err(PyValueError::new_err("min_root_length must be greater than 0"));
+    }
+    
     // In strict mode, first check if the word is in the lemma dictionary
     if strict {
-        if let Some(lemma) = lookup_lemma(word) {
-            return lemma;
+        if let Some(lemma) = lookup_lemma(word)? {
+            return Ok(lemma);
         }
     }
     
@@ -188,7 +271,7 @@ fn strip_suffixes_validated(word: &str, strict: bool, min_root_length: usize) ->
             }
         }
     }
-    current
+    Ok(current)
 }
 
 /// Get embedded detached suffixes list
@@ -295,7 +378,7 @@ mod tests {
         ];
 
         for (inflected, expected) in test_cases {
-            let result = lookup_lemma(inflected);
+            let result = lookup_lemma(inflected).unwrap();
             let expected_str = expected.map(|s| s.to_string());
             assert_eq!(result, expected_str, 
                 "Failed: {} -> {:?} (expected: {:?})", 
@@ -315,7 +398,7 @@ mod tests {
         ];
 
         for (inflected, expected) in test_cases {
-            let result = lookup_lemma(inflected);
+            let result = lookup_lemma(inflected).unwrap();
             let expected_str = expected.map(|s| s.to_string());
             assert_eq!(result, expected_str,
                 "Failed: {} -> {:?} (expected: {:?})",
@@ -330,7 +413,7 @@ mod tests {
         let oov_words = vec!["bilgisayar", "internet", "xyz123", "nonexistent"];
 
         for word in oov_words {
-            let result = lookup_lemma(word);
+            let result = lookup_lemma(word).unwrap();
             assert_eq!(result, None,
                 "OOV word '{}' should return None, got: {:?}",
                 word, result
@@ -361,7 +444,7 @@ mod tests {
         ];
 
         for (word, expected_contains) in test_cases {
-            let result = strip_suffixes(word);
+            let result = strip_suffixes(word).unwrap();
             assert!(result.contains(expected_contains),
                 "strip_suffixes({}) = '{}' should contain '{}'",
                 word, result, expected_contains
@@ -379,7 +462,7 @@ mod tests {
         ];
 
         for (word, expected) in test_cases {
-            let result = strip_suffixes_validated(word, false, 2);
+            let result = strip_suffixes_validated(word, false, 2).unwrap();
             assert_eq!(result, expected,
                 "strip_suffixes_validated({}, lenient) should be '{}'",
                 word, expected
@@ -398,7 +481,7 @@ mod tests {
         ];
 
         for (word, expected) in test_cases {
-            let result = strip_suffixes_validated(word, true, 2);
+            let result = strip_suffixes_validated(word, true, 2).unwrap();
             assert_eq!(result, expected,
                 "strip_suffixes_validated({}, strict) should be '{}'",
                 word, expected
@@ -414,7 +497,7 @@ mod tests {
         // Example: "kitaplardan" -> naive might strip to "ki" or "k"
         // but validated should stop at "kitap"
         let word = "kitaplardan";
-        let validated_result = strip_suffixes_validated(word, true, 2);
+        let validated_result = strip_suffixes_validated(word, true, 2).unwrap();
         
         // Should be a valid root
         assert!(validated_result.len() >= 2, 
@@ -447,8 +530,8 @@ mod tests {
         ];
 
         for word in test_words {
-            let naive = strip_suffixes(word);
-            let validated = strip_suffixes_validated(word, true, 2);
+            let naive = strip_suffixes(word).unwrap();
+            let validated = strip_suffixes_validated(word, true, 2).unwrap();
             
             println!("Word: {} | Naive: {} | Validated: {}", word, naive, validated);
             
