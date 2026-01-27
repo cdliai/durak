@@ -199,6 +199,61 @@ pipeline = Pipeline([
 ])
 ```
 
+### Choosing a Lemmatization Strategy
+
+**Durak supports three lemmatization strategies:**
+
+| Strategy   | Accuracy | Best For                                    |
+|------------|----------|---------------------------------------------|
+| **lookup**     | 68.8%    | Formal/standard Turkish (news, documents)   |
+| **heuristic**  | 18.3%    | OOV-heavy domains (social media, slang)     |
+| **hybrid** (default) | 69.7% | Balanced precision/recall (most research)   |
+
+**When to use `lookup`:**
+- Corpus is formal/standard Turkish
+- Need high precision for dictionary-covered words
+- Fast processing required
+- Example: news articles, official documents
+
+**When to use `heuristic`:**
+- OOV-heavy domains (social media, misspellings)
+- Better recall on unknown words needed
+- Can tolerate lower precision
+- Example: Twitter data, informal chat
+
+**When to use `hybrid` (recommended):**
+- General-purpose NLP tasks
+- Balanced precision/recall trade-off
+- Most research and production applications
+- Falls back to heuristic when lookup fails
+
+**Usage:**
+
+```python
+from durak.lemmatizer import Lemmatizer
+
+# Default: hybrid strategy
+lemmatizer = Lemmatizer()
+
+# Explicit strategy
+lemmatizer = Lemmatizer(strategy="lookup")
+
+# Example usage
+lemmas = [lemmatizer(word) for word in ["kitaplar", "geliyorum", "evlerde"]]
+```
+
+**Evaluating custom datasets:**
+
+```bash
+# Run evaluation on your own test set
+python scripts/evaluate_lemmatizer.py --all --test-set my_test.tsv
+
+# Check for regressions after dictionary updates
+python scripts/evaluate_lemmatizer.py --all --check-regression
+```
+
+See `resources/tr/lemmas/eval/README.md` for details on creating custom test sets and interpreting results.
+
 ### Suffix Configuration
 
 **Current state**: Rust suffixes are hard-coded for demo purposes

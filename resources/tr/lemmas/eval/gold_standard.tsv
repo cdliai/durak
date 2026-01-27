@@ -93,6 +93,58 @@ size	siz	test
 bunlar	bu	test
 şunlar	şu	test
 #
+# Verbs - Conditional Tense
+gelsem	gel	manual
+gelsen	gel	manual
+gelse	gel	manual
+gelsek	gel	manual
+alsam	al	manual
+alsaydım	al	manual
+#
+# Verbs - Imperative
+gel	gel	test
+gelin	gel	manual
+gitme	git	manual
+alma	al	manual
+#
+# Verbs - Participles and Verbal Nouns
+gelen	gel	manual
+giden	git	manual
+gelme	gel	manual
+yapma	yap	manual
+alış	al	manual
+verişler	veriş	manual
+#
+# Adjectives - Comparative and Superlative
+daha güzel	güzel	manual
+en güzel	güzel	manual
+büyükler	büyük	test
+küçükler	küçük	manual
+#
+# Proper Nouns with Apostrophe + Possessive
+Ahmet'in	ahmet	manual
+İstanbul'da	istanbul	manual
+Türkiye'de	türkiye	manual
+Ankara'ya	ankara	manual
+#
+# Compound Words and Complex Chains
+görebildim	görebil	manual
+yapabiliyorum	yapabil	manual
+gelebilir	gelebil	manual
+gelemeyecek	gele	manual
+#
+# Adjectives to Nouns
+güzellik	güzel	manual
+büyüklük	büyük	manual
+zenginlik	zengin	manual
+#
+# Words with Double Consonants
+hakkında	hak	manual
+yıkkaç	yık	manual
+#
 # Edge Cases
 kiler	kiler	test
 unknownword	unknownword	test
+yemek	yemek	test
+yapmak	yap	manual
+gitmek	git	manual
