@@ -59,17 +59,26 @@ def tokenize_with_offsets(text: str) -> list[tuple[str, int, int]]:
 def lookup_lemma(word: str) -> str | None:
     """Perform exact dictionary lookup for lemmatization.
 
-    Tier 1 lemmatization: Fast exact lookup in the internal dictionary.
+    Tier 1 lemmatization: Fast exact lookup in the embedded Turkish lemma dictionary.
+    The dictionary contains 1,362+ inflected forms mapped to their base lemmas,
+    loaded from resources/tr/lemmas/turkish_lemma_dict.txt at build time.
+
+    Coverage:
+    - High-frequency nouns with case/plural suffixes
+    - Common verb inflections (tense, aspect, person markers)
+    - Systematic vowel harmony patterns (front/back vowel classes)
 
     Args:
-        word: The word to lemmatize
+        word: The inflected word to lemmatize
 
     Returns:
-        The lemma if found in dictionary, None otherwise
+        The base lemma if found in dictionary, None otherwise
 
     Examples:
         >>> lookup_lemma("kitaplar")
         'kitap'
+        >>> lookup_lemma("geliyorum")
+        'gel'
         >>> lookup_lemma("unknown")
         None
     """

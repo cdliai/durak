@@ -266,6 +266,27 @@ mod tests {
     }
 
     #[test]
+    fn test_lookup_lemma_with_resource_dict() {
+        // Test lookups from embedded turkish_lemma_dict.txt
+        let test_cases = vec![
+            ("kitaplar", "kitap"),
+            ("evler", "ev"),
+            ("geliyorum", "gel"),
+            ("aldım", "al"),
+            ("adamlar", "adam"),
+            ("anaları", "ana"),
+        ];
+
+        for (inflected, expected_lemma) in test_cases {
+            let result = lookup_lemma(inflected);
+            assert_eq!(result, Some(expected_lemma.to_string()),
+                "lookup_lemma('{}') should return '{}', got: {:?}",
+                inflected, expected_lemma, result
+            );
+        }
+    }
+
+    #[test]
     fn test_lookup_lemma_oov_words() {
         // Out-of-vocabulary words should return None
         let oov_words = vec!["bilgisayar", "internet", "xyz123", "nonexistent"];
