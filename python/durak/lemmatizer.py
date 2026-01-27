@@ -101,21 +101,21 @@ class Lemmatizer:
             lookup_start = perf_counter() if self.collect_metrics else None
             lemma = lookup_lemma(word)
             
-            if self.collect_metrics:
+            if self._metrics is not None:
                 self._metrics.lookup_time += perf_counter() - lookup_start
             
             if lemma is not None:
-                if self.collect_metrics:
+                if self._metrics is not None:
                     self._metrics.lookup_hits += 1
                     self._metrics.total_calls += 1
                     self._metrics.total_time += perf_counter() - start_time
                 return lemma
             
-            if self.collect_metrics:
+            if self._metrics is not None:
                 self._metrics.lookup_misses += 1
             
             if self.strategy == "lookup":
-                if self.collect_metrics:
+                if self._metrics is not None:
                     self._metrics.total_calls += 1
                     self._metrics.total_time += perf_counter() - start_time
                 return word  # Return as-is if not found
@@ -125,7 +125,7 @@ class Lemmatizer:
             heuristic_start = perf_counter() if self.collect_metrics else None
             result = strip_suffixes(word)
             
-            if self.collect_metrics:
+            if self._metrics is not None:
                 self._metrics.heuristic_time += perf_counter() - heuristic_start
                 self._metrics.heuristic_calls += 1
                 self._metrics.total_calls += 1
@@ -167,7 +167,7 @@ class Lemmatizer:
             >>> lemmatizer.get_metrics().total_calls
             0
         """
-        if self.collect_metrics:
+        if self._metrics is not None:
             self._metrics = LemmatizerMetrics()
 
     def __repr__(self) -> str:
