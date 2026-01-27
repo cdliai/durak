@@ -102,8 +102,58 @@ def main():
     except ImportError:
         print("Rust extension not available")
 
-    # 4. Full Pipeline Benchmark
-    print("\n4. Complete Processing Pipeline")
+    # 4. Lemmatizer Cache Benchmark
+    print("\n4. Lemmatizer LRU Cache Performance")
+    print("-" * 70)
+
+    # Generate corpus with Zipfian distribution (realistic word frequency)
+    # Top 100 words cover ~50% of tokens in typical Turkish text
+    common_words = [
+        "kitap", "ev", "araba", "okul", "öğrenci", "öğretmen", "ders",
+        "sınıf", "masa", "sandalye", "kapı", "pencere", "bahçe", "ağaç",
+        "çocuk", "anne", "baba", "kardeş", "arkadaş", "komşu"
+    ] * 50  # 1000 tokens, highly repetitive
+
+    rare_words = [
+        f"nadir_kelime_{i}" for i in range(1000)
+    ]  # 1000 unique tokens
+
+    # Test 1: Cache-friendly workload (repetitive)
+    lemmatizer_cached = durak.Lemmatizer(cache_size=10_000)
+    lemmatizer_nocache = durak.Lemmatizer(cache_size=0)
+
+    def lemmatize_corpus(lemmatizer, words):
+        for word in words:
+            lemmatizer(word)
+
+    cached_time = benchmark(lemmatize_corpus, lemmatizer_cached, common_words, iterations=10)
+    nocache_time = benchmark(lemmatize_corpus, lemmatizer_nocache, common_words, iterations=10)
+
+    cache_info = lemmatizer_cached.get_cache_info()
+    hit_rate = cache_info.hits / (cache_info.hits + cache_info.misses) if cache_info else 0
+
+    print(f"Repetitive corpus (1000 tokens, 20 unique words):")
+    print(f"  With cache:    {cached_time:.4f} ms per call")
+    print(f"  Without cache: {nocache_time:.4f} ms per call")
+    print(f"  Speedup:       {nocache_time / cached_time:.2f}x")
+    print(f"  Cache hit rate: {hit_rate:.1%}")
+
+    # Test 2: Cache-hostile workload (all unique)
+    lemmatizer_cached.clear_cache()
+    cached_time_unique = benchmark(lemmatize_corpus, lemmatizer_cached, rare_words, iterations=10)
+    nocache_time_unique = benchmark(lemmatize_corpus, lemmatizer_nocache, rare_words, iterations=10)
+
+    cache_info_unique = lemmatizer_cached.get_cache_info()
+    hit_rate_unique = cache_info_unique.hits / (cache_info_unique.hits + cache_info_unique.misses) if cache_info_unique else 0
+
+    print(f"\nUnique corpus (1000 unique words, no repetition):")
+    print(f"  With cache:    {cached_time_unique:.4f} ms per call")
+    print(f"  Without cache: {nocache_time_unique:.4f} ms per call")
+    print(f"  Overhead:      {cached_time_unique / nocache_time_unique:.2f}x")
+    print(f"  Cache hit rate: {hit_rate_unique:.1%}")
+
+    # 5. Full Pipeline Benchmark
+    print("\n5. Complete Processing Pipeline")
     print("-" * 70)
 
     pipeline = durak.Pipeline(
