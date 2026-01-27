@@ -103,6 +103,15 @@ from durak import _durak_core
 normalized = _durak_core.fast_normalize("İSTANBUL")  # "istanbul"
 tokens = _durak_core.tokenize_with_offsets("Merhaba dünya!")
 
+# Vowel harmony validation (Turkish morphophonology)
+_durak_core.check_vowel_harmony_py("kitap", "lar")  # True (a-a harmony ✅)
+_durak_core.check_vowel_harmony_py("ev", "ler")     # True (e-e harmony ✅)
+_durak_core.check_vowel_harmony_py("kitap", "ler")  # False (a-e violation ❌)
+
+# Lemmatization with vowel harmony
+_durak_core.strip_suffixes("kitaplar")   # "kitap" (harmony valid)
+_durak_core.strip_suffixes("kitapler")   # "kitapler" (harmony violation, not stripped)
+
 # Embedded resources (no file I/O!)
 stopwords = _durak_core.get_stopwords_base()  # 100-1000x faster loading
 suffixes = _durak_core.get_detached_suffixes()
@@ -113,6 +122,7 @@ suffixes = _durak_core.get_detached_suffixes()
 - **Unicode-aware cleaning**: Turkish-specific normalization (İ/ı, I/i handling)
 - **Configurable stopword management**: Keep-lists, custom additions, domain-specific sets
 - **Regex-based tokenizer**: Preserves Turkish morphology (clitics, suffixes, apostrophes)
+- **Vowel harmony validation**: Linguistically-aware suffix stripping respecting Turkish phonotactics
 - **Offset tracking**: Character-accurate positions for NER and span tasks
 - **Embedded resources**: Zero file I/O, compiled directly into binary
 - **Type-safe**: Complete `.pyi` stubs for IDE support and static analysis

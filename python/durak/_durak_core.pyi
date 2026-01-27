@@ -78,21 +78,58 @@ def lookup_lemma(word: str) -> str | None:
 def strip_suffixes(word: str) -> str:
     """Heuristic suffix stripping for Turkish morphology.
 
-    Tier 2 lemmatization: Rule-based suffix stripping with basic vowel harmony.
-    Recursively strips common Turkish suffixes while preventing over-stripping
-    of short roots (minimum length constraint).
+    Tier 2 lemmatization: Rule-based suffix stripping with vowel harmony validation.
+    Recursively strips common Turkish suffixes ONLY if they respect Turkish vowel
+    harmony rules. Prevents over-stripping of short roots (minimum length constraint).
+
+    Vowel harmony constraint:
+    - Backness harmony: Suffix vowel must match stem's last vowel backness
+    - Back vowels: a, ı, o, u
+    - Front vowels: e, i, ö, ü
 
     Args:
         word: The word to strip suffixes from
 
     Returns:
-        The word with suffixes removed
+        The word with suffixes removed (if harmony is valid)
 
     Examples:
         >>> strip_suffixes("kitaplardan")
         'kitap'
-        >>> strip_suffixes("geliyorum")
-        'gel'
+        >>> strip_suffixes("evlerden")
+        'ev'
+        >>> strip_suffixes("kitapler")  # Harmony violation
+        'kitapler'
+    """
+    ...
+
+def check_vowel_harmony_py(stem: str, suffix: str) -> bool:
+    """Check if a suffix harmonizes with the stem's last vowel.
+
+    Turkish vowel harmony validator that checks backness harmony between
+    stem and suffix. This is a fundamental constraint in Turkish morphophonology.
+
+    Turkish vowel harmony rules:
+    - Backness harmony: Both vowels must be back OR both must be front
+    - Back vowels: a, ı, o, u
+    - Front vowels: e, i, ö, ü
+
+    Args:
+        stem: The stem word to check
+        suffix: The suffix to validate
+
+    Returns:
+        True if vowel harmony is satisfied, False otherwise
+
+    Examples:
+        >>> check_vowel_harmony_py("kitap", "lar")  # a-a (both back)
+        True
+        >>> check_vowel_harmony_py("ev", "ler")  # e-e (both front)
+        True
+        >>> check_vowel_harmony_py("kitap", "ler")  # a-e (mismatch)
+        False
+        >>> check_vowel_harmony_py("ev", "lar")  # e-a (mismatch)
+        False
     """
     ...
 
@@ -170,6 +207,7 @@ __all__ = [
     "tokenize_with_offsets",
     "lookup_lemma",
     "strip_suffixes",
+    "check_vowel_harmony_py",
     "get_detached_suffixes",
     "get_stopwords_base",
     "get_stopwords_metadata",
