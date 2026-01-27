@@ -30,7 +30,7 @@ def load_test_set(test_set_path: Path) -> list[tuple[str, str, str]]:
     """
     test_cases = []
     
-    with open(test_set_path, "r", encoding="utf-8") as f:
+    with open(test_set_path, encoding="utf-8") as f:
         for line in f:
             line = line.strip()
             # Skip comments and empty lines
@@ -100,7 +100,7 @@ def evaluate_strategy(
     }
 
 
-def print_results(results: Dict, show_errors: bool = False):
+def print_results(results: dict, show_errors: bool = False):
     """Pretty-print evaluation results"""
     print(f"\n{'='*60}")
     print(f"Strategy: {results['strategy'].upper()}")
@@ -155,7 +155,7 @@ def compare_strategies(test_set_path: Path, show_errors: bool = False):
     return all_results
 
 
-def save_baseline(results: list[Dict], baseline_path: Path):
+def save_baseline(results: list[dict], baseline_path: Path):
     """Save evaluation results as baseline for regression detection"""
     baseline_data = {
         "baseline_version": "0.4.0",
@@ -177,7 +177,7 @@ def save_baseline(results: list[Dict], baseline_path: Path):
     print(f"\n✅ Baseline saved to {baseline_path}")
 
 
-def check_regression(results: list[Dict], baseline_path: Path, threshold: float = 0.05):
+def check_regression(results: list[dict], baseline_path: Path, threshold: float = 0.05):
     """Check if accuracy dropped significantly from baseline"""
     if not baseline_path.exists():
         print(f"\n⚠️  No baseline found at {baseline_path}")
