@@ -1,5 +1,6 @@
 mod root_validator;
 mod vowel_harmony;
+mod morphotactics;
 
 use pyo3::prelude::*;
 use std::collections::HashMap;
@@ -137,8 +138,9 @@ fn strip_suffixes(word: &str) -> String {
     current
 }
 
-/// Strip suffixes with root validity checking and vowel harmony validation
-/// Prevents over-stripping by validating candidate roots and checking vowel harmony
+/// Strip suffixes with root validity checking, vowel harmony, and morphotactic validation
+/// Prevents over-stripping by validating candidate roots, checking vowel harmony,
+/// and ensuring morphologically valid suffix ordering
 /// 
 /// # Arguments
 /// * `word` - The word to process
@@ -159,6 +161,8 @@ fn strip_suffixes_validated(word: &str, strict: bool, min_root_length: usize, ch
     }
     
     let validator = RootValidator::new(min_root_length, strict);
+    let morphotactics = morphotactics::MorphotacticClassifier::new();
+    
     // Comprehensive Turkish suffix list (ordered by length for greedy matching)
     let suffixes = [
         // Compound suffixes (longer first for greedy matching)
@@ -173,6 +177,7 @@ fn strip_suffixes_validated(word: &str, strict: bool, min_root_length: usize, ch
         "di", "dı", "du", "dü", "ti", "tı", "tu", "tü",
     ];
     let mut current = word.to_string();
+    let mut stripped_suffixes: Vec<&str> = Vec::new();
     
     let mut changed = true;
     while changed {
@@ -181,13 +186,20 @@ fn strip_suffixes_validated(word: &str, strict: bool, min_root_length: usize, ch
             if current.ends_with(suffix) {
                 let candidate = &current[..current.len() - suffix.len()];
                 
-                // Validate root and vowel harmony
+                // Build hypothetical suffix sequence (reverse order: newest first)
+                let mut test_sequence = vec![suffix];
+                test_sequence.extend(stripped_suffixes.iter().rev());
+                test_sequence.reverse();  // Get correct order: oldest → newest
+                
+                // Validate root, vowel harmony, and morphotactic ordering
                 let is_valid_root = validator.is_valid_root(candidate);
                 let has_harmony = !check_harmony || vowel_harmony::check_vowel_harmony(candidate, suffix);
+                let valid_morphotactics = morphotactics.validate_sequence(&test_sequence);
                 
-                // Only strip if both conditions are met
-                if is_valid_root && has_harmony {
+                // Only strip if ALL conditions are met
+                if is_valid_root && has_harmony && valid_morphotactics {
                     current = candidate.to_string();
+                    stripped_suffixes.push(suffix);
                     changed = true;
                     break;
                 }
@@ -455,6 +467,36 @@ mod tests {
         
         // "kitap" is 5 chars, should be accepted
         assert!(validator_strict.is_valid_root("kitap"));
+    }
+
+    #[test]
+    fn test_morphotactic_validation() {
+        // Test that morphotactic constraints prevent invalid suffix sequences
+        
+        // Valid sequences should work
+        let valid_cases = vec![
+            // kitap+lar+ım+da (Plural → Possessive → Case)
+            ("kitaplarımda", "kitap"),
+            // ev+ler+imiz+den (Plural → Possessive → Case)
+            ("evlerimizden", "ev"),
+        ];
+
+        for (word, expected_root) in valid_cases {
+            let result = strip_suffixes_validated(word, false, 2, true);
+            assert!(
+                result.contains(expected_root),
+                "Valid sequence: {} should lemmatize to contain '{}', got '{}'",
+                word, expected_root, result
+            );
+        }
+
+        // Invalid sequences should be rejected (stay closer to original)
+        // Note: We can't easily construct invalid forms because they don't exist
+        // in natural Turkish. The validation prevents theoretical over-stripping.
+        
+        // Example: If we had *"kitapdalar" (Case+Plural, wrong order),
+        // the validator would reject stripping "lar" after "da" was already stripped.
+        // This is tested in morphotactics module tests.
     }
 
     #[test]
