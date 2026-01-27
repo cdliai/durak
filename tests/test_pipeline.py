@@ -1,5 +1,4 @@
 import pytest
-
 from durak.normalizer import Normalizer
 from durak.pipeline import Pipeline
 

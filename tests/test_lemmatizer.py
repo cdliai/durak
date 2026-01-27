@@ -1,5 +1,4 @@
 import pytest
-
 from durak.lemmatizer import Lemmatizer
 
 

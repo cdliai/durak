@@ -1,5 +1,4 @@
 import pytest
-
 from durak.tokenizer import tokenize_with_offsets
 
 
