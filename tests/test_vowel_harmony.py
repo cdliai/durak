@@ -43,10 +43,11 @@ class TestVowelHarmonyPython:
     def test_multi_vowel_suffixes(self):
         """Test suffixes with multiple vowels."""
         # All vowels in suffix must harmonize with root
-        assert check_vowel_harmony_py("kitap", "ların") is True  # kitapların (back-back)
-        assert check_vowel_harmony_py("ev", "lerin") is True  # evlerin (front-front)
-        assert check_vowel_harmony_py("kitap", "lerin") is False  # *kitaplerin (back-front)
-        assert check_vowel_harmony_py("ev", "ların") is False  # *evların (front-back)
+        assert check_vowel_harmony_py("kitap", "ların") is True  # back-back
+        assert check_vowel_harmony_py("ev", "lerin") is True  # front-front
+        # Invalid harmony combinations
+        assert check_vowel_harmony_py("kitap", "lerin") is False  # back-front
+        assert check_vowel_harmony_py("ev", "ların") is False  # front-back
 
     def test_consonant_only_suffixes(self):
         """Test that consonant-only suffixes always pass."""
@@ -84,7 +85,9 @@ class TestStripSuffixesWithHarmony:
         ]
 
         for word, expected_root in test_cases:
-            result = strip_suffixes_validated(word, strict=False, min_root_length=2, check_harmony=True)
+            result = strip_suffixes_validated(
+                word, strict=False, min_root_length=2, check_harmony=True
+            )
             assert result == expected_root, (
                 f"Expected {word} -> {expected_root}, got {result}"
             )
@@ -94,10 +97,14 @@ class TestStripSuffixesWithHarmony:
         word = "kitaplar"
 
         # With harmony check (default)
-        with_harmony = strip_suffixes_validated(word, strict=False, min_root_length=2, check_harmony=True)
+        with_harmony = strip_suffixes_validated(
+            word, strict=False, min_root_length=2, check_harmony=True
+        )
 
         # Without harmony check
-        without_harmony = strip_suffixes_validated(word, strict=False, min_root_length=2, check_harmony=False)
+        without_harmony = strip_suffixes_validated(
+            word, strict=False, min_root_length=2, check_harmony=False
+        )
 
         # For valid Turkish words, both should produce same result
         assert with_harmony == "kitap"
@@ -114,7 +121,9 @@ class TestStripSuffixesWithHarmony:
         ]
 
         for word, expected_root in test_cases:
-            result = strip_suffixes_validated(word, strict=True, min_root_length=2, check_harmony=True)
+            result = strip_suffixes_validated(
+                word, strict=True, min_root_length=2, check_harmony=True
+            )
             assert result == expected_root, (
                 f"Strict mode: Expected {word} -> {expected_root}, got {result}"
             )
@@ -130,10 +139,11 @@ class TestStripSuffixesWithHarmony:
         ]
 
         for word, expected_root in test_cases:
-            result = strip_suffixes_validated(word, strict=False, min_root_length=2, check_harmony=True)
-            assert result == expected_root, (
-                f"Compound suffix harmony: Expected {word} -> {expected_root}, got {result}"
+            result = strip_suffixes_validated(
+                word, strict=False, min_root_length=2, check_harmony=True
             )
+            msg = f"Expected {word} -> {expected_root}, got {result}"
+            assert result == expected_root, msg
 
 
 class TestRealWorldHarmony:

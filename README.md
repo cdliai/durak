@@ -111,12 +111,98 @@ suffixes = _durak_core.get_detached_suffixes()
 ## Features
 
 - **Unicode-aware cleaning**: Turkish-specific normalization (İ/ı, I/i handling)
+- **Emoji sentiment mapping**: Social media NLP with emoji-to-sentiment token conversion
 - **Configurable stopword management**: Keep-lists, custom additions, domain-specific sets
 - **Regex-based tokenizer**: Preserves Turkish morphology (clitics, suffixes, apostrophes)
 - **Offset tracking**: Character-accurate positions for NER and span tasks
 - **Embedded resources**: Zero file I/O, compiled directly into binary
 - **Type-safe**: Complete `.pyi` stubs for IDE support and static analysis
 - **Tiered lemmatization**: Dictionary lookup + heuristic fallback with performance metrics
+
+## Emoji Sentiment Mapping
+
+Durak provides emoji sentiment analysis for social media NLP tasks. Replace emojis with sentiment tokens or extract structured sentiment data for training and analysis.
+
+### Basic Usage
+
+```python
+from durak import clean_text
+
+# Replace emojis with sentiment labels
+text = "Harika! 😊🔥"
+cleaned = clean_text(text, emoji_mode="sentiment")
+print(cleaned)  # "harika! [HAPPY] [HOT]"
+
+# Extract structured sentiment data
+text = "Çok mutlu 😊 ama yorgun 😢"
+cleaned_text, sentiments = clean_text(text, emoji_mode="sentiment_extract")
+print(sentiments)
+# [
+#   {"polarity": "positive", "intensity": 0.7, "label": "HAPPY"},
+#   {"polarity": "negative", "intensity": 0.7, "label": "SAD"}
+# ]
+```
+
+### Sentiment Formats
+
+```python
+# Label format (specific emotion)
+clean_text("Test 😊", emoji_mode="sentiment", sentiment_format="label")
+# "test [HAPPY]"
+
+# Polarity format (positive/negative/neutral)
+clean_text("Test 😊", emoji_mode="sentiment", sentiment_format="polarity")
+# "test [POSITIVE]"
+```
+
+### Unknown Emoji Handling
+
+```python
+# Preserve unknown emojis
+clean_text("Test 🦄", emoji_mode="sentiment", sentiment_unknown="preserve")
+# "test 🦄"
+
+# Remove unknown emojis
+clean_text("Test 🦄", emoji_mode="sentiment", sentiment_unknown="remove")
+# "test"
+
+# Replace with [NEUTRAL]
+clean_text("Test 🦄", emoji_mode="sentiment", sentiment_unknown="neutral")
+# "test [NEUTRAL]"
+```
+
+### Use Cases
+
+**Sentiment Analysis**
+```python
+# Aggregate emoji sentiment scores
+text = "Harika gün! 🌞😍 Ama biraz üzgün 😢"
+_, sentiments = clean_text(text, emoji_mode="sentiment_extract")
+
+positive = sum(s["intensity"] for s in sentiments if s["polarity"] == "positive")
+negative = sum(s["intensity"] for s in sentiments if s["polarity"] == "negative")
+net_sentiment = positive - negative  # +1.0 (overall positive)
+```
+
+**Training Data Augmentation**
+```python
+# Preserve emoji signals as tokens for model training
+corpus = [
+    "Harika! 😊",
+    "Berbat 😡"
+]
+augmented = [clean_text(text, emoji_mode="sentiment") for text in corpus]
+# ["harika! [HAPPY]", "berbat [ANGRY]"]
+```
+
+**Emoji Dictionary**
+
+Durak includes a curated emoji sentiment dictionary (`resources/tr/emoji_sentiment.json`) with 110+ common emojis:
+- Polarity: positive, negative, neutral
+- Intensity: 0.0-1.0 (sentiment strength)
+- Label: HAPPY, SAD, ANGRY, etc.
+
+See [examples/emoji_sentiment_analysis.py](examples/emoji_sentiment_analysis.py) for detailed examples.
 
 ## Lemmatization
 
