@@ -230,7 +230,7 @@ def test_emoji_integration_with_social_media_cleaning() -> None:
 
 def test_map_emoji_sentiment_label_format() -> None:
     text = "Harika! 😊🔥"
-    result = cleaning.map_emoji_sentiment(text, format="label")
+    result = cleaning.map_emoji_sentiment(text, fmt="label")
     assert "[HAPPY]" in result
     assert "[HOT]" in result
     assert "harika" in result.lower()
@@ -238,7 +238,7 @@ def test_map_emoji_sentiment_label_format() -> None:
 
 def test_map_emoji_sentiment_polarity_format() -> None:
     text = "Üzgünüm 😢"
-    result = cleaning.map_emoji_sentiment(text, format="polarity")
+    result = cleaning.map_emoji_sentiment(text, fmt="polarity")
     assert "[NEGATIVE]" in result
     assert "üzgünüm" in result.lower()
 
@@ -265,7 +265,7 @@ def test_map_emoji_sentiment_unknown_neutral() -> None:
 
 def test_map_emoji_sentiment_mixed_known_unknown() -> None:
     text = "Harika 😊 ve garip 🦄"
-    result = cleaning.map_emoji_sentiment(text, format="label", unknown="neutral")
+    result = cleaning.map_emoji_sentiment(text, fmt="label", unknown="neutral")
     assert "[HAPPY]" in result
     assert "[NEUTRAL]" in result
 
@@ -282,13 +282,13 @@ def test_map_emoji_sentiment_no_emojis() -> None:
 
 def test_map_emoji_sentiment_multiple_same_emoji() -> None:
     text = "Çok mutlu 😊😊😊"
-    result = cleaning.map_emoji_sentiment(text, format="label")
+    result = cleaning.map_emoji_sentiment(text, fmt="label")
     assert result.count("[HAPPY]") == 3
 
 
 def test_map_emoji_sentiment_invalid_format_raises() -> None:
-    with pytest.raises(ValueError, match="format must be"):
-        cleaning.map_emoji_sentiment("test 😊", format="invalid")
+    with pytest.raises(ValueError, match="fmt must be"):
+        cleaning.map_emoji_sentiment("test 😊", fmt="invalid")
 
 
 def test_map_emoji_sentiment_invalid_unknown_raises() -> None:
@@ -370,7 +370,7 @@ def test_clean_text_emoji_mode_sentiment_with_format() -> None:
     result = cleaning.clean_text(
         text,
         emoji_mode="sentiment",
-        sentiment_format="polarity",
+        sentiment_fmt="polarity",
     )
     
     assert "[NEGATIVE]" in result
@@ -417,7 +417,9 @@ def test_clean_text_emoji_mode_sentiment_extract_empty() -> None:
 
 def test_clean_text_emoji_mode_sentiment_extract_no_emojis() -> None:
     text = "Emoji yok"
-    cleaned_text, sentiment_data = cleaning.clean_text(text, emoji_mode="sentiment_extract")
+    cleaned_text, sentiment_data = cleaning.clean_text(
+        text, emoji_mode="sentiment_extract"
+    )
     
     assert "emoji yok" in cleaned_text.lower()
     assert sentiment_data == []

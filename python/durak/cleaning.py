@@ -249,7 +249,7 @@ def _load_emoji_sentiment_dict() -> dict[str, dict[str, str | float]]:
 def map_emoji_sentiment(
     text: str,
     *,
-    format: str = "label",
+    fmt: str = "label",
     unknown: str = "preserve",
 ) -> str:
     """Replace emojis with sentiment tokens.
@@ -258,7 +258,7 @@ def map_emoji_sentiment(
     
     Args:
         text: Input text containing emojis
-        format: Output format for known emojis:
+        format: Output fmt for known emojis:
             - "label": Replace with [LABEL] tokens (e.g., [HAPPY], [SAD])
             - "polarity": Replace with [POSITIVE], [NEGATIVE], [NEUTRAL]
         unknown: How to handle unknown emojis:
@@ -280,8 +280,8 @@ def map_emoji_sentiment(
     if not text:
         return ""
     
-    if format not in {"label", "polarity"}:
-        raise ValueError(f"format must be 'label' or 'polarity', got '{format}'")
+    if fmt not in {"label", "polarity"}:
+        raise ValueError(f"fmt must be 'label' or 'polarity', got '{fmt}'")
     
     if unknown not in {"preserve", "remove", "neutral"}:
         raise ValueError(
@@ -296,7 +296,7 @@ def map_emoji_sentiment(
         # Check sentiment dictionary
         if emoji in sentiment_dict:
             data = sentiment_dict[emoji]
-            if format == "label":
+            if fmt == "label":
                 return f"[{data['label']}]"
             else:  # format == "polarity"
                 return f"[{data['polarity'].upper()}]"
@@ -313,7 +313,9 @@ def map_emoji_sentiment(
     return collapse_whitespace(result)
 
 
-def extract_emoji_sentiment(text: str) -> tuple[list[str], list[dict[str, str | float]]]:
+def extract_emoji_sentiment(
+    text: str,
+) -> tuple[list[str], list[dict[str, str | float]]]:
     """Extract emojis and their sentiment data as structured output.
     
     Useful for detailed sentiment analysis with emoji intensity and polarity.
@@ -325,7 +327,7 @@ def extract_emoji_sentiment(text: str) -> tuple[list[str], list[dict[str, str | 
         Tuple of:
         - List of emoji characters found
         - List of sentiment dictionaries (polarity, intensity, label)
-          Unknown emojis get {"polarity": "neutral", "intensity": 0.5, "label": "UNKNOWN"}
+          Unknown emojis get neutral sentiment (0.5 intensity)
           
     Examples:
         >>> emojis, sentiments = extract_emoji_sentiment("Test 😊😢")
@@ -371,7 +373,7 @@ def clean_text(
     *,
     steps: Iterable[Callable[[str], str]] | None = None,
     emoji_mode: str = "keep",
-    sentiment_format: str = "label",
+    sentiment_fmt: str = "label",
     sentiment_unknown: str = "preserve",
 ) -> str | tuple[str, list[str]] | tuple[str, list[dict[str, str | float]]]:
     """Apply the configured cleaning steps sequentially with emoji handling.
@@ -385,7 +387,7 @@ def clean_text(
             - "extract": Return tuple of (cleaned_text, emoji_list)
             - "sentiment": Replace emojis with sentiment tokens
             - "sentiment_extract": Return tuple of (cleaned_text, sentiment_data)
-        sentiment_format: Format for sentiment mode (only used with emoji_mode="sentiment"):
+        sentiment_fmt: Format for sentiment mode:
             - "label": [HAPPY], [SAD], etc. (default)
             - "polarity": [POSITIVE], [NEGATIVE], [NEUTRAL]
         sentiment_unknown: How to handle unknown emojis in sentiment mode:
@@ -395,8 +397,8 @@ def clean_text(
             
     Returns:
         - str: Cleaned text (if emoji_mode is "keep", "remove", or "sentiment")
-        - tuple[str, list[str]]: (cleaned_text, emoji_list) if emoji_mode is "extract"
-        - tuple[str, list[dict]]: (cleaned_text, sentiment_data) if emoji_mode is "sentiment_extract"
+        - tuple[str, list[str]]: (cleaned_text, emoji_list)
+        - tuple[str, list[dict]]: (cleaned_text, sentiment_data)
         
     Raises:
         ValueError: If emoji_mode is invalid
@@ -454,7 +456,7 @@ def clean_text(
     elif emoji_mode == "sentiment":
         cleaned = map_emoji_sentiment(
             cleaned,
-            format=sentiment_format,
+            fmt=sentiment_fmt,
             unknown=sentiment_unknown,
         )
     elif emoji_mode == "sentiment_extract":
