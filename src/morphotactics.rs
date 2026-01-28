@@ -34,6 +34,7 @@ pub enum NominalSlot {
     /// Case markers: -da, -de, -dan, -den, -ın, -in, etc.
     Case = 3,
     /// Copula (to be): -dır, -dir, etc.
+    #[allow(dead_code)]
     Copula = 4,
 }
 
@@ -49,6 +50,7 @@ pub enum VerbalSlot {
     /// Person markers: -m, -n, -k, -z, etc.
     Person = 4,
     /// Copula: -dır, -dir
+    #[allow(dead_code)]
     Copula = 5,
 }
 

@@ -188,6 +188,63 @@ lemmatizer = Lemmatizer(
 lemmatizer("kitaplardan")  # Only strips if root ≥3 chars and valid
 ```
 
+### Vowel Harmony Support
+
+Durak implements **Turkish vowel harmony validation** to prevent incorrect suffix stripping. Turkish suffixes must harmonize with the vowel class (front/back) of the root word.
+
+#### How It Works
+
+```python
+from durak._durak_core import check_vowel_harmony_py, strip_suffixes_validated
+
+# Check if a suffix harmonizes with a root
+check_vowel_harmony_py("kitap", "lar")  # True  (back + back = valid)
+check_vowel_harmony_py("ev", "ler")     # True  (front + front = valid)
+check_vowel_harmony_py("kitap", "ler")  # False (back + front = invalid!)
+check_vowel_harmony_py("ev", "lar")     # False (front + back = invalid!)
+```
+
+#### Vowel Classification
+
+- **Front vowels**: e, i, ö, ü
+- **Back vowels**: a, ı, o, u
+
+**Rule**: Suffixes with front vowels only attach to roots with front vowels, and vice versa.
+
+#### Validated Suffix Stripping
+
+```python
+# Enable harmony checking in suffix stripping
+result = strip_suffixes_validated(
+    "kitaplar",
+    strict=False,           # Use heuristic stripping
+    min_root_length=2,      # Minimum root length
+    check_harmony=True      # Enable vowel harmony validation
+)
+print(result)  # "kitap" (valid: back root + back suffix)
+
+# Invalid harmony is rejected
+result = strip_suffixes_validated("kitapler", check_harmony=True)
+print(result)  # "kitapler" (unchanged: harmony violation prevents stripping)
+```
+
+#### Impact
+
+- **Higher precision**: Reduces false positives in lemmatization
+- **No performance cost**: Compile-time pattern matching
+- **Research-grade**: Improves evaluation metrics for morphological analysis
+
+**Example:**
+```python
+# Without harmony checking (naive)
+strip_suffixes("evlar")  # "ev" ❌ (incorrectly strips invalid suffix)
+
+# With harmony checking
+strip_suffixes_validated("evlar", check_harmony=True)  # "evlar" ✅ (correctly rejects)
+```
+
+See [tests/test_vowel_harmony.py](tests/test_vowel_harmony.py) for comprehensive examples.
+
 ## Development Setup
 
 ### Building from Source

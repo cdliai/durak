@@ -25,11 +25,13 @@ impl VowelClass {
     }
 
     /// Check if this vowel class is back (a, ı, o, u)
+    #[allow(dead_code)]
     pub fn is_back(&self) -> bool {
         !self.is_front()
     }
 
     /// Check if this vowel class is rounded (o, ö, u, ü)
+    #[allow(dead_code)]
     pub fn is_rounded(&self) -> bool {
         matches!(self, VowelClass::FrontRounded | VowelClass::BackRounded)
     }

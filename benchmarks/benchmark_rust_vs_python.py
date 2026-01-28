@@ -106,11 +106,11 @@ def main():
     print("\n4. Complete Processing Pipeline")
     print("-" * 70)
 
-    pipeline = durak.Pipeline(
-        ["clean", "tokenize", "remove_stopwords", "normalize"]
-    )
+    # Using process_text convenience function (updated API)
+    def pipeline_func(text):
+        return durak.process_text(text, remove_stopwords=True, rejoin_suffixes=True)
 
-    pipeline_time = benchmark(pipeline, large_text, iterations=100)
+    pipeline_time = benchmark(pipeline_func, large_text, iterations=100)
     print(f"Full pipeline: {pipeline_time:.4f} ms per call")
 
     print("\n" + "=" * 70)

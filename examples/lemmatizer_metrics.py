@@ -21,7 +21,7 @@ def compare_strategies(corpus: list[str], corpus_name: str) -> None:
         lemmatizer = Lemmatizer(strategy=strategy, collect_metrics=True)
         
         # Process corpus
-        results = [lemmatizer(word) for word in corpus]
+        [lemmatizer(word) for word in corpus]
         
         # Get metrics
         metrics = lemmatizer.get_metrics()

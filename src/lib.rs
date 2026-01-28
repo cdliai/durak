@@ -114,24 +114,71 @@ fn lookup_lemma(word: &str) -> Option<String> {
     dict.get(word).map(|s| s.to_string())
 }
 
-/// Tier 2: Heuristic Suffix Stripping
-/// Simple rule-based stripper for demonstration.
-/// In production, this would use a more complex state machine and vowel harmony checks.
+/// Vowel harmony classification for Turkish morphology
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum VowelClass {
+    Front, // e, i, ö, ü
+    Back,  // a, ı, o, u
+}
+
+/// Classify a character as front or back vowel
+fn classify_vowel(c: char) -> Option<VowelClass> {
+    match c {
+        'e' | 'i' | 'ö' | 'ü' => Some(VowelClass::Front),
+        'a' | 'ı' | 'o' | 'u' => Some(VowelClass::Back),
+        _ => None,
+    }
+}
+
+/// Get the last vowel class from a word
+/// Returns None if no vowels found
+fn get_last_vowel_class(word: &str) -> Option<VowelClass> {
+    word.chars().rev().find_map(classify_vowel)
+}
+
+/// Check if a suffix is valid for the given word stem based on vowel harmony
+/// Turkish vowel harmony rules:
+/// - Front vowels (e, i, ö, ü) only attach to stems with front vowels
+/// - Back vowels (a, ı, o, u) only attach to stems with back vowels
+fn is_valid_suffix(stem: &str, suffix: &str) -> bool {
+    let stem_class = get_last_vowel_class(stem);
+    let suffix_class = get_last_vowel_class(suffix);
+    
+    match (stem_class, suffix_class) {
+        (Some(stem_v), Some(suffix_v)) => stem_v == suffix_v,
+        // If suffix has no vowels (e.g., consonant clusters), allow it
+        (Some(_), None) => true,
+        // If stem has no vowels or both lack vowels, reject (malformed)
+        _ => false,
+    }
+}
+
+/// Tier 2: Heuristic Suffix Stripping with Vowel Harmony Validation
+/// Strips common Turkish suffixes while respecting vowel harmony rules.
 #[pyfunction]
 fn strip_suffixes(word: &str) -> String {
     let suffixes = ["lar", "ler", "nin", "nın", "den", "dan", "du", "dün"];
     let mut current = word.to_string();
     
-    // Very naive recursive stripping for PoC
+    // Recursive stripping with vowel harmony validation
     let mut changed = true;
     while changed {
         changed = false;
         for suffix in suffixes {
-            if current.ends_with(suffix) && current.len() > suffix.len() + 2 { 
-                 // +2 constraint prevents over-stripping short roots
-                current = current[..current.len() - suffix.len()].to_string();
-                changed = true;
-                break; // Restart loop after stripping one suffix
+            if current.ends_with(suffix) {
+                let stem = &current[..current.len() - suffix.len()];
+                
+                // Prevent over-stripping: minimum root length of 2 characters
+                if stem.len() < 2 {
+                    continue;
+                }
+                
+                // Vowel harmony check: only strip if suffix is valid for the stem
+                if is_valid_suffix(stem, suffix) {
+                    current = stem.to_string();
+                    changed = true;
+                    break; // Restart loop after stripping one suffix
+                }
             }
         }
     }
@@ -301,6 +348,91 @@ fn _durak_core(_py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    // ===== Vowel Harmony Unit Tests =====
+
+    #[test]
+    fn test_classify_vowel() {
+        // Test front vowels
+        assert_eq!(classify_vowel('e'), Some(VowelClass::Front));
+        assert_eq!(classify_vowel('i'), Some(VowelClass::Front));
+        assert_eq!(classify_vowel('ö'), Some(VowelClass::Front));
+        assert_eq!(classify_vowel('ü'), Some(VowelClass::Front));
+
+        // Test back vowels
+        assert_eq!(classify_vowel('a'), Some(VowelClass::Back));
+        assert_eq!(classify_vowel('ı'), Some(VowelClass::Back));
+        assert_eq!(classify_vowel('o'), Some(VowelClass::Back));
+        assert_eq!(classify_vowel('u'), Some(VowelClass::Back));
+
+        // Test consonants (should return None)
+        assert_eq!(classify_vowel('k'), None);
+        assert_eq!(classify_vowel('t'), None);
+        assert_eq!(classify_vowel('p'), None);
+    }
+
+    #[test]
+    fn test_get_last_vowel_class() {
+        // Test words with back vowels
+        assert_eq!(get_last_vowel_class("kitap"), Some(VowelClass::Back));
+        assert_eq!(get_last_vowel_class("masa"), Some(VowelClass::Back));
+        assert_eq!(get_last_vowel_class("adam"), Some(VowelClass::Back));
+
+        // Test words with front vowels
+        assert_eq!(get_last_vowel_class("ev"), Some(VowelClass::Front));
+        assert_eq!(get_last_vowel_class("şehir"), Some(VowelClass::Front));
+        assert_eq!(get_last_vowel_class("gül"), Some(VowelClass::Front));
+
+        // Test words ending in consonants
+        assert_eq!(get_last_vowel_class("kitaplar"), Some(VowelClass::Back));
+        assert_eq!(get_last_vowel_class("evler"), Some(VowelClass::Front));
+
+        // Test edge cases
+        assert_eq!(get_last_vowel_class("krk"), None); // No vowels
+        assert_eq!(get_last_vowel_class(""), None);    // Empty string
+    }
+
+    #[test]
+    fn test_is_valid_suffix() {
+        // Valid combinations (harmony respected)
+        assert!(is_valid_suffix("kitap", "lar"));  // back + back
+        assert!(is_valid_suffix("ev", "ler"));      // front + front
+        assert!(is_valid_suffix("masa", "dan"));    // back + back
+        assert!(is_valid_suffix("şehir", "den"));   // front + front
+
+        // Invalid combinations (harmony violated)
+        assert!(!is_valid_suffix("kitap", "ler")); // back + front ❌
+        assert!(!is_valid_suffix("ev", "lar"));    // front + back ❌
+        assert!(!is_valid_suffix("masa", "den"));  // back + front ❌
+        assert!(!is_valid_suffix("şehir", "dan")); // front + back ❌
+
+        // Edge cases
+        assert!(!is_valid_suffix("krk", "lar"));   // stem has no vowels
+        assert!(is_valid_suffix("masa", "n"));     // suffix has no vowels (consonant-only suffix allowed)
+    }
+
+    #[test]
+    fn test_strip_suffixes_vowel_harmony() {
+        // Valid harmony cases - should strip
+        assert_eq!(strip_suffixes("kitaplar"), "kitap"); // back + -lar ✅
+        assert_eq!(strip_suffixes("evler"), "ev");       // front + -ler ✅
+        assert_eq!(strip_suffixes("masadan"), "masa");   // back + -dan ✅
+        assert_eq!(strip_suffixes("şehirden"), "şehir"); // front + -den ✅
+
+        // Invalid harmony cases - should NOT strip (harmony violation)
+        // Note: These are artificial test cases; real Turkish wouldn't produce these
+        assert_eq!(strip_suffixes("kitapler"), "kitapler"); // back + -ler ❌ (harmony violation)
+        assert_eq!(strip_suffixes("evlar"), "evlar");       // front + -lar ❌ (harmony violation)
+
+        // Multiple suffix stripping with harmony
+        assert_eq!(strip_suffixes("kitaplardan"), "kitap"); // -lar and -dan both valid
+
+        // Edge cases
+        assert_eq!(strip_suffixes("ev"), "ev");    // No suffix to strip
+        assert_eq!(strip_suffixes("a"), "a");      // Too short to strip
+    }
+
+    // ===== Existing Tests =====
 
     #[test]
     fn test_lemma_dict_loading() {

@@ -241,7 +241,7 @@ def test_root_validation_strict():
     
     # Should not produce unknown roots
     # (will stop stripping when candidate is not in dictionary)
-    result = lemmatizer("xyzlar")  # nonsense word
+    lemmatizer("xyzlar")  # nonsense word
     # In strict mode, should be conservative
 
 

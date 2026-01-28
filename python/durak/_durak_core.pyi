@@ -96,6 +96,68 @@ def strip_suffixes(word: str) -> str:
     """
     ...
 
+def strip_suffixes_validated(
+    word: str,
+    strict: bool = False,
+    min_root_length: int = 2,
+    check_harmony: bool = True,
+) -> str:
+    """Advanced suffix stripping with vowel harmony validation and root validation.
+
+    Tier 2+ lemmatization: Rule-based suffix stripping with configurable validation:
+    - Vowel harmony checking (optional)
+    - Root validity checking (optional strict mode with dictionary lookup)
+    - Minimum root length enforcement
+    - Morphotactic classification
+
+    Args:
+        word: The word to strip suffixes from
+        strict: If True, validate roots against dictionary before stripping
+        min_root_length: Minimum length for a valid root (default: 2)
+        check_harmony: If True, validate vowel harmony before stripping (default: True)
+
+    Returns:
+        The word with suffixes removed, respecting validation rules
+
+    Examples:
+        >>> strip_suffixes_validated("kitaplar", check_harmony=True)
+        'kitap'
+        >>> strip_suffixes_validated("evler", check_harmony=True)
+        'ev'
+        >>> strip_suffixes_validated("xyz", strict=True)  # Invalid root
+        'xyz'
+    """
+    ...
+
+def check_vowel_harmony_py(root: str, suffix: str) -> bool:
+    """Check if suffix harmonizes with root (Turkish vowel harmony).
+
+    Validates that the suffix vowels are compatible with the root's last vowel
+    according to Turkish front/back and rounded/unrounded vowel harmony.
+
+    Turkish Vowel Harmony:
+    - Front vowels (e, i, ö, ü) require front suffixes
+    - Back vowels (a, ı, o, u) require back suffixes
+
+    Args:
+        root: The root word (e.g., "kitap", "ev")
+        suffix: The suffix to validate (e.g., "lar", "ler")
+
+    Returns:
+        True if the suffix harmonizes with the root, False otherwise
+
+    Examples:
+        >>> check_vowel_harmony_py("kitap", "lar")  # back + back
+        True
+        >>> check_vowel_harmony_py("kitap", "ler")  # back + front (invalid!)
+        False
+        >>> check_vowel_harmony_py("ev", "ler")  # front + front
+        True
+        >>> check_vowel_harmony_py("ev", "lar")  # front + back (invalid!)
+        False
+    """
+    ...
+
 def get_detached_suffixes() -> list[str]:
     """Get embedded detached suffixes list.
 
@@ -170,6 +232,8 @@ __all__ = [
     "tokenize_with_offsets",
     "lookup_lemma",
     "strip_suffixes",
+    "strip_suffixes_validated",
+    "check_vowel_harmony_py",
     "get_detached_suffixes",
     "get_stopwords_base",
     "get_stopwords_metadata",
