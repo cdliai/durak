@@ -6,10 +6,10 @@ This script computes checksums and counts items in embedded resources,
 generating a metadata.json file that's embedded in the Rust binary.
 """
 
-import json
 import hashlib
-from pathlib import Path
+import json
 from datetime import datetime
+from pathlib import Path
 
 
 def compute_checksum(file_path: Path) -> str:
@@ -23,7 +23,10 @@ def compute_checksum(file_path: Path) -> str:
 def count_items(file_path: Path) -> int:
     """Count non-empty lines in a text file."""
     with open(file_path, encoding='utf-8') as f:
-        return len([line for line in f if line.strip() and not line.strip().startswith('#')])
+        return len([
+            line for line in f
+            if line.strip() and not line.strip().startswith('#')
+        ])
 
 
 def generate_metadata():
@@ -116,7 +119,11 @@ def generate_metadata():
     # Print summary
     print("\nResource Summary:")
     for key, info in metadata["resources"].items():
-        print(f"  {key:30} {info['item_count']:4} items  SHA256:{info['checksum'][:12]}...")
+        checksum_short = info['checksum'][:12]
+        print(
+            f"  {key:30} {info['item_count']:4} items  "
+            f"SHA256:{checksum_short}..."
+        )
     
     return metadata
 

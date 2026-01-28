@@ -180,7 +180,7 @@ __all__ = [
     "get_resource_info",
 ]
 
-def get_build_info() -> Dict[str, str]:
+def get_build_info() -> dict[str, str]:
     """Get Durak build information for reproducibility.
     
     Returns build metadata including package version, build date, and
@@ -196,7 +196,7 @@ def get_build_info() -> Dict[str, str]:
     """
     ...
 
-def get_resource_info() -> Dict[str, Dict[str, str]]:
+def get_resource_info() -> dict[str, dict[str, str]]:
     """Get embedded resource versions and checksums.
     
     Returns metadata for all linguistic resources embedded in the binary,

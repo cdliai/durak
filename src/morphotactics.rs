@@ -21,7 +21,6 @@
 /// - gel+di+m (come+PAST+1SG) ✓
 /// - yap+ıl+dı (do+PASS+PAST) ✓
 /// - *gel+m+di (Person before Tense) ✗
-
 use std::collections::HashMap;
 
 /// Morpheme slot types for Turkish nominal morphology

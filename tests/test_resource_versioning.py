@@ -155,7 +155,7 @@ def test_print_reproducibility_report_runs_without_error(capsys):
     assert "Durak Reproducibility Report" in output
     assert "Build Information:" in output
     assert "Embedded Resources:" in output
-    assert "durak_version:" in output or "Durak Version:" in output
+    assert "durak_version" in output
 
 
 def test_reproducibility_report_contains_all_resources(capsys):
