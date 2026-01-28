@@ -4,7 +4,16 @@ from __future__ import annotations
 
 from importlib import metadata
 
-from .cleaning import clean_text, collapse_whitespace, normalize_case, normalize_unicode
+from .cleaning import (
+    clean_text,
+    collapse_whitespace,
+    extract_emoji_sentiment,
+    extract_emojis,
+    map_emoji_sentiment,
+    normalize_case,
+    normalize_unicode,
+    remove_emojis,
+)
 from .lemmatizer import Lemmatizer
 from .normalizer import Normalizer
 from .pipeline import Pipeline, process_text
@@ -49,15 +58,19 @@ __all__ = [
     "attach_detached_suffixes",
     "clean_text",
     "collapse_whitespace",
+    "extract_emoji_sentiment",
+    "extract_emojis",
     "is_stopword",
     "list_stopwords",
     "load_stopword_resource",
     "load_stopword_resources",
     "load_stopwords",
+    "map_emoji_sentiment",
     "normalize_case",
     "normalize_unicode",
     "normalize_tokens",
     "process_text",
+    "remove_emojis",
     "remove_stopwords",
     "split_sentences",
     "tokenize",
