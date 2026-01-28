@@ -6,8 +6,6 @@ use pyo3::prelude::*;
 use std::collections::HashMap;
 use std::sync::OnceLock;
 use regex::Regex;
-// will be keeping for backward compatability
-use serde::{Deserialize, Serialize};
 use root_validator::RootValidator;
 
 
@@ -272,6 +270,110 @@ fn get_stopwords_social_media() -> Vec<String> {
 #[pyfunction]
 fn check_vowel_harmony_py(root: &str, suffix: &str) -> bool {
     vowel_harmony::check_vowel_harmony(root, suffix)
+}
+
+/// Get Durak build information for reproducibility tracking.
+/// 
+/// Returns build metadata including:
+/// - durak_version: Package version (from Cargo.toml)
+/// - build_date: ISO 8601 timestamp when the binary was built
+/// - rust_version: Rust compiler version used to build the package
+/// - package_name: The package name
+/// 
+/// # Returns
+/// HashMap with build metadata keys and string values
+#[pyfunction]
+fn get_build_info() -> PyResult<HashMap<String, String>> {
+    let mut info = HashMap::new();
+    
+    // Package version from Cargo.toml
+    info.insert("durak_version".to_string(), env!("CARGO_PKG_VERSION").to_string());
+    
+    // Build date from metadata.json
+    let metadata: serde_json::Value = serde_json::from_str(RESOURCE_METADATA)
+        .map_err(|e| PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(
+            format!("Failed to parse resource metadata: {}", e)
+        ))?;
+    
+    if let Some(build_date) = metadata.get("build_date").and_then(|v| v.as_str()) {
+        info.insert("build_date".to_string(), build_date.to_string());
+    }
+    
+    // Rust version used for compilation (from rustc at compile time)
+    info.insert("rust_version".to_string(), 
+        option_env!("RUSTC_VERSION")
+            .unwrap_or("unknown")
+            .to_string());
+    
+    // Package name
+    info.insert("package_name".to_string(), env!("CARGO_PKG_NAME").to_string());
+    
+    Ok(info)
+}
+
+/// Get embedded resource versions and checksums for reproducibility.
+/// 
+/// Returns metadata for all linguistic resources embedded in the binary:
+/// - stopwords_base: Base Turkish stopwords
+/// - stopwords_social_media: Social media stopwords
+/// - detached_suffixes: Turkish detached suffixes
+/// - apostrophes: Apostrophe rules
+/// - lemma_suffixes: Lemmatization suffixes
+/// 
+/// Each resource includes:
+/// - name: Human-readable name
+/// - version: Semantic version (e.g., "1.0.0")
+/// - source: Where the resource came from
+/// - checksum: SHA256 hash for exact matching
+/// - item_count: Number of items in the resource
+/// - last_updated: ISO 8601 date
+/// 
+/// # Returns
+/// PyObject representing a nested dictionary of resource metadata
+#[pyfunction]
+fn get_resource_info(py: Python) -> PyResult<Py<PyAny>> {
+    let metadata: serde_json::Value = serde_json::from_str(RESOURCE_METADATA)
+        .map_err(|e| PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(
+            format!("Failed to parse resource metadata: {}", e)
+        ))?;
+    
+    let resources = metadata.get("resources")
+        .and_then(|v| v.as_object())
+        .ok_or_else(|| PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(
+            "Missing 'resources' key in metadata"
+        ))?;
+    
+    // Convert JSON to Python dict
+    let result = pyo3::types::PyDict::new(py);
+    
+    for (key, value) in resources {
+        if let Some(obj) = value.as_object() {
+            let resource_dict = pyo3::types::PyDict::new(py);
+            
+            for (k, v) in obj {
+                match v {
+                    serde_json::Value::String(s) => {
+                        resource_dict.set_item(k, s)?;
+                    },
+                    serde_json::Value::Number(n) => {
+                        if let Some(i) = n.as_i64() {
+                            resource_dict.set_item(k, i)?;
+                        } else if let Some(f) = n.as_f64() {
+                            resource_dict.set_item(k, f)?;
+                        }
+                    },
+                    _ => {
+                        // Convert other types to string as fallback
+                        resource_dict.set_item(k, v.to_string())?;
+                    }
+                }
+            }
+            
+            result.set_item(key, resource_dict)?;
+        }
+    }
+    
+    Ok(result.into())
 }
 
 /// The internal Rust part of the Durak library.

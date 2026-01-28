@@ -5,7 +5,11 @@ This module provides functions to query embedded resource versions, checksums,
 and build metadata for research reproducibility and provenance tracking.
 
 Example:
-    >>> from durak import get_build_info, get_resource_info, print_reproducibility_report
+    >>> from durak import (
+    ...     get_build_info,
+    ...     get_resource_info,
+    ...     print_reproducibility_report
+    ... )
     >>> 
     >>> # Get Durak version and build date
     >>> build = get_build_info()
@@ -21,11 +25,10 @@ Example:
     >>> print_reproducibility_report()
 """
 
-from typing import Dict
 from . import _durak_core
 
 
-def get_build_info() -> Dict[str, str]:
+def get_build_info() -> dict[str, str]:
     """Get Durak build information for reproducibility.
     
     Returns build metadata including package version, build date, and
@@ -49,7 +52,7 @@ def get_build_info() -> Dict[str, str]:
     return _durak_core.get_build_info()
 
 
-def get_resource_info() -> Dict[str, Dict[str, str]]:
+def get_resource_info() -> dict[str, dict[str, str]]:
     """Get embedded resource versions and checksums.
     
     Returns metadata for all linguistic resources embedded in the Durak binary,
@@ -90,8 +93,13 @@ def get_resource_info() -> Dict[str, Dict[str, str]]:
         Items: 118, Checksum: 361908bbb0a4...
         >>> 
         >>> # Verify reproducibility
-        >>> expected_checksum = '361908bbb0a44efc7dcb2dfb600d13a64d3982623701bd4057e0af69ca6d0b04'
-        >>> assert resources['stopwords_base']['checksum'] == expected_checksum
+        >>> expected_checksum = (
+        ...     '361908bbb0a44efc7dcb2dfb600d13a6'
+        ...     '4d3982623701bd4057e0af69ca6d0b04'
+        ... )
+        >>> assert resources['stopwords_base']['checksum'] == (
+        ...     expected_checksum
+        ... )
     """
     return _durak_core.get_resource_info()
 
@@ -213,7 +221,9 @@ def get_bibtex_citation() -> str:
   version = {{{version}}},
   year = {{{year}}},
   url = {{https://github.com/cdliai/durak}},
-  note = {{Stopwords v{stopwords.get('version', '1.0.0')} ({stopwords.get('item_count', '0')} items, SHA256: {stopwords.get('checksum', '')[:12]}...)}}
+  note = {{Stopwords v{stopwords.get('version', '1.0.0')} (
+{stopwords.get('item_count', '0')} items, SHA256: 
+{stopwords.get('checksum', '')[:12]}...)}}
 }}"""
 
 
