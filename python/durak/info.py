@@ -215,15 +215,20 @@ def get_bibtex_citation() -> str:
     version = build_info.get('durak_version', '0.0.0')
     year = datetime.now().year
     
+    # Format note on single line for valid BibTeX
+    note = (
+        f"Stopwords v{stopwords.get('version', '1.0.0')} "
+        f"({stopwords.get('item_count', '0')} items, "
+        f"SHA256: {stopwords.get('checksum', '')[:12]}...)"
+    )
+    
     return f"""@software{{durak{year},
   title = {{Durak: Turkish NLP Toolkit}},
   author = {{Karagöz, Fatih Burak}},
   version = {{{version}}},
   year = {{{year}}},
   url = {{https://github.com/cdliai/durak}},
-  note = {{Stopwords v{stopwords.get('version', '1.0.0')} (
-{stopwords.get('item_count', '0')} items, SHA256: 
-{stopwords.get('checksum', '')[:12]}...)}}
+  note = {{{note}}}
 }}"""
 
 
