@@ -130,7 +130,7 @@ def strip_suffixes_validated(
     ...
 
 def check_vowel_harmony_py(root: str, suffix: str) -> bool:
-    """Check if a suffix harmonizes with a root word according to Turkish vowel harmony rules.
+    """Check if suffix harmonizes with root (Turkish vowel harmony).
 
     Validates that the suffix vowels are compatible with the root's last vowel
     according to Turkish front/back and rounded/unrounded vowel harmony.
