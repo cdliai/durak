@@ -1,7 +1,7 @@
 """Tests for LemmatizerMetrics performance tracking."""
 
 import pytest
-from durak.lemmatizer import Lemmatizer, LemmatizerMetrics
+from durak.lemmatizer import Lemmatizer
 
 
 def test_metrics_disabled_by_default():
@@ -258,8 +258,9 @@ def test_metrics_repr():
 def test_metrics_no_overhead_when_disabled():
     """Verify metrics=False has minimal overhead."""
     try:
-        from durak import _durak_core  # noqa: F401
         import time
+
+        from durak import _durak_core  # noqa: F401
     except ImportError:
         pytest.skip("Rust extension not installed")
     

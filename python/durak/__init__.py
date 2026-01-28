@@ -35,8 +35,8 @@ from .suffixes import (
     attach_detached_suffixes,
 )
 from .tokenizer import (
-    Tokenizer,
     TokenizationError,
+    Tokenizer,
     normalize_tokens,
     split_sentences,
     tokenize,

@@ -11,7 +11,9 @@ except ImportError:
         raise ImportError("Rust extension not installed")
     def strip_suffixes(word: str) -> str:
         raise ImportError("Rust extension not installed")
-    def strip_suffixes_validated(word: str, strict: bool = False, min_root_length: int = 2) -> str:
+    def strip_suffixes_validated(
+        word: str, strict: bool = False, min_root_length: int = 2
+    ) -> str:
         raise ImportError("Rust extension not installed")
 
 Strategy = Literal["lookup", "heuristic", "hybrid"]
