@@ -1,0 +1,150 @@
+# Turkish Lemmatization Gold Standard Test Set
+# Format: inflected<TAB>lemma<TAB>source
+# Source: manual=hand-curated, dict=from dictionary, test=from unit tests
+#
+# Nouns - Plural Forms
+evler	ev	test
+insanlar	insan	test
+çocuklar	çocuk	test
+kadınlar	kadın	test
+erkekler	erkek	test
+kitaplar	kitap	test
+masalar	masa	test
+arabalar	araba	test
+güzeller	güzel	test
+iyiler	iyi	test
+büyükler	büyük	test
+#
+# Nouns - Case Forms (Accusative, Dative, Locative, Ablative)
+kitabı	kitap	test
+kitaba	kitap	test
+kitapta	kitap	test
+kitaptan	kitap	test
+kitapların	kitap	dict
+kitapları	kitap	test
+evleri	ev	test
+#
+# Nouns - Possessive Forms
+evim	ev	test
+evimiz	ev	test
+adamım	adam	dict
+adamımız	adam	dict
+#
+# Nouns - Multiple Suffixes
+adamlar	adam	test
+adamları	adam	dict
+adamın	adam	dict
+adama	adam	dict
+adamda	adam	dict
+adamdan	adam	dict
+#
+# Verbs - Present Tense
+geliyorum	gel	test
+geliyorsun	gel	test
+geliyor	gel	test
+geliyoruz	gel	test
+gidiyorum	git	test
+yapıyorum	yap	test
+okuyorum	oku	test
+yazıyorum	yaz	test
+görüyorum	gör	test
+#
+# Verbs - Past Tense
+geldim	gel	test
+geldin	gel	test
+geldi	gel	test
+geldik	gel	test
+gittim	git	test
+aldim	al	dict
+aldik	al	dict
+aldi	al	dict
+#
+# Verbs - Future Tense
+geleceğim	gel	test
+geleceksin	gel	test
+gelecek	gel	test
+alacağım	al	dict
+alacağız	al	dict
+alacak	al	dict
+alacaksın	al	dict
+alacaksınız	al	dict
+alacaklar	al	dict
+#
+# Verbs - Other Forms
+alar	al	dict
+alarım	al	dict
+gelmeden	gel	test
+#
+# Pronouns - Personal with Cases
+beni	ben	test
+bana	ben	test
+bende	ben	test
+benden	ben	test
+seni	sen	test
+sana	sen	test
+onu	o	test
+ona	o	test
+bizi	biz	test
+bize	biz	test
+sizi	siz	test
+size	siz	test
+#
+# Pronouns - Demonstrative
+bunlar	bu	test
+şunlar	şu	test
+#
+# Verbs - Conditional Tense
+gelsem	gel	manual
+gelsen	gel	manual
+gelse	gel	manual
+gelsek	gel	manual
+alsam	al	manual
+alsaydım	al	manual
+#
+# Verbs - Imperative
+gel	gel	test
+gelin	gel	manual
+gitme	git	manual
+alma	al	manual
+#
+# Verbs - Participles and Verbal Nouns
+gelen	gel	manual
+giden	git	manual
+gelme	gel	manual
+yapma	yap	manual
+alış	al	manual
+verişler	veriş	manual
+#
+# Adjectives - Comparative and Superlative
+daha güzel	güzel	manual
+en güzel	güzel	manual
+büyükler	büyük	test
+küçükler	küçük	manual
+#
+# Proper Nouns with Apostrophe + Possessive
+Ahmet'in	ahmet	manual
+İstanbul'da	istanbul	manual
+Türkiye'de	türkiye	manual
+Ankara'ya	ankara	manual
+#
+# Compound Words and Complex Chains
+görebildim	görebil	manual
+yapabiliyorum	yapabil	manual
+gelebilir	gelebil	manual
+gelemeyecek	gele	manual
+#
+# Adjectives to Nouns
+güzellik	güzel	manual
+büyüklük	büyük	manual
+zenginlik	zengin	manual
+#
+# Words with Double Consonants
+hakkında	hak	manual
+yıkkaç	yık	manual
+#
+# Edge Cases
+kiler	kiler	test
+unknownword	unknownword	test
+yemek	yemek	test
+yapmak	yap	manual
+gitmek	git	manual
