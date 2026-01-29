@@ -12,7 +12,10 @@ authors = [{ name = "Fatih Burak Karagöz", email = "dev@karagoz.io" }]
 license = "MIT"
 license-files = ["LICENSE"]
 keywords = ["turkish nlp", "text processing", "preprocessing", "lemmatization", "tokenization"]
-dependencies = []
+dependencies = ["click>=8.0.0"]
+
+[project.scripts]
+durak = "durak.cli:main"
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
