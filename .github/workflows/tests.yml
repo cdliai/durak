@@ -24,13 +24,17 @@ jobs:
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
 
+      # Run Rust checks once (not for every Python version)
       - name: Run Rust unit tests
+        if: matrix.python-version == '3.11'
         run: cargo test --all-features
 
       - name: Lint Rust code with Clippy
+        if: matrix.python-version == '3.11'
         run: cargo clippy -- -D warnings
 
       - name: Check Rust formatting
+        if: matrix.python-version == '3.11'
         run: cargo fmt --check
 
       - name: Install dependencies and build package
