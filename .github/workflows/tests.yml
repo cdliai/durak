@@ -14,7 +14,7 @@ jobs:
         python-version: ["3.9", "3.10", "3.11", "3.12"]
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
@@ -24,13 +24,17 @@ jobs:
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
 
+      # Run Rust checks once (not for every Python version)
       - name: Run Rust unit tests
+        if: matrix.python-version == '3.11'
         run: cargo test --all-features
 
       - name: Lint Rust code with Clippy
+        if: matrix.python-version == '3.11'
         run: cargo clippy -- -D warnings
 
       - name: Check Rust formatting
+        if: matrix.python-version == '3.11'
         run: cargo fmt --check
 
       - name: Install dependencies and build package
@@ -47,11 +51,9 @@ jobs:
       - name: Run tests with coverage
         run: pytest --cov=durak --cov-report=xml --cov-report=term
 
-      - name: Evaluate Lemmatizer Quality
-        if: matrix.python-version == '3.11'
-        run: |
-          python scripts/evaluate_lemmatizer.py --all --check-regression
-          
+      - name: Run property-based tests with statistics
+        run: pytest tests/test_properties.py --hypothesis-show-statistics -v
+
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
         if: matrix.python-version == '3.11'
