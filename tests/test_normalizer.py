@@ -66,7 +66,7 @@ def test_empty_string(normalizer) -> None:
 
 
 def test_none_input(normalizer) -> None:
-    """Test that None input returns empty string."""
+    """Test that None input raises NormalizerError."""
 
     with patch("durak.normalizer.fast_normalize") as mock_fast:
         with pytest.raises(NormalizerError, match="Input must be a string"):

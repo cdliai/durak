@@ -5,7 +5,7 @@ from durak.normalizer import Normalizer
 try:
     from durak._durak_core import fast_normalize
 
-    RUST_AVAILABLE = False
+    RUST_AVAILABLE = True
 except ImportError:
     RUST_AVAILABLE = False
 
