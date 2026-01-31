@@ -10,6 +10,7 @@ from unittest.mock import patch
 
 import pytest
 from durak.normalizer import Normalizer
+from durak.exceptions import NormalizerError
 
 
 @pytest.fixture
@@ -34,7 +35,7 @@ def test_turkish_i_handling_contract(normalizer, input_text, expected) -> None:
 
     with patch("durak.normalizer.fast_normalize") as mock_fast:
         # mock logic to mimic correct Rust behavior
-        mock_fast.side_effect = lambda x: {
+        mock_fast.side_effect = lambda x, *args: {
             "İstanbul": "istanbul",
             "IŞIK": "ışık",
             "ışık": "ışık",
@@ -55,7 +56,8 @@ def test_none_input(normalizer) -> None:
     """Test that None input returns empty string."""
 
     with patch("durak.normalizer.fast_normalize") as mock_fast:
-        assert normalizer(None) == ""
+        with pytest.raises(NormalizerError, match="Input must be a string"):
+            normalizer(None)
         mock_fast.assert_not_called()
 
 
@@ -85,7 +87,7 @@ def test_bug_flags_ignored() -> None:
 def test_rust_extension_missing() -> None:
     """Test graceful failure when _durak_core is missing."""
 
-    def mock_fallback(text) -> NoReturn:
+    def mock_fallback(text, *args) -> NoReturn:
         raise ImportError("Durak Rust extension is not installed")
 
     with patch("durak.normalizer.fast_normalize", mock_fallback):
@@ -98,3 +100,21 @@ def test_rust_extension_missing() -> None:
 def test_repr() -> None:
     normalizer = Normalizer(lowercase=True, handle_turkish_i=False)
     assert repr(normalizer) == "Normalizer(lowercase=True, handle_turkish_i=False)"
+
+
+# --- Edge Cases --- #
+def test_whitespace_only(normalizer) -> None:
+    """Test whitespace-only strings."""
+
+    with patch("durak.normalizer.fast_normalize") as mock_fast:
+        normalizer("   ")
+        mock_fast.assert_called()
+
+
+def test_long_string(normalizer) -> None:
+    """Test long strings."""
+
+    long_text = "a" * 10000
+    with patch("durak.normalizer.fast_normalize") as mock_fast:
+        normalizer(long_text)
+        mock_fast.assert_called()
