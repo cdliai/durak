@@ -83,18 +83,14 @@ def test_configuration_flags_stored() -> None:
     assert not normalizer.handle_turkish_i
 
 
-def test_bug_lowercase_flags_ignored_by_backend() -> None:
-    """
-    BUG #39: The Rust backend currently ignores the lowercase flag.
-    Even when lowercase=False, fast_normalize is called with default behavior.
-    TODO: Fix backend to respect configuration flags.
-    """
+def test_configuration_flags_passed_by_backend() -> None:
+    """Verify that configuration flags are correctly passed to the Rust backend."""
 
-    normalizer = Normalizer(lowercase=False)
+    normalizer = Normalizer(lowercase=False, handle_turkish_i=True)
 
     with patch("durak.normalizer.fast_normalize") as mock_fast:
         normalizer("TEST")
-        mock_fast.assert_called()
+        mock_fast.assert_called_with("TEST", False, True)
 
 
 # --- Rust Fallback Test --- #
