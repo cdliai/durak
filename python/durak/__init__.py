@@ -5,6 +5,18 @@ from __future__ import annotations
 from importlib import metadata
 
 from .cleaning import clean_text, collapse_whitespace, normalize_case, normalize_unicode
+from .exceptions import (
+    ConfigurationError,
+    DurakError,
+    LemmatizerError,
+    NormalizerError,
+    PipelineError,
+    ResourceError,
+    RustExtensionError,
+    StopwordError,
+    StopwordMetadataError,  # Backward compatibility alias
+    TokenizationError,
+)
 from .lemmatizer import Lemmatizer
 from .normalizer import Normalizer
 from .pipeline import Pipeline, process_text
@@ -26,6 +38,7 @@ from .suffixes import (
     attach_detached_suffixes,
 )
 from .tokenizer import (
+    Tokenizer,
     normalize_tokens,
     split_sentences,
     tokenize,
@@ -39,11 +52,25 @@ __all__ = [
     "BASE_STOPWORDS",
     "DEFAULT_STOPWORD_RESOURCE",
     "DEFAULT_DETACHED_SUFFIXES",
+    # Modules
     "Lemmatizer",
     "Normalizer",
     "Pipeline",
     "StopwordManager",
     "StopwordSnapshot",
+    "Tokenizer",
+    # Exceptions
+    "ConfigurationError",
+    "DurakError",
+    "LemmatizerError",
+    "NormalizerError",
+    "PipelineError",
+    "ResourceError",
+    "RustExtensionError",
+    "StopwordError",
+    "StopwordMetadataError",  # Backward compatibility
+    "TokenizationError",
+    # Functions
     "attach_detached_suffixes",
     "clean_text",
     "collapse_whitespace",
@@ -53,16 +80,14 @@ __all__ = [
     "load_stopword_resources",
     "load_stopwords",
     "normalize_case",
-    "normalize_unicode",
     "normalize_tokens",
+    "normalize_unicode",
     "process_text",
     "remove_stopwords",
     "split_sentences",
     "tokenize",
     "tokenize_text",
     "tokenize_with_offsets",
-    "Tokenizer",
-    "TokenizationError",
 ]
 
 try:

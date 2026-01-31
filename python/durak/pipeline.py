@@ -1,93 +1,109 @@
+"""Pipeline module for composing text processing steps."""
+
 from __future__ import annotations
 
-from collections.abc import Iterable
-from typing import Any
+from durak.cleaning import clean_text, normalize_case
+from durak.exceptions import ConfigurationError, PipelineError
+from durak.normalizer import Normalizer
+from durak.stopwords import remove_stopwords
+from durak.tokenizer import split_sentences, tokenize
 
-from durak.cleaning import clean_text
-from durak.stopwords import remove_stopwords as remove_stopwords_func
-from durak.suffixes import attach_detached_suffixes
-from durak.tokenizer import tokenize
+STEP_REGISTRY = {
+    "clean": clean_text,
+    "normalize": Normalizer(),
+    "normalize_case": normalize_case,
+    "tokenize": tokenize,
+    "split_sentences": split_sentences,
+    "remove_stopwords": remove_stopwords,
+}
 
 
 class Pipeline:
     """
-    A sequential processing pipeline, similar to torch.nn.Sequential.
+    Composable text processing pipeline.
     
     Args:
-        steps (list[Any]): A list of callable components (e.g. Normalizer).
+        steps: List of step names or callables
+        
+    Raises:
+        ConfigurationError: If steps list is empty or contains unknown step names
+        
+    Examples:
+        >>> pipeline = Pipeline(["clean", "tokenize"])
+        >>> tokens = pipeline("Hello world!")
+        ['Hello', 'world', '!']
     """
-    def __init__(self, steps: list[Any]):
-        self.steps = steps
+    
+    def __init__(self, steps: list[str | callable]):
+        if not steps:
+            raise ConfigurationError("Pipeline must have at least one step")
+        
+        self.step_names = []
+        self.steps = []
+        
+        for step in steps:
+            if callable(step):
+                self.step_names.append(step.__name__)
+                self.steps.append(step)
+            elif isinstance(step, str):
+                if step not in STEP_REGISTRY:
+                    raise ConfigurationError(
+                        f"Unknown pipeline step: '{step}'. "
+                        f"Available steps: {', '.join(STEP_REGISTRY.keys())}"
+                    )
+                self.step_names.append(step)
+                self.steps.append(STEP_REGISTRY[step])
+            else:
+                raise ConfigurationError(
+                    f"Pipeline step must be a string or callable, got {type(step).__name__}"
+                )
 
-    def __call__(self, text: str) -> Any:
+    def __call__(self, text: str) -> str | list[str]:
         """
-        Process a single document through the pipeline.
+        Process text through the pipeline.
         
         Args:
-            text (str): Input text.
+            text: Input text to process
             
         Returns:
-            Any: The result of the final pipeline step.
+            Processed result (type depends on pipeline steps)
+            
+        Raises:
+            PipelineError: If input is not a string or step execution fails
         """
+        if not isinstance(text, str):
+            raise PipelineError(
+                f"Pipeline input must be a string, got {type(text).__name__}"
+            )
+        
         doc = text
-        for step in self.steps:
-            doc = step(doc)
+        for step_name, step in zip(self.step_names, self.steps):
+            try:
+                doc = step(doc)
+            except Exception as e:
+                raise PipelineError(
+                    f"Pipeline step '{step_name}' failed: {e}"
+                ) from e
         return doc
 
-    def pipe(self, texts: list[str], batch_size: int = 1000) -> Iterable[Any]:
-        """
-        Process a stream of texts efficiently.
-        
-        Args:
-            texts (list[str]): Input texts.
-            batch_size (int): Size of batches (reserved for 
-                future Rust parallelization).
-            
-        Yields:
-            Any: Processed documents.
-        """
-        # TODO: Implement Rust-based parallel batch processing here.
-        # For now, we iterate in Python.
-        for text in texts:
-            yield self(text)
-
     def __repr__(self) -> str:
-        step_names = [repr(step) for step in self.steps]
-        return "Pipeline([\n  " + ",\n  ".join(step_names) + "\n])"
+        return f"Pipeline([{', '.join(repr(name) for name in self.step_names)}])"
 
-def process_text(
-    text: str,
-    *,
-    remove_stopwords: bool = False,
-    rejoin_suffixes: bool = False,
-    # These params are kept for signature compatibility 
-    # but might need implementation update
-    **kwargs: Any
-) -> list[str]:
+
+def process_text(text: str, steps: list[str | callable]) -> str | list[str]:
     """
-    Legacy wrapper for backward compatibility.
+    Convenience function for one-off pipeline processing.
     
-    This function mimics the old behavior using the new architecture or 
-    existing components. Since we haven't deleted the old cleaning/tokenizer 
-    modules yet, we can import them locally or assume they are available 
-    to replicate the old flow.
+    Args:
+        text: Input text
+        steps: List of step names or callables
+        
+    Returns:
+        Processed result
+        
+    Examples:
+        >>> result = process_text("Hello world!", ["clean", "tokenize"])
+        ['Hello', 'world', '!']
     """
-    
-    # Replicate original pipeline logic from Quickstart:
-    # clean -> tokenize -> rejoin -> remove stopwords
-    
-    # 1. Clean (using default cleaning steps)
-    cleaned = clean_text(text)
-    
-    # 2. Tokenize (using regex strategy)
-    tokens = tokenize(cleaned)
-    
-    # 3. Rejoin suffixes if requested
-    if rejoin_suffixes:
-        tokens = attach_detached_suffixes(tokens)
-        
-    # 4. Remove stopwords if requested
-    if remove_stopwords:
-        tokens = remove_stopwords_func(tokens)
-        
-    return tokens
+    pipeline = Pipeline(steps)
+    return pipeline(text)

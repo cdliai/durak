@@ -1,9 +1,9 @@
 from pathlib import Path
 
 import pytest
-
 from durak import tokenize
 from durak.tokenizer import normalize_tokens, split_sentences, tokenize_text
+
 from tests.data.corpus_validator import validate_corpus
 
 

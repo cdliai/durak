@@ -1,3 +1,10 @@
+"""
+Unit tests for Normalizer class.
+
+Tests configuration parameters (lowercase, handle_turkish_i) to ensure they are
+properly applied by the Rust core.
+"""
+
 from typing import NoReturn
 from unittest.mock import patch
 

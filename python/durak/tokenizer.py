@@ -7,6 +7,7 @@ from collections.abc import Callable, Iterable, Sequence
 from dataclasses import dataclass
 
 from durak.cleaning import normalize_case
+from durak.exceptions import RustExtensionError, TokenizationError
 
 # Regex patterns tuned for Turkish tokenisation.
 APOSTROPHE_TOKEN = r"[A-Za-zÇĞİÖŞÜçğıöşü]+(?:'[A-Za-zÇĞİÖŞÜçğıöşü]+)?"
@@ -32,10 +33,6 @@ ABBREVIATIONS = {
     "mrs.",
     "ms.",
 }
-
-
-class TokenizationError(RuntimeError):
-    """Raised when tokenization strategies encounter unexpected errors."""
 
 
 Tokenizer = Callable[[str], list[str]]
@@ -145,7 +142,9 @@ try:
     tokenize_with_offsets = _durak_core.tokenize_with_offsets
 except ImportError:
     def tokenize_with_offsets(text: str) -> list[tuple[str, int, int]]:
-        raise ImportError("Rust extension not installed")
+        raise RustExtensionError(
+            "Rust extension not installed. Run: maturin develop"
+        )
 
 
 def normalize_tokens(

@@ -26,3 +26,6 @@ htmlcov/
 
 # temporary files
 tmp/
+
+# uv lock file
+uv.lock

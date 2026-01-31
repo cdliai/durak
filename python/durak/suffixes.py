@@ -5,6 +5,8 @@ from __future__ import annotations
 from collections.abc import Iterable, Sequence
 from pathlib import Path
 
+from durak.exceptions import ResourceError
+
 APOSTROPHE_TOKENS: tuple[str, ...] = ("'", "'")
 
 
@@ -22,7 +24,7 @@ def _load_detached_suffixes() -> tuple[str, ...]:
         with resource_path.open(encoding="utf-8") as handle:
             return tuple(line.strip() for line in handle if line.strip())
     except FileNotFoundError as exc:
-        raise RuntimeError(
+        raise ResourceError(
             f"durak data file DETACHED_SUFFIXES.txt is missing from "
             f"{resource_path.parent}."
         ) from exc

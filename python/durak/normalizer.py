@@ -1,12 +1,16 @@
+"""Text normalization utilities."""
+
 from __future__ import annotations
 
+from durak.exceptions import NormalizerError, RustExtensionError
+
 try:
-    from _durak_core import fast_normalize
+    from durak._durak_core import fast_normalize
 except ImportError:
     # Fallback or initialization error handling
     def fast_normalize(text: str) -> str:
-        raise ImportError(
-            "Durak Rust extension (_durak_core) is not installed/compiled."
+        raise RustExtensionError(
+            "Rust extension not installed. Run: maturin develop"
         )
 
 class Normalizer:
@@ -30,16 +34,32 @@ class Normalizer:
             
         Returns:
             str: Normalized string.
+            
+        Raises:
+            NormalizerError: If input is not a string
+            RustExtensionError: If Rust extension is not available
         """
+        if not isinstance(text, str):
+            raise NormalizerError(
+                f"Input must be a string, got {type(text).__name__}"
+            )
+        
         if not text:
             return ""
         
-        if self.lowercase and self.handle_turkish_i:
+        # Pass configuration parameters to Rust core
+        return fast_normalize(text, self.lowercase, self.handle_turkish_i)
+        try:
+            if self.lowercase and self.handle_turkish_i:
+                return fast_normalize(text)
+            
+            # In the future, we can add more configuration options to the Rust core
+            # and pass flags, but for now fast_normalize does both default behaviors.
             return fast_normalize(text)
-        
-        # In the future, we can add more configuration options to the Rust core
-        # and pass flags, but for now fast_normalize does both default behaviors.
-        return fast_normalize(text)
+        except RustExtensionError:
+            raise  # Re-raise as-is
+        except Exception as e:
+            raise NormalizerError(f"Normalization failed: {e}") from e
 
     def __repr__(self) -> str:
         return (

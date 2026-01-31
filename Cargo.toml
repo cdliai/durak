@@ -8,5 +8,25 @@ name = "_durak_core"
 crate-type = ["cdylib"]
 
 [dependencies]
-pyo3 = { version = "0.23.3", features = ["extension-module"] }
+pyo3 = { version = "0.27", features = ["extension-module"] }
 regex = "1.10"
+
+[profile.release]
+# Enable Link-Time Optimization for cross-module inlining
+# Trades longer compile time for faster runtime
+lto = true
+
+# Single codegen unit allows more aggressive optimization
+# Default is 16 (parallelizes compilation but limits optimization)
+codegen-units = 1
+
+# Maximum optimization level (default is 3, but explicit is good)
+opt-level = 3
+
+# Strip debug symbols from release binary
+# Reduces binary size by 2-3x with zero runtime cost
+strip = true
+
+# Abort on panic instead of unwinding
+# Slightly faster, smaller binary (NLP workloads rarely recover from panics)
+panic = "abort"

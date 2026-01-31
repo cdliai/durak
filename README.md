@@ -116,6 +116,77 @@ suffixes = _durak_core.get_detached_suffixes()
 - **Offset tracking**: Character-accurate positions for NER and span tasks
 - **Embedded resources**: Zero file I/O, compiled directly into binary
 - **Type-safe**: Complete `.pyi` stubs for IDE support and static analysis
+- **Tiered lemmatization**: Dictionary lookup + heuristic fallback with performance metrics
+
+## Lemmatization
+
+Durak provides a high-performance lemmatizer with three strategies:
+
+```python
+from durak import Lemmatizer
+
+# Strategy options: "lookup", "heuristic", "hybrid"
+lemmatizer = Lemmatizer(strategy="hybrid")
+
+lemmatizer("kitaplar")    # "kitap"
+lemmatizer("geliyorum")   # "gel"
+lemmatizer("evlerimde")   # "ev"
+```
+
+### Strategies
+
+- **`lookup`**: Dictionary-only (fastest, high precision, fails on OOV words)
+- **`heuristic`**: Suffix stripping (handles OOV, may over-strip)
+- **`hybrid`**: Try lookup first, fallback to heuristic (recommended)
+
+### Performance Metrics
+
+Enable metrics to analyze lemmatization behavior:
+
+```python
+lemmatizer = Lemmatizer(strategy="hybrid", collect_metrics=True)
+
+for word in large_corpus:
+    lemma = lemmatizer(word)
+
+print(lemmatizer.get_metrics())
+# Lemmatizer Metrics:
+#   Total Calls: 10,000
+#   Lookup Hits: 7,234 (72.3%)
+#   Heuristic Fallbacks: 2,766
+#   Avg Call Time: 0.042ms
+#   Lookup Time: 0.038s
+#   Heuristic Time: 0.004s
+```
+
+**Metrics include:**
+- Call counts (lookup hits/misses, heuristic fallbacks)
+- Timing breakdown (per-strategy latency)
+- Cache hit rate
+- Average call time
+
+**Use cases:**
+- Compare strategies on your corpus
+- Debug lemmatization issues
+- Optimize production pipelines
+- Report research performance
+
+See [examples/lemmatizer_metrics.py](examples/lemmatizer_metrics.py) for strategy comparison examples.
+
+### Root Validation
+
+Control heuristic quality with root validation:
+
+```python
+lemmatizer = Lemmatizer(
+    strategy="hybrid",
+    validate_roots=True,        # Enable validation
+    strict_validation=True,     # Require roots in dictionary
+    min_root_length=3,          # Minimum 3 characters
+)
+
+lemmatizer("kitaplardan")  # Only strips if root ≥3 chars and valid
+```
 
 ## Development Setup
 
