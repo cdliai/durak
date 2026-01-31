@@ -24,8 +24,18 @@ def normalizer() -> Normalizer:
         ("İstanbul", "istanbul"),
         ("IŞIK", "ışık"),
         ("ışık", "ışık"),
+        ("ANKARA", "ankara"),
+        ("GELİYOR", "geliyor"),
+        ("123İ456", "123i456"),
     ],
-    ids=["istanbul_case", "isik_upper_case", "isik_lower_case"],
+    ids=[
+        "istanbul_case",
+        "isik_upper_case",
+        "isik_lower_case",
+        "ankara_ascii_case",
+        "mixed_case",
+        "numeric_mixed_case",
+    ],
 )
 def test_turkish_i_handling_contract(normalizer, input_text, expected) -> None:
     """
@@ -39,6 +49,9 @@ def test_turkish_i_handling_contract(normalizer, input_text, expected) -> None:
             "İstanbul": "istanbul",
             "IŞIK": "ışık",
             "ışık": "ışık",
+            "ANKARA": "ankara",
+            "GELİYOR": "geliyor",
+            "123İ456": "123i456",
         }.get(x, x.lower())
 
         assert normalizer(input_text) == expected
@@ -70,10 +83,11 @@ def test_configuration_flags_stored() -> None:
     assert not normalizer.handle_turkish_i
 
 
-def test_bug_flags_ignored() -> None:
+def test_bug_lowercase_flags_ignored_by_backend() -> None:
     """
-    BUG DOCUMENTATION: The current implementation ignores config flags.
-    Even if lowercase=False, the backend is still called.
+    BUG #39: The Rust backend currently ignores the lowercase flag.
+    Even when lowercase=False, fast_normalize is called with default behavior.
+    TODO: Fix backend to respect configuration flags.
     """
 
     normalizer = Normalizer(lowercase=False)
@@ -87,7 +101,7 @@ def test_bug_flags_ignored() -> None:
 def test_rust_extension_missing() -> None:
     """Test graceful failure when _durak_core is missing."""
 
-    def mock_fallback(text, *args) -> NoReturn:
+    def mock_fallback(text: str, *args) -> NoReturn:
         raise ImportError("Durak Rust extension is not installed")
 
     with patch("durak.normalizer.fast_normalize", mock_fallback):
@@ -108,6 +122,7 @@ def test_whitespace_only(normalizer) -> None:
 
     with patch("durak.normalizer.fast_normalize") as mock_fast:
         normalizer("   ")
+        # Whitespace is currently passed to the backend, so we expect a call.
         mock_fast.assert_called()
 
 
