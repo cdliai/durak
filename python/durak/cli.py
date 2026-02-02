@@ -15,13 +15,10 @@ import click
 
 from durak import (
     Lemmatizer,
-    Pipeline,
     StopwordManager,
     attach_detached_suffixes,
     clean_text,
-    list_stopwords,
     load_stopword_resource,
-    process_text,
     tokenize,
 )
 
@@ -65,9 +62,6 @@ def process(input_file: str, output: str | None, **kwargs: Any) -> None:
         text = sys.stdin.read()
     else:
         text = Path(input_file).read_text(encoding="utf-8")
-
-    # Build pipeline steps
-    steps: list[Any] = []
 
     # Clean text with options
     emoji_mode = "keep" if kwargs["keep_emoji"] else "remove"
@@ -121,7 +115,7 @@ def process(input_file: str, output: str | None, **kwargs: Any) -> None:
     help="Output format (default: txt)",
 )
 @click.option("--output", "-o", type=click.Path(), help="Output file (default: stdout)")
-def stopwords(resource: str, format: str, output: str | None) -> None:
+def stopwords(resource: str, output: str | None, **kwargs: Any) -> None:
     """List stopwords from a resource.
 
     Default resource: base/turkish
@@ -130,7 +124,8 @@ def stopwords(resource: str, format: str, output: str | None) -> None:
     words = load_stopword_resource(resource)
 
     # Format output
-    if format == "json":
+    output_format = kwargs.get("format", "txt")
+    if output_format == "json":
         result = json.dumps(sorted(words), ensure_ascii=False, indent=2)
     else:
         result = "\n".join(sorted(words))
@@ -193,10 +188,10 @@ def lemmatize(
     elif output_format == "jsonl":
         result = "\n".join(
             json.dumps(
-                {"token": t, "lemma": l},
+                {"token": t, "lemma": lemma},
                 ensure_ascii=False,
             )
-            for t, l in zip(tokens, results)
+            for t, lemma in zip(tokens, results)
         )
     else:  # text
         for token, lemma in zip(tokens, results):
