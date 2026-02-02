@@ -31,7 +31,7 @@ Durak follows the standards in [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md). By pa
   ```bash
   black .
   ruff check .
-  mypy src
+  mypy python
   ```
 - Update documentation and the roadmap when behaviour changes.
 - Append a new entry to `CHANGELOG.md` under the **Unreleased** section (create it if missing).

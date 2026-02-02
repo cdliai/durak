@@ -9,6 +9,8 @@ from collections.abc import Iterable
 from functools import partial
 from typing import Callable
 
+from durak.exceptions import ConfigurationError
+
 # Common stylistic variants mapped to ASCII or Turkish canonical characters.
 UNICODE_REPLACEMENTS = {
     "\u2018": "'",
@@ -124,7 +126,7 @@ def normalize_case(text: str, mode: str = "lower") -> str:
         )
         return adjusted.upper()
 
-    raise ValueError(
+    raise ConfigurationError(
         f"Unsupported mode '{mode}'. Expected 'lower', 'upper', or 'none'."
     )
 
@@ -166,7 +168,7 @@ def remove_repeated_chars(text: str, *, max_repeats: int = 2) -> str:
     if not text:
         return ""
     if max_repeats < 1:
-        raise ValueError("max_repeats must be >= 1")
+        raise ConfigurationError("max_repeats must be >= 1")
 
     pattern = re.compile(rf"(.)\1{{{max_repeats},}}")
 

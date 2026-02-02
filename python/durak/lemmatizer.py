@@ -1,20 +1,21 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from functools import lru_cache
 from time import perf_counter
 from typing import Literal
+
+from durak.exceptions import ConfigurationError, LemmatizerError, RustExtensionError
 
 try:
     from durak._durak_core import lookup_lemma, strip_suffixes, strip_suffixes_validated
 except ImportError:
     def lookup_lemma(word: str) -> str | None:
-        raise ImportError("Rust extension not installed")
+        raise RustExtensionError("Rust extension not installed. Run: maturin develop")
     def strip_suffixes(word: str) -> str:
-        raise ImportError("Rust extension not installed")
-    def strip_suffixes_validated(
-        word: str, strict: bool = False, min_root_length: int = 2
-    ) -> str:
-        raise ImportError("Rust extension not installed")
+        raise RustExtensionError("Rust extension not installed. Run: maturin develop")
+    def strip_suffixes_validated(word: str, strict: bool = False, min_root_length: int = 2) -> str:
+        raise RustExtensionError("Rust extension not installed. Run: maturin develop")
 
 Strategy = Literal["lookup", "heuristic", "hybrid"]
 
@@ -119,6 +120,18 @@ class Lemmatizer:
         min_root_length: int = 2,
         collect_metrics: bool = False,
     ):
+        # Validate strategy
+        valid_strategies = ("lookup", "heuristic", "hybrid")
+        if strategy not in valid_strategies:
+            raise ConfigurationError(
+                f"Unknown strategy: '{strategy}'. "
+                f"Valid options: {', '.join(valid_strategies)}"
+            )
+        
+        # Validate min_root_length
+        if min_root_length < 1:
+            raise ConfigurationError("min_root_length must be at least 1")
+        
         self.strategy = strategy
         self.validate_roots = validate_roots
         self.strict_validation = strict_validation
@@ -127,9 +140,35 @@ class Lemmatizer:
         self._metrics = LemmatizerMetrics() if collect_metrics else None
 
     def __call__(self, word: str) -> str:
+        """Lemmatize a word.
+        
+        Args:
+            word: Input word to lemmatize
+            
+        Returns:
+            Lemmatized form of the word
+            
+        Raises:
+            LemmatizerError: If input is not a string
+            RustExtensionError: If Rust extension is not available
+        """
+        if not isinstance(word, str):
+            raise LemmatizerError(
+                f"Input must be a string, got {type(word).__name__}"
+            )
+        
         if not word:
             return ""
         
+        try:
+            return self._lemmatize(word)
+        except RustExtensionError:
+            raise  # Re-raise as-is
+        except Exception as e:
+            raise LemmatizerError(f"Lemmatization failed: {e}") from e
+    
+    def _lemmatize(self, word: str) -> str:
+        """Internal lemmatization logic."""
         start_time = perf_counter() if self.collect_metrics else None
             
         # Tier 1: Lookup
@@ -189,7 +228,7 @@ class Lemmatizer:
             ValueError: If metrics collection is not enabled
         """
         if not self.collect_metrics:
-            raise ValueError(
+            raise ConfigurationError(
                 "Metrics not enabled. Initialize with collect_metrics=True."
             )
         # Recompute derived metrics before returning
@@ -208,7 +247,7 @@ class Lemmatizer:
             ValueError: If metrics collection is not enabled
         """
         if not self.collect_metrics:
-            raise ValueError(
+            raise ConfigurationError(
                 "Metrics not enabled. Initialize with collect_metrics=True."
             )
         self._metrics = LemmatizerMetrics()

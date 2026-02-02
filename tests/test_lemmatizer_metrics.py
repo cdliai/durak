@@ -1,7 +1,8 @@
 """Tests for LemmatizerMetrics performance tracking."""
 
 import pytest
-from durak.lemmatizer import Lemmatizer
+from durak.exceptions import ConfigurationError
+from durak.lemmatizer import Lemmatizer, LemmatizerMetrics
 
 
 def test_metrics_disabled_by_default():
@@ -12,13 +13,13 @@ def test_metrics_disabled_by_default():
 
 
 def test_metrics_raises_when_disabled():
-    """Should raise ValueError when accessing metrics if not enabled."""
+    """Should raise ConfigurationError when accessing metrics if not enabled."""
     lemmatizer = Lemmatizer(strategy="hybrid", collect_metrics=False)
     
-    with pytest.raises(ValueError, match="Metrics not enabled"):
+    with pytest.raises(ConfigurationError, match="Metrics not enabled"):
         lemmatizer.get_metrics()
     
-    with pytest.raises(ValueError, match="Metrics not enabled"):
+    with pytest.raises(ConfigurationError, match="Metrics not enabled"):
         lemmatizer.reset_metrics()
 
 
