@@ -329,7 +329,11 @@ def clean(input_file: str, output: str | None, **kwargs: Any) -> None:
 
     # Clean text with options
     emoji_mode = "keep" if kwargs["keep_emoji"] else "remove"
-    cleaned = clean_text(text, emoji_mode=emoji_mode, lowercase=kwargs["lowercase"])
+    cleaned = clean_text(text, emoji_mode=emoji_mode)
+
+    # Apply lowercase if requested
+    if kwargs["lowercase"]:
+        cleaned = cleaned.lower()
 
     # Format output
     output_format = kwargs.get("format", "text")

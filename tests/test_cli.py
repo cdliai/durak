@@ -4,7 +4,11 @@ from __future__ import annotations
 
 import json
 import subprocess
+import sys
 from pathlib import Path
+
+# Use python3 explicitly since 'python' may not be available
+PYTHON_CMD = sys.executable
 
 
 def test_cli_exists():
@@ -19,7 +23,7 @@ def test_cli_clean_command():
     """Test clean command via subprocess."""
     test_text = "İSTANBUL'da harika bir gün!"
     result = subprocess.run(
-        ["python", "-m", "durak.cli", "clean", "-"],
+        [PYTHON_CMD, "-m", "durak.cli", "clean", "-"],
         input=test_text,
         capture_output=True,
         text=True,
@@ -33,7 +37,7 @@ def test_cli_clean_with_json_format():
     """Test clean command with JSON output format."""
     test_text = "İSTANBUL"
     result = subprocess.run(
-        ["python", "-m", "durak.cli", "clean", "-", "--format", "json"],
+        [PYTHON_CMD, "-m", "durak.cli", "clean", "-", "--format", "json"],
         input=test_text,
         capture_output=True,
         text=True,
@@ -49,7 +53,7 @@ def test_cli_tokenize_command():
     """Test tokenize command via subprocess."""
     test_text = "Merhaba dünya"
     result = subprocess.run(
-        ["python", "-m", "durak.cli", "tokenize", "-"],
+        [PYTHON_CMD, "-m", "durak.cli", "tokenize", "-"],
         input=test_text,
         capture_output=True,
         text=True,
@@ -64,7 +68,7 @@ def test_cli_tokenize_with_json_format():
     """Test tokenize command with JSON output format."""
     test_text = "Merhaba dünya"
     result = subprocess.run(
-        ["python", "-m", "durak.cli", "tokenize", "-", "--format", "json"],
+        [PYTHON_CMD, "-m", "durak.cli", "tokenize", "-", "--format", "json"],
         input=test_text,
         capture_output=True,
         text=True,
@@ -80,7 +84,7 @@ def test_cli_tokenize_with_json_format():
 def test_cli_lemmatize_command():
     """Test lemmatize command via subprocess."""
     result = subprocess.run(
-        ["python", "-m", "durak.cli", "lemmatize", "kitaplar", "evler"],
+        [PYTHON_CMD, "-m", "durak.cli", "lemmatize", "kitaplar", "evler"],
         capture_output=True,
         text=True,
         encoding="utf-8",
@@ -93,7 +97,7 @@ def test_cli_lemmatize_command():
 def test_cli_stopwords_command():
     """Test stopwords command via subprocess."""
     result = subprocess.run(
-        ["python", "-m", "durak.cli", "stopwords", "--format", "json"],
+        [PYTHON_CMD, "-m", "durak.cli", "stopwords", "--format", "json"],
         capture_output=True,
         text=True,
         encoding="utf-8",
@@ -108,7 +112,7 @@ def test_cli_stopwords_command():
 def test_cli_version_command():
     """Test version command via subprocess."""
     result = subprocess.run(
-        ["python", "-m", "durak.cli", "version"],
+        [PYTHON_CMD, "-m", "durak.cli", "version"],
         capture_output=True,
         text=True,
         encoding="utf-8",
@@ -121,7 +125,7 @@ def test_cli_normalize_command():
     """Test normalize command via subprocess."""
     test_text = "İSTANBUL"
     result = subprocess.run(
-        ["python", "-m", "durak.cli", "normalize", "-"],
+        [PYTHON_CMD, "-m", "durak.cli", "normalize", "-"],
         input=test_text,
         capture_output=True,
         text=True,
@@ -135,7 +139,7 @@ def test_cli_process_command():
     """Test process command via subprocess."""
     test_text = "Merhaba dünya"
     result = subprocess.run(
-        ["python", "-m", "durak.cli", "process", "-"],
+        [PYTHON_CMD, "-m", "durak.cli", "process", "-"],
         input=test_text,
         capture_output=True,
         text=True,

@@ -43,7 +43,9 @@ class Pipeline:
         
         for step in steps:
             if callable(step):
-                self.step_names.append(step.__name__)
+                # Use __name__ for functions, class name for instances
+                step_name = getattr(step, '__name__', step.__class__.__name__)
+                self.step_names.append(step_name)
                 self.steps.append(step)
             elif isinstance(step, str):
                 if step not in STEP_REGISTRY:
