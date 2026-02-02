@@ -24,7 +24,6 @@ repos:
     hooks:
       - id: mypy
         args: [python]
-        additional_dependencies: [types-all]
         files: ^(python|tests)/
 
   # General checks from pre-commit-hooks
