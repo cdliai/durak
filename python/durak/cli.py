@@ -39,16 +39,10 @@ def cli() -> None:
 
 @cli.command()
 @click.argument("input_file", type=click.Path(exists=True, allow_dash=True))
-@click.option(
-    "--output", "-o", type=click.Path(), help="Output file (default: stdout)"
-)
+@click.option("--output", "-o", type=click.Path(), help="Output file (default: stdout)")
 @click.option("--remove-stopwords", "-s", is_flag=True, help="Remove stopwords")
-@click.option(
-    "--attach-suffixes", "-a", is_flag=True, help="Attach detached suffixes"
-)
-@click.option(
-    "--lowercase", "-l", is_flag=True, default=True, help="Lowercase text"
-)
+@click.option("--attach-suffixes", "-a", is_flag=True, help="Attach detached suffixes")
+@click.option("--lowercase", "-l", is_flag=True, default=True, help="Lowercase text")
 @click.option("--keep-emoji", "-e", is_flag=True, help="Keep emojis in output")
 @click.option(
     "--format",
@@ -126,9 +120,7 @@ def process(input_file: str, output: str | None, **kwargs: Any) -> None:
     default="txt",
     help="Output format (default: txt)",
 )
-@click.option(
-    "--output", "-o", type=click.Path(), help="Output file (default: stdout)"
-)
+@click.option("--output", "-o", type=click.Path(), help="Output file (default: stdout)")
 def stopwords(resource: str, format: str, output: str | None) -> None:
     """List stopwords from a resource.
 
@@ -160,9 +152,7 @@ def stopwords(resource: str, format: str, output: str | None) -> None:
     default="hybrid",
     help="Lemmatization strategy (default: hybrid)",
 )
-@click.option(
-    "--metrics", "-m", is_flag=True, help="Show performance metrics"
-)
+@click.option("--metrics", "-m", is_flag=True, help="Show performance metrics")
 @click.option(
     "--format",
     "-f",
@@ -170,7 +160,9 @@ def stopwords(resource: str, format: str, output: str | None) -> None:
     default="text",
     help="Output format (default: text)",
 )
-def lemmatize(tokens: tuple[str, ...], strategy: str, metrics: bool, **kwargs: Any) -> None:
+def lemmatize(
+    tokens: tuple[str, ...], strategy: str, metrics: bool, **kwargs: Any
+) -> None:
     """Lemmatize words.
 
     TOKENS: Words to lemmatize (space-separated)
@@ -218,7 +210,9 @@ def lemmatize(tokens: tuple[str, ...], strategy: str, metrics: bool, **kwargs: A
             if output_format == "json":
                 result = result.rstrip("}") + f', "metrics": {metrics_json}}}'
             else:  # jsonl
-                result += "\n" + json.dumps({"metrics": metrics_json}, ensure_ascii=False)
+                result += "\n" + json.dumps(
+                    {"metrics": metrics_json}, ensure_ascii=False
+                )
         else:
             click.echo("\n" + str(lemmatizer_obj.get_metrics()))
 
@@ -229,15 +223,9 @@ def lemmatize(tokens: tuple[str, ...], strategy: str, metrics: bool, **kwargs: A
 
 @cli.command(name="tokenize")
 @click.argument("input_file", type=click.Path(exists=True, allow_dash=True))
-@click.option(
-    "--output", "-o", type=click.Path(), help="Output file (default: stdout)"
-)
-@click.option(
-    "--stopwords", "-s", is_flag=True, help="Remove stopwords"
-)
-@click.option(
-    "--suffixes", "-a", is_flag=True, help="Attach detached suffixes"
-)
+@click.option("--output", "-o", type=click.Path(), help="Output file (default: stdout)")
+@click.option("--stopwords", "-s", is_flag=True, help="Remove stopwords")
+@click.option("--suffixes", "-a", is_flag=True, help="Attach detached suffixes")
 @click.option(
     "--format",
     "-f",
@@ -298,13 +286,9 @@ def tokenize_cmd(
 
 @cli.command()
 @click.argument("input_file", type=click.Path(exists=True, allow_dash=True))
-@click.option(
-    "--output", "-o", type=click.Path(), help="Output file (default: stdout)"
-)
+@click.option("--output", "-o", type=click.Path(), help="Output file (default: stdout)")
 @click.option("--lowercase", "-l", is_flag=True, default=True, help="Lowercase text")
-@click.option(
-    "--keep-emoji", "-e", is_flag=True, help="Keep emojis in output"
-)
+@click.option("--keep-emoji", "-e", is_flag=True, help="Keep emojis in output")
 @click.option(
     "--format",
     "-f",
@@ -357,9 +341,7 @@ def clean(input_file: str, output: str | None, **kwargs: Any) -> None:
 
 @cli.command()
 @click.argument("input_file", type=click.Path(exists=True, allow_dash=True))
-@click.option(
-    "--output", "-o", type=click.Path(), help="Output file (default: stdout)"
-)
+@click.option("--output", "-o", type=click.Path(), help="Output file (default: stdout)")
 @click.option(
     "--turkish-i", is_flag=True, default=True, help="Handle Turkish I/ı conversion"
 )
@@ -370,7 +352,9 @@ def clean(input_file: str, output: str | None, **kwargs: Any) -> None:
     default="text",
     help="Output format (default: text)",
 )
-def normalize(input_file: str, output: str | None, turkish_i: bool, **kwargs: Any) -> None:
+def normalize(
+    input_file: str, output: str | None, turkish_i: bool, **kwargs: Any
+) -> None:
     """Normalize text (lowercase and handle Turkish I/ı).
 
     INPUT_FILE: Path to input text file (or '-' for stdin)
