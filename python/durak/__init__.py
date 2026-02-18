@@ -24,7 +24,7 @@ from .exceptions import (
 )
 from .lemmatizer import Lemmatizer
 from .normalizer import Normalizer
-from .pipeline import Pipeline, process_text
+from .pipeline import Pipeline, process_text, process_text_with_steps
 from .stopwords import (
     BASE_STOPWORDS,
     DEFAULT_STOPWORD_RESOURCE,
@@ -93,6 +93,7 @@ __all__ = [
     "print_reproducibility_report",
     "normalize_unicode",
     "process_text",
+    "process_text_with_steps",
     "remove_stopwords",
     "split_sentences",
     "tokenize",

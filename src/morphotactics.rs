@@ -1,27 +1,26 @@
 /// Turkish Morphotactics: Suffix Ordering Constraints
-/// 
+///
 /// Implements Turkish morpheme sequence rules to validate suffix ordering.
 /// Prevents morphologically invalid sequences like *"kitap+da+lar" (Case before Plural).
-/// 
+///
 /// # Turkish Suffix Slot Sequence (Nominal):
-/// 
+///
 /// ROOT → [Plural] → [Possessive] → [Case] → [Copula]
-/// 
+///
 /// Examples:
 /// - kitap+lar+ım+da (book+PL+1SG.POSS+LOC) ✓
 /// - ev+im+de (house+1SG.POSS+LOC) ✓
 /// - *kitap+da+lar (Case before Plural) ✗
 /// - *ev+lar+da+im (Case before Possessive) ✗
-/// 
+///
 /// # Turkish Suffix Slot Sequence (Verbal):
-/// 
+///
 /// ROOT → [Voice] → [Negation] → [Tense/Aspect] → [Person] → [Copula]
-/// 
+///
 /// Examples:
 /// - gel+di+m (come+PAST+1SG) ✓
 /// - yap+ıl+dı (do+PASS+PAST) ✓
 /// - *gel+m+di (Person before Tense) ✗
-
 use std::collections::HashMap;
 
 /// Morpheme slot types for Turkish nominal morphology
@@ -183,7 +182,7 @@ impl MorphotacticClassifier {
 
     /// Validate a sequence of suffixes
     /// Returns true if the sequence is morphotactically valid
-    /// 
+    ///
     /// For ambiguous suffixes (e.g., -ım can be possessive or person marker),
     /// we try both nominal and verbal interpretations and accept if either is valid.
     pub fn validate_sequence(&self, suffixes: &[&str]) -> bool {
@@ -192,9 +191,9 @@ impl MorphotacticClassifier {
         }
 
         // Check if any suffix appears in both paradigms (ambiguous)
-        let has_ambiguous = suffixes.iter().any(|s| {
-            self.nominal_map.contains_key(s) && self.verbal_map.contains_key(s)
-        });
+        let has_ambiguous = suffixes
+            .iter()
+            .any(|s| self.nominal_map.contains_key(s) && self.verbal_map.contains_key(s));
 
         if has_ambiguous {
             // Try both paradigms

@@ -13,9 +13,6 @@ license = "MIT"
 license-files = ["LICENSE"]
 keywords = ["turkish nlp", "text processing", "preprocessing", "lemmatization", "tokenization"]
 dependencies = ["click>=8.0.0"]
-
-[project.scripts]
-durak = "durak.cli:main"
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
@@ -30,16 +27,15 @@ classifiers = [
     "Topic :: Text Processing :: Linguistic",
 ]
 
+[project.scripts]
+durak = "durak.cli:main"
+
 [project.urls]
 Homepage = "https://karagoz.io"
 Repository = "https://github.com/fbkaragoz/durak"
 Issues = "https://github.com/fbkaragoz/durak/issues"
 Documentation = "https://github.com/fbkaragoz/durak#readme"
 Changelog = "https://github.com/fbkaragoz/durak/blob/main/CHANGELOG.md"
-
-[tool.maturin]
-python-source = "python"
-module-name = "durak._durak_core"
 
 [project.optional-dependencies]
 dev = [
@@ -51,6 +47,10 @@ dev = [
     "mypy>=1.0.0",
     "hypothesis>=6.0.0",
 ]
+
+[tool.maturin]
+python-source = "python"
+module-name = "durak._durak_core"
 
 [tool.black]
 line-length = 88

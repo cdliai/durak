@@ -1,9 +1,9 @@
 /// Turkish Vowel Harmony Checker
-/// 
+///
 /// Implements vowel harmony rules for Turkish morphology:
 /// - Front/Back harmony: Front vowels (e,i,ö,ü) vs Back vowels (a,ı,o,u)
 /// - Rounded/Unrounded harmony: Rounded (o,ö,u,ü) vs Unrounded (a,e,ı,i)
-/// 
+///
 /// Used to validate suffix attachment in lemmatization and morphological analysis.
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -49,23 +49,21 @@ pub fn get_vowel_class(c: char) -> Option<VowelClass> {
 
 /// Get the last vowel class in a word (used to determine suffix harmony)
 pub fn get_last_vowel_class(word: &str) -> Option<VowelClass> {
-    word.chars()
-        .rev()
-        .find_map(get_vowel_class)
+    word.chars().rev().find_map(get_vowel_class)
 }
 
 /// Check if a suffix harmonizes with the given root vowel class
-/// 
+///
 /// # Turkish Vowel Harmony Rules:
-/// 
+///
 /// 1. **Front/Back Harmony** (applies to all suffixes):
 ///    - Front vowels (e, i, ö, ü) → Front suffixes
 ///    - Back vowels (a, ı, o, u) → Back suffixes
-/// 
+///
 /// 2. **Rounding Harmony** (applies after front/back is determined):
 ///    - After rounded vowels: May use rounded suffixes
 ///    - After unrounded vowels: Typically use unrounded suffixes
-/// 
+///
 /// # Examples:
 /// - kitap (back) + -lar = kitaplar ✓ (back-back)
 /// - kitap (back) + -ler = *kitapler ✗ (back-front, invalid!)
@@ -85,13 +83,13 @@ pub fn check_harmony(root_vowel: VowelClass, suffix_vowel: VowelClass) -> bool {
 }
 
 /// Check if a suffix string harmonizes with a root string
-/// 
+///
 /// Validates that all vowels in the suffix harmonize with the last vowel in the root.
-/// 
+///
 /// # Arguments
 /// * `root` - The root word (e.g., "kitap")
 /// * `suffix` - The suffix to check (e.g., "lar")
-/// 
+///
 /// # Returns
 /// * `true` if the suffix harmonizes with the root
 /// * `false` if harmony is violated
@@ -104,10 +102,7 @@ pub fn check_vowel_harmony(root: &str, suffix: &str) -> bool {
     };
 
     // Check all vowels in the suffix
-    let suffix_vowels: Vec<VowelClass> = suffix
-        .chars()
-        .filter_map(get_vowel_class)
-        .collect();
+    let suffix_vowels: Vec<VowelClass> = suffix.chars().filter_map(get_vowel_class).collect();
 
     // Empty suffix or suffix with no vowels = always valid
     if suffix_vowels.is_empty() {
@@ -150,7 +145,10 @@ mod tests {
 
     #[test]
     fn test_last_vowel_extraction() {
-        assert_eq!(get_last_vowel_class("kitap"), Some(VowelClass::BackUnrounded));
+        assert_eq!(
+            get_last_vowel_class("kitap"),
+            Some(VowelClass::BackUnrounded)
+        );
         assert_eq!(get_last_vowel_class("ev"), Some(VowelClass::FrontUnrounded));
         assert_eq!(get_last_vowel_class("göz"), Some(VowelClass::FrontRounded));
         assert_eq!(get_last_vowel_class("yol"), Some(VowelClass::BackRounded));
@@ -213,12 +211,12 @@ mod tests {
     fn test_real_world_examples() {
         // Real Turkish words with correct harmony
         let valid_pairs = vec![
-            ("masa", "lar"), // masalar
-            ("kalem", "ler"), // kalemler
-            ("okul", "dan"), // okuldan
-            ("öğrenci", "den"), // öğrenciden
+            ("masa", "lar"),         // masalar
+            ("kalem", "ler"),        // kalemler
+            ("okul", "dan"),         // okuldan
+            ("öğrenci", "den"),      // öğrenciden
             ("bilgisayar", "ların"), // bilgisayarların
-            ("telefon", "lar"), // telefonlar
+            ("telefon", "lar"),      // telefonlar
         ];
 
         for (root, suffix) in valid_pairs {
@@ -232,9 +230,9 @@ mod tests {
 
         // Real Turkish words with incorrect harmony (should fail)
         let invalid_pairs = vec![
-            ("masa", "ler"), // *maseler
-            ("kalem", "lar"), // *kalemlar
-            ("okul", "den"), // *okulden
+            ("masa", "ler"),    // *maseler
+            ("kalem", "lar"),   // *kalemlar
+            ("okul", "den"),    // *okulden
             ("öğrenci", "dan"), // *öğrencidan
         ];
 

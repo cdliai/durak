@@ -14,6 +14,18 @@ from durak import (
     tokenize,
 )
 
+from dataclasses import dataclass, field
+
+@dataclass 
+class ProcessingContext:
+    text: str
+    metadata: list[str] = field(default_factory=list)
+    tokens: list[str] = field(default_factory=list)
+
+    def add_metadata(self, info:str):
+        self.metadata.append(info)
+
+
 
 def main():
     print("=" * 60)
@@ -38,6 +50,7 @@ def main():
         keep=["var", "git"],  # Keep these even if they're stopwords
     )
 
+    
     tokens = tokenize(clean_text(text))
     print(f"Tokens: {tokens}")
 
