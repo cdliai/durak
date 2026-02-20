@@ -328,8 +328,9 @@ def clean(input_file: str, output: str | None, **kwargs: Any) -> None:
         text = Path(input_file).read_text(encoding="utf-8")
 
     # Clean text with options
+    # Note: lowercase normalization is part of DEFAULT_CLEANING_STEPS
     emoji_mode = "keep" if kwargs["keep_emoji"] else "remove"
-    cleaned = clean_text(text, emoji_mode=emoji_mode, lowercase=kwargs["lowercase"])
+    cleaned = clean_text(text, emoji_mode=emoji_mode)
 
     # Format output
     output_format = kwargs.get("format", "text")

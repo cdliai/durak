@@ -45,21 +45,22 @@ pip install durak-nlp
 ### Minimal Pipeline
 
 ```python
-from durak import process_text
+from durak import Pipeline, remove_stopwords, attach_detached_suffixes, clean_text, tokenize
 
 entries = [
     "Türkiye'de NLP zor. Durak kolaylaştırır.",
     "Ankara ' da kaldım.",
 ]
 
-tokens = [
-    process_text(
-        entry,
-        remove_stopwords=True,
-        rejoin_suffixes=True,  # glue detached suffixes before filtering
-    )
-    for entry in entries
-]
+# Create a reusable pipeline
+pipeline = Pipeline([
+    clean_text,
+    tokenize,
+    attach_detached_suffixes,  # glue detached suffixes before filtering
+    lambda tokens: remove_stopwords(tokens),
+])
+
+tokens = [pipeline(entry) for entry in entries]
 
 print(tokens[0])
 # ["türkiye'de", "nlp", "zor", ".", "durak", "kolaylaştırır", "."]
@@ -69,6 +70,18 @@ print(tokens[1])
 ```
 
 The pipeline executes: **clean → tokenize → rejoin detached suffixes → remove stopwords**
+
+You can also use the `process_text` convenience function for one-off processing:
+
+```python
+from durak import process_text
+
+result = process_text(
+    "Türkiye'de NLP zor!",
+    steps=["clean", "tokenize", "remove_stopwords"]
+)
+# ["türkiye'de", "nlp", "zor", "!"]
+```
 
 ### Build Blocks à la Carte
 

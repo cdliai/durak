@@ -6,23 +6,27 @@ for Turkish text processing.
 
 from __future__ import annotations
 
-def fast_normalize(text: str) -> str:
+def fast_normalize(text: str, lowercase: bool = True, handle_turkish_i: bool = True) -> str:
     """Fast normalization for Turkish text.
 
-    Handles Turkish-specific I/ı and İ/i conversion correctly and lowercases the rest.
+    Handles Turkish-specific I/ı and İ/i conversion correctly with configurable options.
     This is a high-performance Rust implementation with single-pass allocation.
 
     Args:
         text: The text to normalize
+        lowercase: If True, convert to lowercase (default: True)
+        handle_turkish_i: If True, handle Turkish I/ı and İ/i conversion (default: True)
 
     Returns:
-        Normalized lowercase text with correct Turkish character handling
+        Normalized text with correct Turkish character handling
 
     Examples:
         >>> fast_normalize("ISTANBUL")
         'istanbul'
         >>> fast_normalize("İSTANBUL")
         'istanbul'
+        >>> fast_normalize("İSTANBUL", lowercase=False)
+        'İSTANBUL'
     """
     ...
 
@@ -240,8 +244,6 @@ __all__ = [
     "get_stopwords_base",
     "get_stopwords_metadata",
     "get_stopwords_social_media",
-    "get_build_info",
-    "get_resource_info",
     "get_build_info",
     "get_resource_info",
 ]
