@@ -8,10 +8,11 @@ try:
     from durak._durak_core import fast_normalize
 except ImportError:
     # Fallback or initialization error handling
-    def fast_normalize(text: str) -> str:
+    def fast_normalize(text: str, lowercase: bool = True, handle_turkish_i: bool = True) -> str:
         raise RustExtensionError(
             "Rust extension not installed. Run: maturin develop"
         )
+
 
 class Normalizer:
     """
@@ -48,14 +49,8 @@ class Normalizer:
             return ""
         
         # Pass configuration parameters to Rust core
-        return fast_normalize(text, self.lowercase, self.handle_turkish_i)
         try:
-            if self.lowercase and self.handle_turkish_i:
-                return fast_normalize(text)
-            
-            # In the future, we can add more configuration options to the Rust core
-            # and pass flags, but for now fast_normalize does both default behaviors.
-            return fast_normalize(text)
+            return fast_normalize(text, self.lowercase, self.handle_turkish_i)
         except RustExtensionError:
             raise  # Re-raise as-is
         except Exception as e:
