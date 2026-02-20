@@ -22,7 +22,6 @@ Example:
 """
 
 from typing import Dict
-from . import _durak_core
 
 
 def get_build_info() -> Dict[str, str]:
@@ -46,6 +45,17 @@ def get_build_info() -> Dict[str, str]:
         >>> print(f"Built: {info['build_date']}")
         Built: 2026-01-26T08:30:51.849239Z
     """
+    from . import _durak_core
+    
+    if _durak_core is None:
+        from datetime import datetime
+        return {
+            "durak_version": "0.4.0-dev",
+            "build_date": datetime.now().isoformat(),
+            "package_name": "durak (Python fallback)",
+            "note": "Rust extension not available - using Python fallback",
+        }
+    
     return _durak_core.get_build_info()
 
 
@@ -74,7 +84,7 @@ def get_resource_info() -> Dict[str, Dict[str, str]]:
             - name: Human-readable name
             - version: Semantic version (e.g., '1.0.0')
             - source: Where the resource came from
-            - checksum: SHA256 hash (64 hex chars)
+            - checksum: SHA256 hash (64 hex characters)
             - item_count: Number of items (as string)
             - last_updated: ISO 8601 date
     
@@ -93,6 +103,20 @@ def get_resource_info() -> Dict[str, Dict[str, str]]:
         >>> expected_checksum = '361908bbb0a44efc7dcb2dfb600d13a64d3982623701bd4057e0af69ca6d0b04'
         >>> assert resources['stopwords_base']['checksum'] == expected_checksum
     """
+    from . import _durak_core
+    
+    if _durak_core is None:
+        # Return fallback metadata from Python resources
+        import json
+        from pathlib import Path
+        
+        metadata_path = Path(__file__).parent.parent.parent / "resources" / "metadata.json"
+        if metadata_path.exists():
+            with open(metadata_path, encoding="utf-8") as f:
+                data = json.load(f)
+            return data.get("resources", {})
+        return {}
+    
     return _durak_core.get_resource_info()
 
 
@@ -163,8 +187,8 @@ def print_reproducibility_report() -> None:
         print(f"\n{resource_name}:")
         for key, value in sorted(info.items()):
             # Truncate checksum for readability
-            if key == 'checksum' and len(value) > 20:
-                display_value = value[:16] + "..."
+            if key == 'checksum' and len(str(value)) > 20:
+                display_value = str(value)[:16] + "..."
             else:
                 display_value = value
             print(f"  {key:20}: {display_value}")
