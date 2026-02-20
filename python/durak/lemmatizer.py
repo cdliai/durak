@@ -7,15 +7,29 @@ from typing import Literal
 
 from durak.exceptions import ConfigurationError, LemmatizerError, RustExtensionError
 
-try:
-    from durak._durak_core import lookup_lemma, strip_suffixes, strip_suffixes_validated
-except ImportError:
-    def lookup_lemma(word: str) -> str | None:
-        raise RustExtensionError("Rust extension not installed. Run: maturin develop")
-    def strip_suffixes(word: str) -> str:
-        raise RustExtensionError("Rust extension not installed. Run: maturin develop")
-    def strip_suffixes_validated(word: str, strict: bool = False, min_root_length: int = 2) -> str:
-        raise RustExtensionError("Rust extension not installed. Run: maturin develop")
+
+def _get_rust_function(name: str):
+    """Lazy import of Rust functions to avoid circular import issues."""
+    from durak import _durak_core
+    
+    if _durak_core is None:
+        def fallback(*args, **kwargs):
+            raise RustExtensionError("Rust extension not installed. Run: maturin develop")
+        return fallback
+    
+    return getattr(_durak_core, name)
+
+
+def lookup_lemma(word: str) -> str | None:
+    return _get_rust_function("lookup_lemma")(word)
+
+
+def strip_suffixes(word: str) -> str:
+    return _get_rust_function("strip_suffixes")(word)
+
+
+def strip_suffixes_validated(word: str, strict: bool = False, min_root_length: int = 2) -> str:
+    return _get_rust_function("strip_suffixes_validated")(word, strict, min_root_length)
 
 Strategy = Literal["lookup", "heuristic", "hybrid"]
 
