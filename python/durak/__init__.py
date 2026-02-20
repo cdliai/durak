@@ -4,12 +4,20 @@ from __future__ import annotations
 
 from importlib import metadata
 
-from .cleaning import clean_text, collapse_whitespace, normalize_case, normalize_unicode
+from .cleaning import (
+    clean_text,
+    collapse_whitespace,
+    extract_emojis,
+    normalize_case,
+    normalize_unicode,
+    remove_emojis,
+)
 from .info import (
     get_bibtex_citation,
     get_build_info,
     get_resource_info,
     print_reproducibility_report,
+)
 from .exceptions import (
     ConfigurationError,
     DurakError,
@@ -90,6 +98,8 @@ __all__ = [
     "normalize_case",
     "normalize_tokens",
     "print_reproducibility_report",
+    "extract_emojis",
+    "remove_emojis",
     "normalize_unicode",
     "process_text",
     "remove_stopwords",
