@@ -1,0 +1,625 @@
+{
+  "timestamp": "2026-02-21 01:13:15",
+  "correctness": {
+    "passed": 48,
+    "failed": 0,
+    "tests": [
+      {
+        "document": "01_basic_proper_nouns",
+        "config": "basic",
+        "tokens": 28,
+        "passed": true,
+        "errors": []
+      },
+      {
+        "document": "01_basic_proper_nouns",
+        "config": "with_stopwords",
+        "tokens": 25,
+        "passed": true,
+        "errors": []
+      },
+      {
+        "document": "01_basic_proper_nouns",
+        "config": "with_suffixes",
+        "tokens": 28,
+        "passed": true,
+        "errors": []
+      },
+      {
+        "document": "01_basic_proper_nouns",
+        "config": "full",
+        "tokens": 18,
+        "passed": true,
+        "errors": []
+      },
+      {
+        "document": "02_detached_suffixes",
+        "config": "basic",
+        "tokens": 30,
+        "passed": true,
+        "errors": []
+      },
+      {
+        "document": "02_detached_suffixes",
+        "config": "with_stopwords",
+        "tokens": 27,
+        "passed": true,
+        "errors": []
+      },
+      {
+        "document": "02_detached_suffixes",
+        "config": "with_suffixes",
+        "tokens": 24,
+        "passed": true,
+        "errors": []
+      },
+      {
+        "document": "02_detached_suffixes",
+        "config": "full",
+        "tokens": 15,
+        "passed": true,
+        "errors": []
+      },
+      {
+        "document": "03_social_media",
+        "config": "basic",
+        "tokens": 30,
+        "passed": true,
+        "errors": []
+      },
+      {
+        "document": "03_social_media",
+        "config": "with_stopwords",
+        "tokens": 25,
+        "passed": true,
+        "errors": []
+      },
+      {
+        "document": "03_social_media",
+        "config": "with_suffixes",
+        "tokens": 30,
+        "passed": true,
+        "errors": []
+      },
+      {
+        "document": "03_social_media",
+        "config": "full",
+        "tokens": 18,
+        "passed": true,
+        "errors": []
+      },
+      {
+        "document": "04_turkish_i_handling",
+        "config": "basic",
+        "tokens": 35,
+        "passed": true,
+        "errors": []
+      },
+      {
+        "document": "04_turkish_i_handling",
+        "config": "with_stopwords",
+        "tokens": 31,
+        "passed": true,
+        "errors": []
+      },
+      {
+        "document": "04_turkish_i_handling",
+        "config": "with_suffixes",
+        "tokens": 35,
+        "passed": true,
+        "errors": []
+      },
+      {
+        "document": "04_turkish_i_handling",
+        "config": "full",
+        "tokens": 23,
+        "passed": true,
+        "errors": []
+      },
+      {
+        "document": "05_morphological_variants",
+        "config": "basic",
+        "tokens": 20,
+        "passed": true,
+        "errors": []
+      },
+      {
+        "document": "05_morphological_variants",
+        "config": "with_stopwords",
+        "tokens": 20,
+        "passed": true,
+        "errors": []
+      },
+      {
+        "document": "05_morphological_variants",
+        "config": "with_suffixes",
+        "tokens": 20,
+        "passed": true,
+        "errors": []
+      },
+      {
+        "document": "05_morphological_variants",
+        "config": "full",
+        "tokens": 14,
+        "passed": true,
+        "errors": []
+      },
+      {
+        "document": "06_informal_colloquial",
+        "config": "basic",
+        "tokens": 48,
+        "passed": true,
+        "errors": []
+      },
+      {
+        "document": "06_informal_colloquial",
+        "config": "with_stopwords",
+        "tokens": 31,
+        "passed": true,
+        "errors": []
+      },
+      {
+        "document": "06_informal_colloquial",
+        "config": "with_suffixes",
+        "tokens": 43,
+        "passed": true,
+        "errors": []
+      },
+      {
+        "document": "06_informal_colloquial",
+        "config": "full",
+        "tokens": 20,
+        "passed": true,
+        "errors": []
+      },
+      {
+        "document": "07_mixed_language",
+        "config": "basic",
+        "tokens": 34,
+        "passed": true,
+        "errors": []
+      },
+      {
+        "document": "07_mixed_language",
+        "config": "with_stopwords",
+        "tokens": 27,
+        "passed": true,
+        "errors": []
+      },
+      {
+        "document": "07_mixed_language",
+        "config": "with_suffixes",
+        "tokens": 34,
+        "passed": true,
+        "errors": []
+      },
+      {
+        "document": "07_mixed_language",
+        "config": "full",
+        "tokens": 19,
+        "passed": true,
+        "errors": []
+      },
+      {
+        "document": "08_html_markup",
+        "config": "basic",
+        "tokens": 15,
+        "passed": true,
+        "errors": []
+      },
+      {
+        "document": "08_html_markup",
+        "config": "with_stopwords",
+        "tokens": 11,
+        "passed": true,
+        "errors": []
+      },
+      {
+        "document": "08_html_markup",
+        "config": "with_suffixes",
+        "tokens": 15,
+        "passed": true,
+        "errors": []
+      },
+      {
+        "document": "08_html_markup",
+        "config": "full",
+        "tokens": 8,
+        "passed": true,
+        "errors": []
+      },
+      {
+        "document": "09_repeated_chars",
+        "config": "basic",
+        "tokens": 16,
+        "passed": true,
+        "errors": []
+      },
+      {
+        "document": "09_repeated_chars",
+        "config": "with_stopwords",
+        "tokens": 15,
+        "passed": true,
+        "errors": []
+      },
+      {
+        "document": "09_repeated_chars",
+        "config": "with_suffixes",
+        "tokens": 16,
+        "passed": true,
+        "errors": []
+      },
+      {
+        "document": "09_repeated_chars",
+        "config": "full",
+        "tokens": 10,
+        "passed": true,
+        "errors": []
+      },
+      {
+        "document": "10_formal_news",
+        "config": "basic",
+        "tokens": 45,
+        "passed": true,
+        "errors": []
+      },
+      {
+        "document": "10_formal_news",
+        "config": "with_stopwords",
+        "tokens": 43,
+        "passed": true,
+        "errors": []
+      },
+      {
+        "document": "10_formal_news",
+        "config": "with_suffixes",
+        "tokens": 45,
+        "passed": true,
+        "errors": []
+      },
+      {
+        "document": "10_formal_news",
+        "config": "full",
+        "tokens": 33,
+        "passed": true,
+        "errors": []
+      },
+      {
+        "document": "11_punctuation_variants",
+        "config": "basic",
+        "tokens": 53,
+        "passed": true,
+        "errors": []
+      },
+      {
+        "document": "11_punctuation_variants",
+        "config": "with_stopwords",
+        "tokens": 48,
+        "passed": true,
+        "errors": []
+      },
+      {
+        "document": "11_punctuation_variants",
+        "config": "with_suffixes",
+        "tokens": 53,
+        "passed": true,
+        "errors": []
+      },
+      {
+        "document": "11_punctuation_variants",
+        "config": "full",
+        "tokens": 24,
+        "passed": true,
+        "errors": []
+      },
+      {
+        "document": "12_numbers_and_dates",
+        "config": "basic",
+        "tokens": 41,
+        "passed": true,
+        "errors": []
+      },
+      {
+        "document": "12_numbers_and_dates",
+        "config": "with_stopwords",
+        "tokens": 39,
+        "passed": true,
+        "errors": []
+      },
+      {
+        "document": "12_numbers_and_dates",
+        "config": "with_suffixes",
+        "tokens": 41,
+        "passed": true,
+        "errors": []
+      },
+      {
+        "document": "12_numbers_and_dates",
+        "config": "full",
+        "tokens": 29,
+        "passed": true,
+        "errors": []
+      }
+    ]
+  },
+  "benchmarks": {
+    "basic": {
+      "per_document": {
+        "01_basic_proper_nouns": {
+          "avg_ms": 0.04120633399907092,
+          "tokens": 28
+        },
+        "02_detached_suffixes": {
+          "avg_ms": 0.03266928399898461,
+          "tokens": 30
+        },
+        "03_social_media": {
+          "avg_ms": 0.04763948399886431,
+          "tokens": 30
+        },
+        "04_turkish_i_handling": {
+          "avg_ms": 0.04717623599935905,
+          "tokens": 35
+        },
+        "05_morphological_variants": {
+          "avg_ms": 0.034215100000437815,
+          "tokens": 20
+        },
+        "06_informal_colloquial": {
+          "avg_ms": 0.053358544000730035,
+          "tokens": 48
+        },
+        "07_mixed_language": {
+          "avg_ms": 0.0439652479999495,
+          "tokens": 34
+        },
+        "08_html_markup": {
+          "avg_ms": 0.03278499599946372,
+          "tokens": 15
+        },
+        "09_repeated_chars": {
+          "avg_ms": 0.02700185799949395,
+          "tokens": 16
+        },
+        "10_formal_news": {
+          "avg_ms": 0.06809686199994758,
+          "tokens": 45
+        },
+        "11_punctuation_variants": {
+          "avg_ms": 0.04801612200026284,
+          "tokens": 53
+        },
+        "12_numbers_and_dates": {
+          "avg_ms": 0.04931867000050261,
+          "tokens": 41
+        }
+      },
+      "average_ms": 0.04378739483308891,
+      "average_tokens": 32.916666666666664,
+      "throughput_tok_per_sec": 751738.4122106405
+    },
+    "with_stopwords": {
+      "per_document": {
+        "01_basic_proper_nouns": {
+          "avg_ms": 0.049445947999629425,
+          "tokens": 25
+        },
+        "02_detached_suffixes": {
+          "avg_ms": 0.04138801400040393,
+          "tokens": 27
+        },
+        "03_social_media": {
+          "avg_ms": 0.0564513919998717,
+          "tokens": 25
+        },
+        "04_turkish_i_handling": {
+          "avg_ms": 0.056921284000054584,
+          "tokens": 31
+        },
+        "05_morphological_variants": {
+          "avg_ms": 0.040138544000001275,
+          "tokens": 20
+        },
+        "06_informal_colloquial": {
+          "avg_ms": 0.06586771000002045,
+          "tokens": 31
+        },
+        "07_mixed_language": {
+          "avg_ms": 0.05303393000031065,
+          "tokens": 27
+        },
+        "08_html_markup": {
+          "avg_ms": 0.03706391800005804,
+          "tokens": 11
+        },
+        "09_repeated_chars": {
+          "avg_ms": 0.030788811998718302,
+          "tokens": 15
+        },
+        "10_formal_news": {
+          "avg_ms": 0.08115435799845727,
+          "tokens": 43
+        },
+        "11_punctuation_variants": {
+          "avg_ms": 0.06095393800023885,
+          "tokens": 48
+        },
+        "12_numbers_and_dates": {
+          "avg_ms": 0.06052661000103399,
+          "tokens": 39
+        }
+      },
+      "average_ms": 0.052811204833233205,
+      "average_tokens": 28.5,
+      "throughput_tok_per_sec": 539658.2049206616
+    },
+    "with_suffixes": {
+      "per_document": {
+        "01_basic_proper_nouns": {
+          "avg_ms": 0.05176677399867913,
+          "tokens": 28
+        },
+        "02_detached_suffixes": {
+          "avg_ms": 0.04220284199982416,
+          "tokens": 24
+        },
+        "03_social_media": {
+          "avg_ms": 0.05938340799912112,
+          "tokens": 30
+        },
+        "04_turkish_i_handling": {
+          "avg_ms": 0.05939849199967284,
+          "tokens": 35
+        },
+        "05_morphological_variants": {
+          "avg_ms": 0.04199587400034943,
+          "tokens": 20
+        },
+        "06_informal_colloquial": {
+          "avg_ms": 0.06842310399952112,
+          "tokens": 43
+        },
+        "07_mixed_language": {
+          "avg_ms": 0.055347739998978795,
+          "tokens": 34
+        },
+        "08_html_markup": {
+          "avg_ms": 0.038866736000272795,
+          "tokens": 15
+        },
+        "09_repeated_chars": {
+          "avg_ms": 0.032358632000978105,
+          "tokens": 16
+        },
+        "10_formal_news": {
+          "avg_ms": 0.08215455600111454,
+          "tokens": 45
+        },
+        "11_punctuation_variants": {
+          "avg_ms": 0.0627806740012602,
+          "tokens": 53
+        },
+        "12_numbers_and_dates": {
+          "avg_ms": 0.06238639999901352,
+          "tokens": 41
+        }
+      },
+      "average_ms": 0.054755435999898815,
+      "average_tokens": 32.0,
+      "throughput_tok_per_sec": 584416.860456725
+    },
+    "full": {
+      "per_document": {
+        "01_basic_proper_nouns": {
+          "avg_ms": 0.062608922000436,
+          "tokens": 18
+        },
+        "02_detached_suffixes": {
+          "avg_ms": 0.05265272799988452,
+          "tokens": 15
+        },
+        "03_social_media": {
+          "avg_ms": 0.07215651200021966,
+          "tokens": 18
+        },
+        "04_turkish_i_handling": {
+          "avg_ms": 0.07399463599904266,
+          "tokens": 23
+        },
+        "05_morphological_variants": {
+          "avg_ms": 0.050199078001242015,
+          "tokens": 14
+        },
+        "06_informal_colloquial": {
+          "avg_ms": 0.08647131800171337,
+          "tokens": 20
+        },
+        "07_mixed_language": {
+          "avg_ms": 0.06911933199990017,
+          "tokens": 19
+        },
+        "08_html_markup": {
+          "avg_ms": 0.045630919999894104,
+          "tokens": 8
+        },
+        "09_repeated_chars": {
+          "avg_ms": 0.03866521199961426,
+          "tokens": 10
+        },
+        "10_formal_news": {
+          "avg_ms": 0.10075726600007329,
+          "tokens": 33
+        },
+        "11_punctuation_variants": {
+          "avg_ms": 0.08073258399963379,
+          "tokens": 24
+        },
+        "12_numbers_and_dates": {
+          "avg_ms": 0.07947050400071021,
+          "tokens": 29
+        }
+      },
+      "average_ms": 0.06770491766686366,
+      "average_tokens": 19.25,
+      "throughput_tok_per_sec": 284322.0354349739
+    }
+  },
+  "components": {
+    "tokenize": {
+      "avg_ms": 0.004007379999620753,
+      "ops_per_sec": 249539.59946265072
+    },
+    "clean_text (keep)": {
+      "avg_ms": 0.03635929350002698,
+      "ops_per_sec": 27503.284682890167
+    },
+    "clean_text (remove)": {
+      "avg_ms": 0.042623489999641606,
+      "ops_per_sec": 23461.24167702852
+    },
+    "normalize_case": {
+      "avg_ms": 0.00013354899965634104,
+      "ops_per_sec": 7487888.359877498
+    },
+    "attach_suffixes": {
+      "avg_ms": 0.0013360779998947692,
+      "ops_per_sec": 748459.2965970258
+    },
+    "remove_stopwords": {
+      "avg_ms": 0.019229453499974625,
+      "ops_per_sec": 52003.55797949846
+    }
+  },
+  "comparison": {
+    "raw_tokenize": {
+      "avg_ms": 0.06666487800066534,
+      "tokens": 45,
+      "reduction_pct": 0.0
+    },
+    "default": {
+      "avg_ms": 0.06613606000064465,
+      "tokens": 45,
+      "reduction_pct": 0.0
+    },
+    "+stopwords": {
+      "avg_ms": 0.07964989399988553,
+      "tokens": 43,
+      "reduction_pct": 4.444444444444439
+    },
+    "+suffixes": {
+      "avg_ms": 0.08223421799993957,
+      "tokens": 45,
+      "reduction_pct": 0.0
+    },
+    "+punctuation": {
+      "avg_ms": 0.07959812199987937,
+      "tokens": 35,
+      "reduction_pct": 22.22222222222222
+    },
+    "+all": {
+      "avg_ms": 0.10043186599978071,
+      "tokens": 33,
+      "reduction_pct": 26.66666666666667
+    }
+  }
+}
