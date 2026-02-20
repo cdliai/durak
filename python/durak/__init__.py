@@ -32,7 +32,8 @@ from .exceptions import (
 )
 from .lemmatizer import Lemmatizer
 from .normalizer import Normalizer
-from .pipeline import Pipeline, process_text
+from .pipeline import Pipeline
+from .processor import ProcessorConfig, ProcessingResult, TextProcessor, process_text
 from .stopwords import (
     BASE_STOPWORDS,
     DEFAULT_STOPWORD_RESOURCE,
@@ -69,8 +70,11 @@ __all__ = [
     "Lemmatizer",
     "Normalizer",
     "Pipeline",
+    "ProcessorConfig",
+    "ProcessingResult",
     "StopwordManager",
     "StopwordSnapshot",
+    "TextProcessor",
     "Tokenizer",
     # Exceptions
     "ConfigurationError",
