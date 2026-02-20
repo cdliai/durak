@@ -47,6 +47,14 @@ from .stopwords import (
     remove_stopwords,
 )
 from .stats import FrequencyCounter, ngrams
+from .ottoman import (
+    OttomanConfig,
+    OttomanProcessingResult,
+    OttomanProcessor,
+    OttomanTransliterator,
+    TransliterationMapping,
+    ottoman_to_modern,
+)
 from .suffixes import (
     APOSTROPHE_TOKENS,
     DEFAULT_DETACHED_SUFFIXES,
@@ -77,6 +85,13 @@ __all__ = [
     "StopwordSnapshot",
     "TextProcessor",
     "Tokenizer",
+    # Ottoman module
+    "OttomanConfig",
+    "OttomanProcessingResult",
+    "OttomanProcessor",
+    "OttomanTransliterator",
+    "TransliterationMapping",
+    "ottoman_to_modern",
     # Exceptions
     "ConfigurationError",
     "DurakError",
