@@ -1,0 +1,9 @@
+# Repeated/Elongated Characters
+# Expected: Normalize repeated characters
+
+Çooooook güzel olmuş!
+Nasıııılsın?
+Harikaaaaaa!
+Tamamdırrrr
+Neeeeee? Gerçekten mi?
+Teşekkür ederimmm

@@ -1,0 +1,9 @@
+# Turkish with Detached Suffixes (Common in Noisy Text)
+# Expected: Suffixes should be reattached
+
+Ankara ' da kaldım.
+İstanbul ' a geldik.
+Türkiye ' den çıktı.
+Ev ' de oturuyor.
+Okul ' a gitti.
+Park ' ta oynadık.

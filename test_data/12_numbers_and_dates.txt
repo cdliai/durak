@@ -1,0 +1,9 @@
+# Numbers, Dates, and Currency
+# Expected: Handle numeric formats correctly
+
+14.03.2024 tarihinde 1.250,50 TL ödeme yapıldı.
+Saat 09:30'da toplantı var.
+2023 yılında 3.456 kişi katıldı.
+Telefon: +90 532 123 45 67
+%25 indirim uygulandı.
+1-2 gün içinde teslimat yapılacak.

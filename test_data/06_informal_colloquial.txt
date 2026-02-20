@@ -1,0 +1,8 @@
+# Informal/Colloquial Turkish
+# Expected: Handle informal variants
+
+Bi bakayım dedim de, çok güzel olmuş ya!
+Naber? İyi misin? Benim için de bir şey alırsın değil mi?
+Çok tatlışşş bu ya 😍😍😍
+Hani şey vardı ya, işte onu yapcam.
+Gidicem, yapıcam, diyecem (informal future)

@@ -1,0 +1,9 @@
+# Turkish Morphological Variants (Suffix Chains)
+# Expected: Proper tokenization and lemmatization
+
+Kitaplarımdan birini okudum.
+Evlerimizden çıktık.
+Çocuklarımızla oynadık.
+Arkadaşlarımla buluştum.
+Okullarımıza gittik.
+Masanın üstünde duruyor.

@@ -1,0 +1,9 @@
+# Social Media Style with Mentions, Hashtags, URLs
+# Expected: Handle social media elements appropriately
+
+Hey @ahmet! Bu haber çok güzel 😊🎉
+#Türkiye trend oluyor!
+Check out https://example.com for more info
+RT @user: Bugün çok güzel bir gün!!! 🌞
+Yeni proje hakkında ne düşünüyorsunuz? #nlp #turkish
+www.karagoz.io adresinden ulaşabilirsiniz.

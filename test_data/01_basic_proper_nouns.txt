@@ -1,0 +1,8 @@
+# Basic Turkish with Proper Nouns and Apostrophes
+# Expected: Preserves proper noun apostrophe structures
+
+Türkiye'de NLP zor. Durak kolaylaştırır.
+İstanbul'a gittik. Ankara'da kaldık.
+Türkiye'nin en büyük şehri İstanbul'dur.
+Fatih'te bir kafe var.
+Galata Köprüsü'nden geçtik.

@@ -1,0 +1,17 @@
+{
+  "description": "Basic Turkish with Proper Nouns",
+  "test_cases": [
+    {
+      "input": "Türkiye'de NLP zor. Durak kolaylaştırır.",
+      "expected_tokens": ["türkiye'de", "nlp", "zor", ".", "durak", "kolaylaştırır", "."],
+      "expected_lemmas": ["türkiye", "nlp", "zor", ".", "durak", "kolaylaştır", "."],
+      "checks": ["preserve_apostrophe", "lowercase", "punctuation_separate"]
+    },
+    {
+      "input": "İstanbul'a gittik. Ankara'da kaldık.",
+      "expected_tokens": ["i̇stanbul'a", "gittik", ".", "ankara'da", "kaldık", "."],
+      "checks": ["detached_suffix_handling", "proper_noun_case"]
+    }
+  ],
+  "nuances": ["proper_nouns", "apostrophes", " Turkish_specific_chars"]
+}

@@ -1,0 +1,21 @@
+{
+  "description": "Detached Suffixes (Noisy Text)",
+  "test_cases": [
+    {
+      "input": "Ankara ' da kaldım.",
+      "expected_after_reattach": ["ankara'da", "kaldım", "."],
+      "checks": ["suffix_reattachment", "whitespace_normalization"]
+    },
+    {
+      "input": "İstanbul ' ya geldik.",
+      "expected_after_reattach": ["i̇stanbul'ya", "geldik", "."],
+      "checks": ["suffix_reattachment", "turkish_i_handling", "dative_case"]
+    },
+    {
+      "input": "İstanbul ' da kaldık.",
+      "expected_after_reattach": ["i̇stanbul'da", "kaldık", "."],
+      "checks": ["suffix_reattachment", "locative_case"]
+    }
+  ],
+  "nuances": ["noisy_text", "spacing_issues", "suffix_reattachment"]
+}

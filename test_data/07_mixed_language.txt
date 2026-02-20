@@ -1,0 +1,9 @@
+# Mixed Turkish-English Text
+# Expected: Handle code-switching gracefully
+
+Bugün meeting var saat 3'te.
+Bu çok important bir konu.
+Project manager ile konuştum.
+Deadline yaklaşıyor, yetiştiremiyorum.
+Email attım ama cevap gelmedi.
+File'ı upload ettim.

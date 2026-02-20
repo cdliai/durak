@@ -1,0 +1,8 @@
+# HTML and Markup Content
+# Expected: Strip HTML, preserve text content
+
+<p>Türkiye'de <strong>NLP</strong> çok önemli.</p>
+<div class="content">Ankara'da bir <em>etkinlik</em> var.</div>
+<script>alert('test')</script>
+<p>Bu haber <a href="http://example.com">burada</a> yayınlandı.</p>
+<style>.red{color:red}</style>

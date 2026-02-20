@@ -1,0 +1,26 @@
+{
+  "description": "Turkish I/ı and İ/i Handling",
+  "test_cases": [
+    {
+      "input": "İSTANBUL",
+      "expected_normalized": "istanbul",
+      "note": "İ → i, then lowercase"
+    },
+    {
+      "input": "IĞDIR",
+      "expected_normalized": "ığdır",
+      "note": "I → ı (dotless), then lowercase"
+    },
+    {
+      "input": "İngiltere",
+      "expected_normalized": "ingiltere",
+      "note": "İ → i (dotted), then lowercase"
+    },
+    {
+      "input": "Istanbul",
+      "expected_normalized": "ıstanbul",
+      "note": "I → ı (dotless) - technically correct for Turkish, though proper noun is 'İstanbul'"
+    }
+  ],
+  "nuances": ["turkish_dotted_i", "turkish_dotless_i", "case_conversion"]
+}

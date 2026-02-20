@@ -1,0 +1,10 @@
+# Various Punctuation Patterns
+# Expected: Proper tokenization of punctuation
+
+Merhaba! Nasılsın?
+Bugün... Yani... Şey... Anlatamıyorum.
+Fiyat: 100 TL, Adet: 5
+E-posta: test@example.com
+Saat 14:30'da buluşalım.
+"Türkiye çok güzel" dedi.
+(Parantez içinde bir not)

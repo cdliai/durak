@@ -1,0 +1,91 @@
+{
+  "timestamp": "2026-02-21 00:52:47",
+  "rust_available": false,
+  "test_files": [
+    "01_basic_proper_nouns",
+    "02_detached_suffixes",
+    "03_social_media",
+    "04_turkish_i_handling",
+    "05_morphological_variants",
+    "06_informal_colloquial",
+    "07_mixed_language",
+    "08_html_markup",
+    "09_repeated_chars",
+    "10_formal_news",
+    "11_punctuation_variants",
+    "12_numbers_and_dates"
+  ],
+  "results": {
+    "correctness": {
+      "turkish_i": {
+        "passed": 5,
+        "failed": 0,
+        "tests": [
+          {
+            "input": "İSTANBUL",
+            "expected": "istanbul",
+            "got": "istanbul",
+            "passed": true
+          },
+          {
+            "input": "IĞDIR",
+            "expected": "ığdır",
+            "got": "ığdır",
+            "passed": true
+          },
+          {
+            "input": "İngiltere",
+            "expected": "ingiltere",
+            "got": "ingiltere",
+            "passed": true
+          },
+          {
+            "input": "ÇİÇEKLER",
+            "expected": "çiçekler",
+            "got": "çiçekler",
+            "passed": true
+          },
+          {
+            "input": "Istanbul",
+            "expected": "ıstanbul",
+            "got": "ıstanbul",
+            "passed": true
+          }
+        ]
+      },
+      "cleaning": {
+        "passed": 4,
+        "failed": 0,
+        "tests": []
+      },
+      "suffixes": {
+        "passed": 5,
+        "failed": 0,
+        "tests": []
+      },
+      "tokenization": {
+        "passed": 2,
+        "failed": 0,
+        "tests": []
+      },
+      "lemmatization": {
+        "passed": 0,
+        "failed": 0,
+        "skipped": true
+      },
+      "summary": {
+        "passed": 16,
+        "failed": 0,
+        "total": 16
+      }
+    },
+    "performance": {
+      "cleaning": {
+        "avg_ms": 0.5286738199993124
+      },
+      "full_pipeline": {
+        "avg_ms": 0.6789975999708986
+      }
+    }
+  }
+}

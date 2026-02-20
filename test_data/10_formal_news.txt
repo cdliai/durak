@@ -1,0 +1,8 @@
+# Formal/News Style Turkish
+# Expected: Proper handling of formal structures
+
+Türkiye Büyük Millet Meclisi'nde önemli bir görüşme yapıldı.
+Cumhurbaşkanı Recep Tayyip Erdoğan, Ankara'da bir konuşma gerçekleştirdi.
+Türkiye Cumhuriyeti Merkez Bankası faiz kararını açıkladı.
+Prof. Dr. Ahmet Yılmaz, yeni araştırmasını yayınladı.
+Bakanlık tarafından yapılan açıklamaya göre...

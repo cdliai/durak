@@ -1,0 +1,10 @@
+# Turkish I/ı and İ/i Handling (Critical for Turkish NLP)
+# Expected: Correct case conversion
+
+İSTANBUL çok güzel.
+IĞDIR'dan selamlar.
+İngiltere'ye gitti.
+İlginç bir olay.
+Istanbul vs İstanbul (should both become istanbul)
+İZMİR ve ızmir (should both become izmir)
+ÇİÇEKLER ve çiçekler
