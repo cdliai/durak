@@ -46,6 +46,7 @@ from .stopwords import (
     load_stopwords,
     remove_stopwords,
 )
+from .stats import FrequencyCounter, ngrams
 from .suffixes import (
     APOSTROPHE_TOKENS,
     DEFAULT_DETACHED_SUFFIXES,
@@ -90,6 +91,8 @@ __all__ = [
     # Functions
     "attach_detached_suffixes",
     "clean_text",
+    "FrequencyCounter",
+    "ngrams",
     "collapse_whitespace",
     "get_bibtex_citation",
     "get_build_info",
