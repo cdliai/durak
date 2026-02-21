@@ -13,9 +13,6 @@ license = "MIT"
 license-files = ["LICENSE"]
 keywords = ["turkish nlp", "text processing", "preprocessing", "lemmatization", "tokenization"]
 dependencies = ["click>=8.0.0"]
-
-[project.scripts]
-durak = "durak.cli:main"
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
@@ -29,6 +26,9 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Topic :: Text Processing :: Linguistic",
 ]
+
+[project.scripts]
+durak = "durak.cli:main"
 
 [project.urls]
 Homepage = "https://karagoz.io"
