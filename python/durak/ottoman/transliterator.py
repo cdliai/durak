@@ -225,6 +225,7 @@ class OttomanTransliterator:
         result_chars = []
         mappings = []
         
+        trans_pos = 0
         i = 0
         while i < len(text):
             char = text[i]
@@ -238,16 +239,16 @@ class OttomanTransliterator:
                     modern = char
                 
                 # Record mapping
-                trans_start = len("".join(result_chars))
+                trans_start = trans_pos
                 result_chars.append(modern)
-                trans_end = len("".join(result_chars))
-                mappings.append((i, i + 1, trans_start, trans_end))
+                trans_pos += len(modern)
+                mappings.append((i, i + 1, trans_start, trans_pos))
             else:
                 # Pass through unchanged (regular Latin letters, spaces, etc.)
-                trans_start = len("".join(result_chars))
+                trans_start = trans_pos
                 result_chars.append(char)
-                trans_end = len("".join(result_chars))
-                mappings.append((i, i + 1, trans_start, trans_end))
+                trans_pos += len(char)
+                mappings.append((i, i + 1, trans_start, trans_pos))
             
             i += 1
         
