@@ -78,9 +78,10 @@ from durak import process_text
 
 result = process_text(
     "Türkiye'de NLP zor!",
-    steps=["clean", "tokenize", "remove_stopwords"]
+    remove_stopwords=True,
+    attach_suffixes=True,
 )
-# ["türkiye'de", "nlp", "zor", "!"]
+# result.tokens => ["türkiye'de", "nlp", "zor", "!"]
 ```
 
 ### Build Blocks à la Carte

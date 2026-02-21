@@ -8,7 +8,7 @@ This module provides:
 
 Example:
     >>> from durak.stats import FrequencyCounter, ngrams
-    >>> from durak import TextProcessor
+    >>> from durak import TextProcessor, ProcessorConfig
     >>> 
     >>> processor = TextProcessor(ProcessorConfig(lemmatize=True))
     >>> texts = ["Kitap okuyorum.", "Kitap yazıyorum."]
