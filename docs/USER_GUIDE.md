@@ -77,6 +77,7 @@ config = ProcessorConfig(emoji_mode="remove")
 
 # Extract emojis separately
 config = ProcessorConfig(emoji_mode="extract")
+processor = TextProcessor(config)
 result = processor.process("Harika! 🎉")
 print(result.tokens)   # ['harika']
 print(result.emojis)   # ['🎉']

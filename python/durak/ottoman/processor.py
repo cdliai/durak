@@ -335,11 +335,22 @@ class OttomanProcessor:
                 else:
                     output_token = original_token
                 
-                # Create mapping for this token
+                # Create mapping for this token using document-level offsets
+                if orig_start >= 0 and orig_end >= orig_start:
+                    # Use document-level offsets derived from the full mapping
+                    token_char_mappings = [
+                        (orig_start, orig_end, trans_idx, trans_idx + len(token))
+                    ]
+                else:
+                    # Fallback: use token-local offsets if we could not resolve global ones
+                    token_char_mappings = [
+                        (0, len(original_token), 0, len(token))
+                    ]
+
                 token_mapping = TransliterationMapping(
                     original=original_token,
                     transliterated=token,
-                    char_mappings=[(0, len(original_token), 0, len(token))],
+                    char_mappings=token_char_mappings,
                 )
                 
                 processed_tokens.append(output_token)
@@ -363,7 +374,20 @@ class OttomanProcessor:
                 ))
                 script_types.append(script_type)
         
-        # Step 6: Remove stopwords (using processed/modern tokens for matching)
+        # Step 6: Strip custom suffixes from processed tokens
+        if self.suffixes:
+            sorted_suffixes = sorted(self.suffixes, key=len, reverse=True)
+            stripped = []
+            for token in processed_tokens:
+                # Remove the longest matching suffix (at most one per token)
+                for suffix in sorted_suffixes:
+                    if token.endswith(suffix) and len(token) > len(suffix):
+                        token = token[: -len(suffix)]
+                        break
+                stripped.append(token)
+            processed_tokens = stripped
+
+        # Step 7: Remove stopwords (using processed/modern tokens for matching)
         if self.stopwords:
             filtered_indices = [
                 i for i, token in enumerate(processed_tokens)

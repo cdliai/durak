@@ -24,7 +24,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Callable, Literal
 
-from durak.cleaning import clean_text, normalize_case
+from durak.cleaning import clean_text, normalize_case, DEFAULT_CLEANING_STEPS
 from durak.exceptions import ConfigurationError
 from durak.lemmatizer import Lemmatizer
 from durak.stopwords import BASE_STOPWORDS, StopwordManager, remove_stopwords
@@ -152,28 +152,37 @@ class TextProcessor:
         result = ProcessingResult()
         
         # Step 1: Clean text (with emoji handling)
+        # When lowercase=False, use a custom steps pipeline that omits case normalization
+        if self.config.lowercase:
+            cleaning_steps = None  # use DEFAULT_CLEANING_STEPS (includes lowercase)
+        else:
+            cleaning_steps = tuple(
+                step for step in DEFAULT_CLEANING_STEPS
+                if not (
+                    step is normalize_case
+                    or getattr(step, "func", None) is normalize_case
+                )
+            )
+
         if self.config.emoji_mode == "extract":
-            cleaned, emojis = clean_text(text, emoji_mode="extract")
+            cleaned, emojis = clean_text(text, steps=cleaning_steps, emoji_mode="extract")
             result.emojis = emojis
         else:
-            cleaned = clean_text(text, emoji_mode=self.config.emoji_mode)
+            cleaned = clean_text(text, steps=cleaning_steps, emoji_mode=self.config.emoji_mode)
         
-        # Step 2: Additional lowercase normalization if needed
-        # (clean_text already lowercases via DEFAULT_CLEANING_STEPS)
-        
-        # Step 3: Tokenize
+        # Step 2: Tokenize
         tokens = tokenize(cleaned, strip_punct=self.config.remove_punctuation)
         
-        # Step 4: Reattach detached suffixes
+        # Step 3: Reattach detached suffixes
         if self.config.attach_suffixes:
             tokens = attach_detached_suffixes(tokens)
         
-        # Step 5: Lemmatize (before stopword removal to help with matching)
+        # Step 4: Lemmatize (before stopword removal to help with matching)
         if self.config.lemmatize and self.config.lemmatizer:
             lemmas = [self.config.lemmatizer(token) for token in tokens]
             result.lemmas = lemmas
         
-        # Step 6: Remove stopwords
+        # Step 5: Remove stopwords
         if self.config.remove_stopwords and self.config.stopword_manager:
             # Filter both tokens and lemmas together
             filtered_indices = [

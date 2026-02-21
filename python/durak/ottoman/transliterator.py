@@ -165,6 +165,7 @@ class OttomanTransliterator:
         mappings = []
         ambiguous = []
         
+        trans_pos = 0
         i = 0
         while i < len(text):
             char = text[i]
@@ -186,19 +187,21 @@ class OttomanTransliterator:
                 if char in AMBIGUOUS_MAPPINGS:
                     ambiguous.append((i, char, latin_char))
                 
-                # Record mapping
-                trans_start = len("".join(transliterated_chars))
+                # Record mapping using running counter instead of O(n) join
+                trans_start = trans_pos
                 transliterated_chars.append(latin_char)
-                trans_end = len("".join(transliterated_chars))
+                trans_pos += len(latin_char)
+                trans_end = trans_pos
                 
                 mappings.append((i, i + 1, trans_start, trans_end))
                 i += 1
             else:
                 # Non-Arabic character (space, punctuation, etc.)
                 # Pass through but record mapping
-                trans_start = len("".join(transliterated_chars))
+                trans_start = trans_pos
                 transliterated_chars.append(char)
-                trans_end = len("".join(transliterated_chars))
+                trans_pos += len(char)
+                trans_end = trans_pos
                 
                 mappings.append((i, i + 1, trans_start, trans_end))
                 i += 1
@@ -225,6 +228,7 @@ class OttomanTransliterator:
         result_chars = []
         mappings = []
         
+        trans_pos = 0
         i = 0
         while i < len(text):
             char = text[i]
@@ -237,16 +241,18 @@ class OttomanTransliterator:
                     # Keep original if preserving and would be removed
                     modern = char
                 
-                # Record mapping
-                trans_start = len("".join(result_chars))
+                # Record mapping using running counter instead of O(n) join
+                trans_start = trans_pos
                 result_chars.append(modern)
-                trans_end = len("".join(result_chars))
+                trans_pos += len(modern)
+                trans_end = trans_pos
                 mappings.append((i, i + 1, trans_start, trans_end))
             else:
                 # Pass through unchanged (regular Latin letters, spaces, etc.)
-                trans_start = len("".join(result_chars))
+                trans_start = trans_pos
                 result_chars.append(char)
-                trans_end = len("".join(result_chars))
+                trans_pos += len(char)
+                trans_end = trans_pos
                 mappings.append((i, i + 1, trans_start, trans_end))
             
             i += 1
