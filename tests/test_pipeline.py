@@ -4,7 +4,13 @@ import pytest
 import warnings
 
 from durak.normalizer import Normalizer
-from durak.pipeline import Pipeline, process_text, process_text_with_steps
+from durak.context import ProcessingContext
+from durak.pipeline import (
+    Pipeline,
+    process_text,
+    process_text_with_context,
+    process_text_with_steps,
+)
 from durak.exceptions import ConfigurationError, PipelineError
 
 
@@ -102,6 +108,24 @@ class TestProcessTextWithSteps:
         result = process_text_with_steps("Hello World!", ["clean", "tokenize"])
         assert isinstance(result, list)
         assert len(result) > 0
+
+
+class TestProcessTextWithContext:
+    """Tests for context-aware pipeline execution."""
+
+    def test_pipeline_run_with_context(self):
+        pipe = Pipeline(["clean", "tokenize"])
+        context = pipe.run_with_context("Hello World!")
+
+        assert isinstance(context, ProcessingContext)
+        assert context.tokens == ["hello", "world", "!"]
+        assert context.normalized_tokens == ["hello", "world", "!"]
+        assert context.metadata == ["clean", "tokenize"]
+
+    def test_process_text_with_context_wrapper(self):
+        context = process_text_with_context("Ankara ' da", ["clean", "tokenize"])
+        assert isinstance(context, ProcessingContext)
+        assert context.tokens
 
 
 class TestProcessTextDeprecated:

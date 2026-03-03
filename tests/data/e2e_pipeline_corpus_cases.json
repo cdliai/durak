@@ -1,0 +1,270 @@
+{
+  "cases": [
+    {
+      "id": "clean_academic_workshop",
+      "kind": "clean",
+      "text": "Ankara'da düzenlenen Türkçe NLP çalıştayında araştırmacılar veri kalitesini tartıştı.",
+      "min_tokens": 8,
+      "required_tokens": ["ankara'da", "türkçe", "nlp", "tartıştı"],
+      "removed_by_stopwords": []
+    },
+    {
+      "id": "clean_lab_measurement",
+      "kind": "clean",
+      "text": "Bugün saat 09:30'da laboratuvarda 3 farklı model karşılaştırıldı.",
+      "min_tokens": 10,
+      "required_tokens": ["bugün", "laboratuvarda", "model", "karşılaştırıldı"],
+      "removed_by_stopwords": ["da"]
+    },
+    {
+      "id": "clean_morphology_benchmark",
+      "kind": "clean",
+      "text": "Öğrenciler, morfoloji tabanlı çözümün hata oranını %12'den %7'ye düşürdü.",
+      "min_tokens": 12,
+      "required_tokens": ["öğrenciler", "morfoloji", "oranını", "düşürdü"],
+      "removed_by_stopwords": ["ye"]
+    },
+    {
+      "id": "clean_devops_notes",
+      "kind": "clean",
+      "text": "Kütüphanedeki belgeler hızlıca etiketlendi ve sürüm kontrolüne alındı.",
+      "min_tokens": 8,
+      "required_tokens": ["kütüphanedeki", "belgeler", "sürüm", "kontrolüne"],
+      "removed_by_stopwords": ["ve"]
+    },
+    {
+      "id": "clean_university_course",
+      "kind": "clean",
+      "text": "İstanbul Teknik Üniversitesi'nde doğal dil işleme dersi yoğun ilgi görüyor.",
+      "min_tokens": 10,
+      "required_tokens": ["istanbul", "teknik", "doğal", "işleme"],
+      "removed_by_stopwords": []
+    },
+    {
+      "id": "clean_meeting_agenda",
+      "kind": "clean",
+      "text": "Yarınki toplantıda sözlük kapsaması, kök doğruluğu ve örneklem dengesi konuşulacak.",
+      "min_tokens": 10,
+      "required_tokens": ["yarınki", "sözlük", "doğruluğu", "konuşulacak"],
+      "removed_by_stopwords": ["ve"]
+    },
+    {
+      "id": "clean_engineering_log",
+      "kind": "clean",
+      "text": "Mühendis ekip, üretim hattında log temizleme adımlarını standartlaştırdı.",
+      "min_tokens": 8,
+      "required_tokens": ["mühendis", "üretim", "temizleme", "standartlaştırdı"],
+      "removed_by_stopwords": []
+    },
+    {
+      "id": "clean_ner_result",
+      "kind": "clean",
+      "text": "Bu çalışma, Türkçe adlandırılmış varlık tanıma başarımını anlamlı biçimde artırdı.",
+      "min_tokens": 10,
+      "required_tokens": ["çalışma", "adlandırılmış", "tanıma", "artırdı"],
+      "removed_by_stopwords": ["bu"]
+    },
+    {
+      "id": "clean_ethics_approval",
+      "kind": "clean",
+      "text": "Araştırma grubu verileri anonimleştirip etik kurul onayını tamamladı.",
+      "min_tokens": 8,
+      "required_tokens": ["araştırma", "verileri", "etik", "tamamladı"],
+      "removed_by_stopwords": []
+    },
+    {
+      "id": "clean_human_eval",
+      "kind": "clean",
+      "text": "Modelin çıktılarını insan değerlendiriciler kör test protokolüyle puanladı.",
+      "min_tokens": 8,
+      "required_tokens": ["modelin", "insan", "test", "puanladı"],
+      "removed_by_stopwords": []
+    },
+    {
+      "id": "clean_long_policy_paragraph",
+      "kind": "clean",
+      "text": "Proje kapsamında toplanan tüm metinler önce otomatik temizleme hattından geçirildi. Ardından örneklem denetimi için 500 belge rastgele seçildi ve iki bağımsız anotatör tarafından etiketlendi.",
+      "min_tokens": 22,
+      "required_tokens": ["proje", "metinler", "otomatik", "anotatör"],
+      "removed_by_stopwords": ["tüm", "için", "ve"]
+    },
+    {
+      "id": "clean_legal_notice",
+      "kind": "clean",
+      "text": "Kurum, veri işleme faaliyetlerini KVKK'nın ilgili maddelerine uygun biçimde yürüttüğünü beyan eder.",
+      "min_tokens": 10,
+      "required_tokens": ["kurum", "veri", "işleme", "beyan"],
+      "removed_by_stopwords": []
+    },
+    {
+      "id": "clean_medical_record",
+      "kind": "clean",
+      "text": "Hastanın şikayetleri üç gündür sürüyor; ateş 38.2 derece, öksürük hafif seyrediyor.",
+      "min_tokens": 12,
+      "required_tokens": ["hastanın", "şikayetleri", "ateş", "öksürük"],
+      "removed_by_stopwords": []
+    },
+    {
+      "id": "clean_customer_ops",
+      "kind": "clean",
+      "text": "Destek ekibi biletleri öncelik düzeyine göre sınıflandırdı ve kritik talepleri aynı gün kapattı.",
+      "min_tokens": 12,
+      "required_tokens": ["destek", "biletleri", "öncelik", "kritik"],
+      "removed_by_stopwords": ["ve"]
+    },
+    {
+      "id": "clean_finance_summary",
+      "kind": "clean",
+      "text": "Şirketin üçüncü çeyrek gelirleri yüzde 18 arttı, operasyonel marj ise 2 puan iyileşti.",
+      "min_tokens": 12,
+      "required_tokens": ["şirketin", "gelirleri", "operasyonel", "iyileşti"],
+      "removed_by_stopwords": ["ise"]
+    },
+    {
+      "id": "clean_transport_update",
+      "kind": "clean",
+      "text": "Sabah seferlerinde yoğunluk arttı ancak aktarma süreleri planlanan aralıkta kaldı.",
+      "min_tokens": 10,
+      "required_tokens": ["sabah", "seferlerinde", "yoğunluk", "kaldı"],
+      "removed_by_stopwords": []
+    },
+
+    {
+      "id": "noisy_html_social_url",
+      "kind": "noisy",
+      "text": "<div>Merhabaa!!! @kullanici bugün #harika bir günnn 😍😍 https://ornek.com/test?a=1</div>",
+      "min_tokens": 6,
+      "required_tokens": ["merhabaa", "bugün", "bir", "günn"],
+      "absent_in_clean": ["http", "@", "#", "<div>", "</div>"],
+      "removed_by_stopwords": ["bir"]
+    },
+    {
+      "id": "noisy_caps_url_hashtag",
+      "kind": "noisy",
+      "text": "İSTANBUL'DA    YAŞIYORUMMM!!!   www.ornek.org  #NLP @etiket",
+      "min_tokens": 4,
+      "required_tokens": ["istanbul'da", "yaşıyorumm"],
+      "absent_in_clean": ["www.", "@", "#"],
+      "removed_by_stopwords": []
+    },
+    {
+      "id": "noisy_detached_suffix",
+      "kind": "noisy",
+      "text": "Ankara ' da ve İzmir ' de toplantı var mı ?",
+      "min_tokens": 10,
+      "required_tokens": ["ankara", "izmir", "toplantı", "mı"],
+      "joined_tokens": ["ankara'da", "izmir'de"],
+      "removed_by_stopwords": ["ve", "var", "mı"]
+    },
+    {
+      "id": "noisy_release_url",
+      "kind": "noisy",
+      "text": "Sürüm notları burada: https://github.com/org/repo/releases/tag/v0.4.0 !!!",
+      "min_tokens": 5,
+      "required_tokens": ["sürüm", "notları", "burada"],
+      "absent_in_clean": ["http", "github.com"],
+      "removed_by_stopwords": []
+    },
+    {
+      "id": "noisy_html_price_repetition",
+      "kind": "noisy",
+      "text": "<p>Fiyat 1.250,75 TL oldu!!!</p> amaaaaa stokta mı???",
+      "min_tokens": 9,
+      "required_tokens": ["fiyat", "1.250,75", "tl", "stokta"],
+      "absent_in_clean": ["<p>", "</p>"],
+      "removed_by_stopwords": ["oldu", "mı"]
+    },
+    {
+      "id": "noisy_abbrev_question",
+      "kind": "noisy",
+      "text": "dr. Ahmet bugün geldi mi??",
+      "min_tokens": 7,
+      "required_tokens": ["dr", "ahmet", "bugün", "geldi"],
+      "removed_by_stopwords": ["mi"]
+    },
+    {
+      "id": "noisy_encoding_artifact",
+      "kind": "noisy",
+      "text": "Veri seti mış gibi görünen ama bozuk encodıng içeren satır: Ã§ok garip",
+      "min_tokens": 12,
+      "required_tokens": ["veri", "seti", "encodıng", "garip"],
+      "removed_by_stopwords": ["ama", "gibi"]
+    },
+    {
+      "id": "noisy_api_error_emoticon",
+      "kind": "noisy",
+      "text": "Bunu test etmek için API'ye POST attım; cevap 500 döndü :(",
+      "min_tokens": 10,
+      "required_tokens": ["test", "apı'ye", "post", "500"],
+      "removed_by_stopwords": ["bunu", "için"]
+    },
+    {
+      "id": "noisy_repeated_chars",
+      "kind": "noisy",
+      "text": "Yaaani buuu kadarrr uzatmaa lütfennnn!!!",
+      "min_tokens": 6,
+      "required_tokens": ["yaani", "buu", "kadarr", "lütfenn"],
+      "removed_by_stopwords": []
+    },
+    {
+      "id": "noisy_mentions_hashtags",
+      "kind": "noisy",
+      "text": "Kullanıcı adı @foo_bar ve etiket #deneme123 kaldırılmalı.",
+      "min_tokens": 6,
+      "required_tokens": ["kullanıcı", "adı", "etiket", "kaldırılmalı"],
+      "absent_in_clean": ["@", "#", "foo_bar", "deneme123"],
+      "removed_by_stopwords": ["ve"]
+    },
+    {
+      "id": "noisy_script_injection",
+      "kind": "noisy",
+      "text": "HTML <script>alert('x')</script> içeriği temizlenmeli, değil mi?",
+      "min_tokens": 7,
+      "required_tokens": ["html", "içeriği", "temizlenmeli", "değil"],
+      "absent_in_clean": ["<script>", "</script>", "alert"],
+      "removed_by_stopwords": ["mi"]
+    },
+    {
+      "id": "noisy_time_suffix",
+      "kind": "noisy",
+      "text": "Saat 18:45'te başlayıp 20:10'da biten oturum oldukça verimli geçti.",
+      "min_tokens": 16,
+      "required_tokens": ["saat", "başlayıp", "oturum", "verimli"],
+      "removed_by_stopwords": ["te", "da"]
+    },
+    {
+      "id": "noisy_multiline_forum",
+      "kind": "noisy",
+      "text": "\n  Selamlarrr!!!\n  Bu konu için açtığım başlıkta\n  www.forum.com/link varrr ve @moderator etiketliii\n",
+      "min_tokens": 8,
+      "required_tokens": ["selamlarr", "konu", "açtığım", "başlıkta"],
+      "absent_in_clean": ["www.", "@", "moderator"],
+      "removed_by_stopwords": ["bu", "için", "ve"]
+    },
+    {
+      "id": "noisy_mixed_symbols",
+      "kind": "noisy",
+      "text": "NLP pipeline'ı: clean -> tokenize -> attach_suffixes -> remove_stopwords",
+      "min_tokens": 14,
+      "required_tokens": ["nlp", "pipeline'ı", "clean", "tokenize"],
+      "removed_by_stopwords": []
+    },
+    {
+      "id": "noisy_ocr_like_text",
+      "kind": "noisy",
+      "text": "Rapor metn1 OCR'dan geld1; satırlar ç0k bozuk ama anlam kıvılcımı var.",
+      "min_tokens": 12,
+      "required_tokens": ["rapor", "ocr'dan", "bozuk", "anlam"],
+      "removed_by_stopwords": ["ama", "var"]
+    },
+    {
+      "id": "noisy_chat_style",
+      "kind": "noisy",
+      "text": "kanka bugün gelio musun yaaa, ben de ofisteyim :)) #hadi",
+      "min_tokens": 10,
+      "required_tokens": ["kanka", "bugün", "gelio", "ofisteyim"],
+      "absent_in_clean": ["#", "hadi"],
+      "removed_by_stopwords": ["de"]
+    }
+  ]
+}

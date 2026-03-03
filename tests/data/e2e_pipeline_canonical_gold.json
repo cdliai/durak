@@ -1,0 +1,303 @@
+{
+  "cases": [
+    {
+      "id": "proper_noun_detached",
+      "text": "Ankara ' da toplantı var mı ?",
+      "expected_clean": "ankara ' da toplantı var mı?",
+      "expected_tokens": [
+        "ankara",
+        "'",
+        "da",
+        "toplantı",
+        "var",
+        "mı",
+        "?"
+      ],
+      "expected_attached_tokens": [
+        "ankara'da",
+        "toplantı",
+        "var",
+        "mı",
+        "?"
+      ],
+      "expected_filtered_tokens": [
+        "ankara'da",
+        "toplantı",
+        "?"
+      ]
+    },
+    {
+      "id": "function_words_no_merge",
+      "text": "Ben de bugün geliyorum.",
+      "expected_clean": "ben de bugün geliyorum.",
+      "expected_tokens": [
+        "ben",
+        "de",
+        "bugün",
+        "geliyorum",
+        "."
+      ],
+      "expected_attached_tokens": [
+        "ben",
+        "de",
+        "bugün",
+        "geliyorum",
+        "."
+      ],
+      "expected_filtered_tokens": [
+        "bugün",
+        "geliyorum",
+        "."
+      ]
+    },
+    {
+      "id": "quote_particles_no_merge",
+      "text": "Koşarken, 'de' ve 'da' parçacıkları yanlış ayrıldığında ne olur?",
+      "expected_clean": "koşarken, 'de' ve 'da' parçacıkları yanlış ayrıldığında ne olur?",
+      "expected_tokens": [
+        "koşarken",
+        ",",
+        "'",
+        "de",
+        "'",
+        "ve",
+        "'",
+        "da",
+        "'",
+        "parçacıkları",
+        "yanlış",
+        "ayrıldığında",
+        "ne",
+        "olur",
+        "?"
+      ],
+      "expected_attached_tokens": [
+        "koşarken",
+        ",",
+        "'",
+        "de",
+        "'",
+        "ve",
+        "'",
+        "da",
+        "'",
+        "parçacıkları",
+        "yanlış",
+        "ayrıldığında",
+        "ne",
+        "olur",
+        "?"
+      ],
+      "expected_filtered_tokens": [
+        "koşarken",
+        ",",
+        "'",
+        "'",
+        "'",
+        "'",
+        "parçacıkları",
+        "yanlış",
+        "ayrıldığında",
+        "?"
+      ]
+    },
+    {
+      "id": "html_social_noise",
+      "text": "<div>Merhabaa!!! @kullanici bugün #harika bir günnn 😍😍 https://ornek.com/test?a=1</div>",
+      "expected_clean": "merhabaa!! bugün bir günn 😍😍",
+      "expected_tokens": [
+        "merhabaa",
+        "!",
+        "!",
+        "bugün",
+        "bir",
+        "günn",
+        "😍",
+        "😍"
+      ],
+      "expected_attached_tokens": [
+        "merhabaa",
+        "!",
+        "!",
+        "bugün",
+        "bir",
+        "günn",
+        "😍",
+        "😍"
+      ],
+      "expected_filtered_tokens": [
+        "merhabaa",
+        "!",
+        "!",
+        "bugün",
+        "günn",
+        "😍",
+        "😍"
+      ]
+    },
+    {
+      "id": "numeric_time_suffix",
+      "text": "Saat 18:45'te başlayıp 20:10'da biten oturum oldukça verimli geçti.",
+      "expected_clean": "saat 18:45'te başlayıp 20:10'da biten oturum oldukça verimli geçti.",
+      "expected_tokens": [
+        "saat",
+        "18",
+        ":",
+        "45",
+        "'",
+        "te",
+        "başlayıp",
+        "20",
+        ":",
+        "10",
+        "'",
+        "da",
+        "biten",
+        "oturum",
+        "oldukça",
+        "verimli",
+        "geçti",
+        "."
+      ],
+      "expected_attached_tokens": [
+        "saat",
+        "18",
+        ":",
+        "45",
+        "'",
+        "te",
+        "başlayıp",
+        "20",
+        ":",
+        "10",
+        "'",
+        "da",
+        "biten",
+        "oturum",
+        "oldukça",
+        "verimli",
+        "geçti",
+        "."
+      ],
+      "expected_filtered_tokens": [
+        "saat",
+        "18",
+        ":",
+        "45",
+        "'",
+        "başlayıp",
+        "20",
+        ":",
+        "10",
+        "'",
+        "biten",
+        "oturum",
+        "oldukça",
+        "verimli",
+        "geçti",
+        "."
+      ]
+    },
+    {
+      "id": "release_url_cleanup",
+      "text": "Sürüm notları burada: https://github.com/org/repo/releases/tag/v0.4.0 !!!",
+      "expected_clean": "sürüm notları burada:!!",
+      "expected_tokens": [
+        "sürüm",
+        "notları",
+        "burada",
+        ":",
+        "!",
+        "!"
+      ],
+      "expected_attached_tokens": [
+        "sürüm",
+        "notları",
+        "burada",
+        ":",
+        "!",
+        "!"
+      ],
+      "expected_filtered_tokens": [
+        "sürüm",
+        "notları",
+        "burada",
+        ":",
+        "!",
+        "!"
+      ]
+    },
+    {
+      "id": "chat_style_stopword",
+      "text": "kanka bugün gelio musun yaaa, ben de ofisteyim :)) #hadi",
+      "expected_clean": "kanka bugün gelio musun yaa, ben de ofisteyim:))",
+      "expected_tokens": [
+        "kanka",
+        "bugün",
+        "gelio",
+        "musun",
+        "yaa",
+        ",",
+        "ben",
+        "de",
+        "ofisteyim",
+        ":)",
+        ")"
+      ],
+      "expected_attached_tokens": [
+        "kanka",
+        "bugün",
+        "gelio",
+        "musun",
+        "yaa",
+        ",",
+        "ben",
+        "de",
+        "ofisteyim",
+        ":)",
+        ")"
+      ],
+      "expected_filtered_tokens": [
+        "kanka",
+        "bugün",
+        "gelio",
+        "musun",
+        "yaa",
+        ",",
+        "ofisteyim",
+        ":)",
+        ")"
+      ]
+    },
+    {
+      "id": "script_cleanup",
+      "text": "HTML <script>alert('x')</script> içeriği temizlenmeli, değil mi?",
+      "expected_clean": "html içeriği temizlenmeli, değil mi?",
+      "expected_tokens": [
+        "html",
+        "içeriği",
+        "temizlenmeli",
+        ",",
+        "değil",
+        "mi",
+        "?"
+      ],
+      "expected_attached_tokens": [
+        "html",
+        "içeriği",
+        "temizlenmeli",
+        ",",
+        "değil",
+        "mi",
+        "?"
+      ],
+      "expected_filtered_tokens": [
+        "html",
+        "içeriği",
+        "temizlenmeli",
+        ",",
+        "?"
+      ]
+    }
+  ]
+}

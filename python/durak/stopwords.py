@@ -11,13 +11,16 @@ from typing import Any, cast
 
 from durak.cleaning import normalize_case
 from durak.exceptions import ConfigurationError, StopwordError, StopwordMetadataError
-
-# Resource directory is now at project root: resources/tr/stopwords
-STOPWORD_DATA_DIR = (
-    Path(__file__).resolve().parent.parent.parent / "resources" / "tr" / "stopwords"
+from durak.resources_provider import (
+    DEFAULT_RESOURCE_PROVIDER,
+    STOPWORDS_DIR as RESOURCE_STOPWORDS_DIR,
+    STOPWORDS_METADATA_PATH as RESOURCE_STOPWORDS_METADATA_PATH,
 )
+
+# Keep backward-compatible path constants, but source them from the central provider.
+STOPWORD_DATA_DIR = RESOURCE_STOPWORDS_DIR
 DEFAULT_STOPWORD_RESOURCE = "base/turkish"
-STOPWORD_METADATA_PATH = STOPWORD_DATA_DIR / "metadata.json"
+STOPWORD_METADATA_PATH = RESOURCE_STOPWORDS_METADATA_PATH
 
 __all__ = [
     "BASE_STOPWORDS",
@@ -46,8 +49,11 @@ def _resolve_metadata_path(metadata_path: Path | str | None) -> Path:
 def _read_stopword_metadata(resolved_metadata_path: str) -> dict[str, Any]:
     metadata_path = Path(resolved_metadata_path)
     try:
-        raw = metadata_path.read_text(encoding="utf-8")
-    except FileNotFoundError as exc:
+        if metadata_path.resolve() == STOPWORD_METADATA_PATH.resolve():
+            raw = DEFAULT_RESOURCE_PROVIDER.load_stopwords_metadata_text()
+        else:
+            raw = metadata_path.read_text(encoding="utf-8")
+    except (FileNotFoundError, StopwordError) as exc:
         raise StopwordMetadataError(
             f"Stopword metadata file not found at '{metadata_path}'."
         ) from exc

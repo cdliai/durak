@@ -6,6 +6,10 @@ All notable changes to Durak will be documented here. This project adheres to [S
 
 - Added unit tests for Normalizer class covering Turkish I/ı handling and Rust fallback.
 - Planned enhancements to lemmatization adapters and pipeline orchestration.
+- Documentation alignment:
+  - README now reflects MIT licensing and documents CLI usage.
+  - Quickstart now promotes `Pipeline` instead of deprecated `process_text`.
+  - Clarified that project licensing remains MIT (since 0.3.0).
 
 ## [0.4.0] - 2025-12-23
 

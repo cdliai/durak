@@ -1,6 +1,10 @@
 # Turkish Lemmatization Suffixes
+# NOTE:
+#   Canonical rule ownership moved to `src/suffix_inventory.rs`.
+#   This file is kept as a human-readable reference only.
+#   Runtime lemmatization/morphotactic logic does not load this file directly.
 # Common suffixes used for heuristic suffix stripping in lemmatization
-#
+# 
 # WARNING: This is a simplified list for demonstration purposes.
 # Production lemmatization should use:
 #   1. Dictionary lookup (Tier 1)

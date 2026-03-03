@@ -2,11 +2,11 @@
 
 This guide provides recommendations for using and extending Durak effectively.
 
-## 🎯 General Principles
+## General Principles
 
 ### 1. Resource Management
 
-**✅ DO**: Use embedded Rust resources for production
+**DO**: Use embedded Rust resources for production
 
 ```python
 from durak import _durak_core
@@ -16,7 +16,7 @@ stopwords = set(_durak_core.get_stopwords_base())
 suffixes = _durak_core.get_detached_suffixes()
 ```
 
-**❌ DON'T**: Load from files in hot paths
+**DON'T**: Load from files in hot paths
 
 ```python
 # Slower, file I/O overhead
@@ -32,7 +32,7 @@ stopwords = load_stopword_resource("base/turkish")  # OK for development, not pr
 
 ### 2. Performance Optimization
 
-**✅ DO**: Use Rust functions directly for performance-critical code
+**DO**: Use Rust functions directly for performance-critical code
 
 ```python
 from durak import _durak_core
@@ -42,7 +42,7 @@ normalized = _durak_core.fast_normalize(text)
 tokens = _durak_core.tokenize_with_offsets(text)
 ```
 
-**✅ DO**: Batch process when possible
+**DO**: Batch process when possible
 
 ```python
 from durak import _durak_core
@@ -52,7 +52,7 @@ normalized_texts = [_durak_core.fast_normalize(t) for t in texts]
 tokenized = [_durak_core.tokenize_with_offsets(t) for t in normalized_texts]
 ```
 
-**❌ DON'T**: Mix Python/Rust unnecessarily in loops
+**DON'T**: Mix Python/Rust unnecessarily in loops
 
 ```python
 # Inefficient: context switching overhead
@@ -64,7 +64,7 @@ for text in texts:
 
 ### 3. Pipeline Design
 
-**✅ DO**: Create reusable pipeline objects
+**DO**: Create reusable pipeline objects
 
 ```python
 from durak import StopwordManager, Pipeline, Normalizer
@@ -82,7 +82,7 @@ pipeline = Pipeline([
 results = [pipeline(text) for text in texts]
 ```
 
-**❌ DON'T**: Recreate expensive objects in loops
+**DON'T**: Recreate expensive objects in loops
 
 ```python
 # Bad: recreates manager every iteration
@@ -92,11 +92,11 @@ for text in texts:
     filtered = [t for t in tokens if not mgr.is_stopword(t)]
 ```
 
-## 📝 Configuration Management
+## Configuration Management
 
 ### Externalizing Hard-Coded Values
 
-**✅ DO**: Use resource files for configuration
+**DO**: Use resource files for configuration
 
 ```python
 # resources/tr/config/custom_apostrophes.txt
@@ -145,11 +145,11 @@ apostrophes = (config_dir / "custom_apostrophes.txt").read_text().strip().split(
 
 6. **Rebuild**: `maturin develop --release`
 
-## 🔧 Extension Patterns
+## Extension Patterns
 
 ### Custom Stopword Management
 
-**✅ DO**: Use domain-specific stopword files
+**DO**: Use domain-specific stopword files
 
 ```python
 # resources/tr/stopwords/domains/medical.txt
@@ -157,11 +157,11 @@ apostrophes = (config_dir / "custom_apostrophes.txt").read_text().strip().split(
 
 manager = StopwordManager.from_resources([
     "base/turkish",
-    "domains/medical",  # Domain-specific
+    "domains/medical",        # Domain-specific
 ], keep=["hasta", "doktor"])  # Keep domain terms
 ```
 
-**✅ DO**: Export and version stopword sets
+**DO**: Export and version stopword sets
 
 ```python
 manager = StopwordManager(additions=["term1", "term2"])
@@ -229,11 +229,11 @@ pipeline = Pipeline([
 
 3. **For production**: Implement proper morphological analysis with vowel harmony
 
-## 🧪 Testing Best Practices
+## Testing Best Practices
 
 ### Unit Tests
 
-**✅ DO**: Test with realistic Turkish text
+**DO**: Test with realistic Turkish text
 
 ```python
 def test_preserves_diacritics():
@@ -243,7 +243,7 @@ def test_preserves_diacritics():
     assert "Türkiye'ye" in tokens    # Preserves ü
 ```
 
-**✅ DO**: Test edge cases
+**DO**: Test edge cases
 
 ```python
 def test_apostrophe_variants():
@@ -254,7 +254,7 @@ def test_apostrophe_variants():
 
 ### Performance Testing
 
-**✅ DO**: Benchmark critical paths
+**DO**: Benchmark critical paths
 
 ```python
 import time
@@ -271,7 +271,7 @@ rust_time = benchmark(_durak_core.fast_normalize, text)
 print(f"Speedup: {py_time / rust_time:.2f}x")
 ```
 
-## 🚀 Deployment
+## Deployment
 
 ### Production Checklist
 
@@ -306,7 +306,7 @@ maturin develop
 maturin develop --release
 ```
 
-## 📊 Monitoring
+## Monitoring
 
 ### Resource Loading
 
@@ -346,11 +346,11 @@ def process_corpus(texts):
     return [durak.process_text(t, remove_stopwords=True) for t in texts]
 ```
 
-## 🔐 Security
+## Security
 
 ### Input Validation
 
-**✅ DO**: Validate external resources
+**DO**: Validate external resources
 
 ```python
 from pathlib import Path
@@ -368,7 +368,7 @@ def load_safe_stopwords(path: Path | str) -> set[str]:
     return durak.load_stopwords(path)
 ```
 
-**✅ DO**: Sanitize user input before processing
+**DO**: Sanitize user input before processing
 
 ```python
 def process_user_text(text: str) -> list[str]:

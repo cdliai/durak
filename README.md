@@ -3,7 +3,7 @@
 [![PyPI](https://img.shields.io/pypi/v/durak-nlp.svg)](https://pypi.org/project/durak-nlp/)
 [![Python Versions](https://img.shields.io/pypi/pyversions/durak-nlp.svg)](https://pypi.org/project/durak-nlp/)
 [![Tests](https://github.com/fbkaragoz/durak/actions/workflows/tests.yml/badge.svg)](https://github.com/fbkaragoz/durak/actions/workflows/tests.yml)
-[![License](https://img.shields.io/badge/license-Durak%201.2-blue.svg)](LICENSE)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17477942.svg)](https://doi.org/10.5281/zenodo.17477942)
 
 <p align="center">
@@ -45,21 +45,15 @@ pip install durak-nlp
 ### Minimal Pipeline
 
 ```python
-from durak import process_text
+from durak import Pipeline
 
 entries = [
     "Türkiye'de NLP zor. Durak kolaylaştırır.",
     "Ankara ' da kaldım.",
 ]
 
-tokens = [
-    process_text(
-        entry,
-        remove_stopwords=True,
-        rejoin_suffixes=True,  # glue detached suffixes before filtering
-    )
-    for entry in entries
-]
+pipeline = Pipeline(["clean", "tokenize", "attach_suffixes", "remove_stopwords"])
+tokens = [pipeline(entry) for entry in entries]
 
 print(tokens[0])
 # ["türkiye'de", "nlp", "zor", ".", "durak", "kolaylaştırır", "."]
@@ -69,6 +63,8 @@ print(tokens[1])
 ```
 
 The pipeline executes: **clean → tokenize → rejoin detached suffixes → remove stopwords**
+
+`process_text()` is still available for backward compatibility, but it is deprecated. Prefer `Pipeline` for new code.
 
 ### Build Blocks à la Carte
 
@@ -106,6 +102,25 @@ tokens = _durak_core.tokenize_with_offsets("Merhaba dünya!")
 # Embedded resources (no file I/O!)
 stopwords = _durak_core.get_stopwords_base()  # 100-1000x faster loading
 suffixes = _durak_core.get_detached_suffixes()
+```
+
+### CLI Quickstart
+
+```bash
+# Show all commands
+durak --help
+
+# Process text from stdin
+echo "Ankara ' da NLP çalıştım." | durak process - --attach-suffixes --remove-stopwords
+
+# Tokenize a file with optional post-processing
+durak tokenize input.txt --suffixes --stopwords --format json
+
+# Lemmatize tokens
+durak lemmatize kitaplar evlerimde geliyorum --strategy hybrid
+
+# List stopwords from a resource
+durak stopwords --resource base/turkish --format txt
 ```
 
 ## Features
@@ -247,9 +262,11 @@ durak/
 ## Documentation
 
 - **[Architecture Guide](docs/ARCHITECTURE.md)**: Design principles and component architecture
+- **[Backends Guide](docs/BACKENDS.md)**: Backend control layer and capability matrix
 - **[Examples](examples/)**: Basic and advanced usage demonstrations
 - **[Benchmarks](benchmarks/)**: Performance comparison and optimization tips
 - **[API Design Docs](docs/design/)**: Detailed component specifications
+- **[Rule Ownership](docs/RULE_OWNERSHIP.md)**: Canonical linguistic/resource source map
 - **[Changelog](CHANGELOG.md)**: Version history and migration guides
 - **[Roadmap](docs/ROADMAP.md)**: Future enhancements and planned features
 
@@ -276,7 +293,7 @@ Run `python benchmarks/benchmark_rust_vs_python.py` to measure on your system.
 
 ## License
 
-Durak is distributed under the [Durak License v1.2](LICENSE). Commercial or institutional use requires explicit written permission from the author.
+Durak is distributed under the [MIT License](LICENSE).
 
 ---
 

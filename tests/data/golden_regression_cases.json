@@ -1,0 +1,51 @@
+{
+  "normalization": [
+    {
+      "input": "İSTANBUL ve IĞDIR",
+      "expected": "istanbul ve ığdır"
+    },
+    {
+      "input": "IŞIK ve İZMİR",
+      "expected": "ışık ve izmir"
+    }
+  ],
+  "tokenization": [
+    {
+      "input": "Türkiye'ye gidiyorum.",
+      "expected": ["Türkiye'ye", "gidiyorum", "."]
+    },
+    {
+      "input": "URL: https://karagoz.io/test?a=1",
+      "expected": ["URL", ":", "https://karagoz.io/test?a=1"]
+    }
+  ],
+  "pipeline": [
+    {
+      "steps": ["clean", "tokenize"],
+      "input": "Merhaba Dünya!",
+      "expected": ["merhaba", "dünya", "!"]
+    },
+    {
+      "steps": ["clean", "tokenize", "attach_suffixes", "remove_stopwords"],
+      "input": "Ankara ' da bir test.",
+      "expected": ["ankara'da", "test", "."]
+    }
+  ],
+  "lemmatization": [
+    {
+      "strategy": "lookup",
+      "input": "kitaplar",
+      "expected": "kitap"
+    },
+    {
+      "strategy": "heuristic",
+      "input": "masalar",
+      "expected": "masa"
+    },
+    {
+      "strategy": "hybrid",
+      "input": "geliyorum",
+      "expected": "gel"
+    }
+  ]
+}

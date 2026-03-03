@@ -89,4 +89,4 @@ strict_optional = true
 show_error_codes = true
 ignore_missing_imports = true
 # SPDX-FileCopyrightText: © 2025 Fatih Burak Karagöz
-# SPDX-License-Identifier: LicenseRef-Durak-NonCommercial-1.2
+# SPDX-License-Identifier: MIT

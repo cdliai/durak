@@ -28,6 +28,63 @@ except ImportError:
     __version__ = "0.4.0"
 
 
+def _read_input_text(input_file: str) -> str:
+    if input_file == "-":
+        return sys.stdin.read()
+    return Path(input_file).read_text(encoding="utf-8")
+
+
+def _unwrap_cleaned_text(cleaned_result: str | tuple[str, list[str]]) -> str:
+    if isinstance(cleaned_result, tuple):
+        return cleaned_result[0]
+    return cleaned_result
+
+
+def _tokenize_pipeline(
+    text: str,
+    *,
+    keep_emoji: bool = False,
+    attach_suffixes: bool = False,
+    remove_stopwords: bool = False,
+) -> list[str]:
+    emoji_mode = "keep" if keep_emoji else "remove"
+    cleaned = _unwrap_cleaned_text(clean_text(text, emoji_mode=emoji_mode))
+    tokens = tokenize(cleaned)
+
+    if attach_suffixes:
+        tokens = attach_detached_suffixes(
+            tokens,
+            allow_without_apostrophe=False,
+            safe_mode=True,
+        )
+
+    if remove_stopwords:
+        manager = StopwordManager()
+        tokens = [token for token in tokens if not manager.is_stopword(token)]
+
+    return tokens
+
+
+def _render_tokens(tokens: list[str], output_format: str, *, text_separator: str) -> str:
+    if output_format == "json":
+        return json.dumps(
+            {"tokens": tokens, "count": len(tokens)},
+            ensure_ascii=False,
+            indent=2,
+        )
+    if output_format == "jsonl":
+        return "\n".join(json.dumps({"token": token}, ensure_ascii=False) for token in tokens)
+    return text_separator.join(tokens)
+
+
+def _emit_output(result: str, output: str | None, *, success_message: str) -> None:
+    if output:
+        Path(output).write_text(result, encoding="utf-8")
+        click.echo(success_message.format(output=output))
+        return
+    click.echo(result)
+
+
 @click.group()
 @click.version_option(version=__version__)
 def cli() -> None:
@@ -62,45 +119,20 @@ def process(input_file: str, output: str | None, **kwargs: Any) -> None:
         durak process --remove-stopwords input.txt
         echo "İSTANBUL'da" | durak process
     """
-    if input_file == "-":
-        text = sys.stdin.read()
-    else:
-        text = Path(input_file).read_text(encoding="utf-8")
-
-    emoji_mode = "keep" if kwargs["keep_emoji"] else "remove"
-    cleaned_result = clean_text(text, emoji_mode=emoji_mode)
-
-    if isinstance(cleaned_result, tuple):
-        cleaned = cleaned_result[0]
-    else:
-        cleaned = cleaned_result
-
-    tokens = tokenize(cleaned)
-
-    if kwargs["attach_suffixes"]:
-        tokens = attach_detached_suffixes(tokens)
-
-    if kwargs["remove_stopwords"]:
-        tokens = [t for t in tokens if not StopwordManager().is_stopword(t)]
-
+    text = _read_input_text(input_file)
+    tokens = _tokenize_pipeline(
+        text,
+        keep_emoji=kwargs["keep_emoji"],
+        attach_suffixes=kwargs["attach_suffixes"],
+        remove_stopwords=kwargs["remove_stopwords"],
+    )
     output_format = kwargs.get("format", "text")
-
-    if output_format == "json":
-        result = json.dumps(
-            {"tokens": tokens, "count": len(tokens)},
-            ensure_ascii=False,
-            indent=2,
-        )
-    elif output_format == "jsonl":
-        result = "\n".join(json.dumps({"token": t}, ensure_ascii=False) for t in tokens)
-    else:
-        result = " ".join(tokens)
-
-    if output:
-        Path(output).write_text(result, encoding="utf-8")
-        click.echo(f"Processed text written to {output}")
-    else:
-        click.echo(result)
+    result = _render_tokens(tokens, output_format, text_separator=" ")
+    _emit_output(
+        result,
+        output,
+        success_message="Processed text written to {output}",
+    )
 
 
 @cli.command()
@@ -200,7 +232,7 @@ def lemmatize(
         if output_format != "text":
             metrics_obj = lemmatizer_obj.get_metrics()
             if output_format == "json":
-                result = result.rstrip("}") + f', "metrics": {metrics_obj.to_dict()}}}'
+                result = result.rstrip("}") + f', "metrics": {metrics_obj.to_dict()}'
             else:
                 result += "\n" + json.dumps(
                     {"metrics": metrics_obj.to_dict()}, ensure_ascii=False
@@ -235,44 +267,16 @@ def tokenize_cmd(
         durak tokenize --remove-stopwords --rejoin-suffixes input.txt
         echo "Merhaba dünya" | durak tokenize --format json
     """
-    if input_file == "-":
-        text = sys.stdin.read()
-    else:
-        text = Path(input_file).read_text(encoding="utf-8")
-
-    cleaned_result = clean_text(text)
-
-    if isinstance(cleaned_result, tuple):
-        cleaned = cleaned_result[0]
-    else:
-        cleaned = cleaned_result
-
-    tokens = tokenize(cleaned)
-
-    if suffixes:
-        tokens = attach_detached_suffixes(tokens)
-
-    if stopwords:
-        tokens = [t for t in tokens if not StopwordManager().is_stopword(t)]
-
+    text = _read_input_text(input_file)
+    tokens = _tokenize_pipeline(
+        text,
+        keep_emoji=False,
+        attach_suffixes=suffixes,
+        remove_stopwords=stopwords,
+    )
     output_format = kwargs.get("format", "text")
-
-    if output_format == "json":
-        result = json.dumps(
-            {"tokens": tokens, "count": len(tokens)},
-            ensure_ascii=False,
-            indent=2,
-        )
-    elif output_format == "jsonl":
-        result = "\n".join(json.dumps({"token": t}, ensure_ascii=False) for t in tokens)
-    else:
-        result = "\n".join(tokens)
-
-    if output:
-        Path(output).write_text(result, encoding="utf-8")
-        click.echo(f"Tokens written to {output}")
-    else:
-        click.echo(result)
+    result = _render_tokens(tokens, output_format, text_separator="\n")
+    _emit_output(result, output, success_message="Tokens written to {output}")
 
 
 @cli.command()
@@ -295,18 +299,9 @@ def clean(input_file: str, output: str | None, **kwargs: Any) -> None:
         durak clean input.txt > output.txt
         echo "İSTANBUL'da" | durak clean
     """
-    if input_file == "-":
-        text = sys.stdin.read()
-    else:
-        text = Path(input_file).read_text(encoding="utf-8")
-
+    text = _read_input_text(input_file)
     emoji_mode = "keep" if kwargs["keep_emoji"] else "remove"
-    cleaned_result = clean_text(text, emoji_mode=emoji_mode)
-
-    if isinstance(cleaned_result, tuple):
-        cleaned = cleaned_result[0]
-    else:
-        cleaned = cleaned_result
+    cleaned = _unwrap_cleaned_text(clean_text(text, emoji_mode=emoji_mode))
 
     output_format = kwargs.get("format", "text")
 
@@ -319,11 +314,7 @@ def clean(input_file: str, output: str | None, **kwargs: Any) -> None:
     else:
         result = cleaned
 
-    if output:
-        Path(output).write_text(result, encoding="utf-8")
-        click.echo(f"Cleaned text written to {output}")
-    else:
-        click.echo(result)
+    _emit_output(result, output, success_message="Cleaned text written to {output}")
 
 
 @cli.command()
@@ -350,10 +341,7 @@ def normalize(
         durak normalize input.txt
         echo "İSTANBUL" | durak normalize --format json
     """
-    if input_file == "-":
-        text = sys.stdin.read()
-    else:
-        text = Path(input_file).read_text(encoding="utf-8")
+    text = _read_input_text(input_file)
 
     if turkish_i:
         from durak.normalizer import Normalizer
@@ -374,11 +362,7 @@ def normalize(
             indent=2,
         )
 
-    if output:
-        Path(output).write_text(result, encoding="utf-8")
-        click.echo(f"Normalized text written to {output}")
-    else:
-        click.echo(result)
+    _emit_output(result, output, success_message="Normalized text written to {output}")
 
 
 @cli.command()

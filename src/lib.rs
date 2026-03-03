@@ -1,5 +1,6 @@
 mod morphotactics;
 mod root_validator;
+mod suffix_inventory;
 mod vowel_harmony;
 
 use pyo3::prelude::*;
@@ -186,116 +187,6 @@ fn lookup_lemma(word: &str) -> Option<String> {
     dict.get(word).map(|s| s.to_string())
 }
 
-/// Turkish suffix categories for morphological analysis
-///
-/// Turkish is an agglutinative language with complex suffix chains.
-/// Suffixes must be applied in a specific order (slot system).
-mod suffixes {
-    /// Compound suffixes that should be stripped as a unit before individual suffixes
-    /// These are morphological combinations that occur frequently
-    pub const COMPOUND_SUFFIXES: &[&str] = &[
-        // Without doing (negation + ablative): gel-meden = without coming
-        "meden",
-        "madan",
-        // Plural + Possessive combinations
-        "larımız",
-        "lerimiz",
-        "ların",
-        "lerin",
-        "larımızdan",
-        "lerimizden",
-        // Plural + Case combinations
-        "lardan",
-        "lerden",
-        "lara",
-        "lere",
-        // Possessive + Case combinations
-        "ımızdan",
-        "imizden",
-        "ındanan",
-        "indenan",
-        // Verbal compound: gel-me-di-m = didn't come
-        "medim",
-        "madım",
-        "medin",
-        "madın",
-        "medi",
-        "madı",
-        "medik",
-        "madık",
-        "mişim",
-        "mışım",
-        "mişiz",
-        "mışız",
-        // Continuous + person: geliyorum
-        "yorum",
-        "yorsun",
-        "yor",
-        "yoruz",
-        "yorsunuz",
-        "yorlar",
-        // Future + person
-        "eceğim",
-        "acağım",
-        "eceğiz",
-        "acağız",
-        "eceksin",
-        "acaksın",
-        // Ability
-        "yebilmek",
-        "yabilmek",
-        "ebilirim",
-        "abilirim",
-    ];
-
-    /// Nominal suffixes (attached to nouns, adjectives)
-    /// Order: Plural → Possessive → Case
-    pub const NOMINAL_SUFFIXES: &[&str] = &[
-        // Plural (Slot 1)
-        "lar", "ler", // Possessive (Slot 2) - 1st person
-        "ım", "im", "um", "üm", "ımız", "imiz", "umuz", "ümüz",
-        // Possessive (Slot 2) - 2nd person
-        "ın", "in", "un", "ün", "ınız", "iniz", "unuz", "ünüz",
-        // Possessive (Slot 2) - 3rd person
-        "ı", "i", "u", "ü", "sı", "si", "su", "sü", // Case (Slot 3) - Accusative
-        "ı", "i", "u", "ü", // Case (Slot 3) - Dative
-        "a", "e", "ya", "ye", // Case (Slot 3) - Locative
-        "da", "de", "ta", "te", // Case (Slot 3) - Ablative
-        "dan", "den", "tan", "ten", // Case (Slot 3) - Genitive
-        "ın", "in", "un", "ün", "nın", "nin", "nun", "nün",
-    ];
-
-    /// Verbal suffixes (attached to verbs)
-    /// Order: Voice → Negation → Tense/Aspect → Person
-    pub const VERBAL_SUFFIXES: &[&str] = &[
-        // Voice (Slot 1) - Passive, Causative, Reflexive, Reciprocal
-        "ıl", "il", "ul", "ül", "n", "ın", "in", "un", "ün", "dir", "dır", "dur", "dür", "tir",
-        "tır", "tur", "tür", "ş", "ış", "iş", "uş", "üş", // Negation (Slot 2)
-        "me", "ma", // Tense/Aspect (Slot 3)
-        "di", "dı", "du", "dü", "ti", "tı", "tu", "tü", // Definite past
-        "miş", "mış", "muş", "müş", // Evidential/Indefinite past
-        "ecek", "acak", // Future
-        "iyor", // Present continuous (fixed form - always "iyor")
-        "er", "ar", // Aorist
-        "mekte", "makta", // Progressive
-        // Person (Slot 4)
-        "m", "n", "k", "z", "ım", "im", "um", "üm", "ın", "in", "un", "ün", "ız", "iz", "uz", "üz",
-        "sın", "sin", "sun", "sün", "sınız", "siniz", "sunuz", "sünüz", "lar",
-        "ler", // 3rd person plural
-        // Infinitive
-        "mek", "mak",
-    ];
-
-    /// Fixed morphemes that don't follow standard vowel harmony
-    /// These should be handled specially in harmony checking
-    pub const FIXED_MORPHEMES: &[&str] = &[
-        "iyor",  // Present continuous - always "iyor" regardless of root
-        "ken",   // While - always "ken"
-        "ki",    // Relative - always "ki"
-        "leyin", // Time - always "leyin"
-    ];
-}
-
 /// Tier 2: Heuristic Suffix Stripping
 /// Simple rule-based stripper for demonstration.
 /// In production, this would use a more complex state machine and vowel harmony checks.
@@ -304,10 +195,10 @@ fn strip_suffixes(word: &str) -> String {
     let mut current = word.to_string();
 
     // Use compound suffixes first (longest match)
-    let all_suffixes: Vec<&str> = suffixes::COMPOUND_SUFFIXES
+    let all_suffixes: Vec<&str> = suffix_inventory::COMPOUND_SUFFIXES
         .iter()
-        .chain(suffixes::NOMINAL_SUFFIXES.iter())
-        .chain(suffixes::VERBAL_SUFFIXES.iter())
+        .chain(suffix_inventory::NOMINAL_SUFFIXES.iter())
+        .chain(suffix_inventory::VERBAL_SUFFIXES.iter())
         .cloned()
         .collect();
 
@@ -319,11 +210,27 @@ fn strip_suffixes(word: &str) -> String {
         sorted.sort_by(|a, b| b.len().cmp(&a.len()));
 
         for suffix in sorted {
-            if current.ends_with(suffix) && current.chars().count() > suffix.chars().count() + 2 {
-                current = current[..current.len() - suffix.len()].to_string();
-                changed = true;
-                break;
+            if !current.ends_with(suffix) {
+                continue;
             }
+
+            let suffix_char_len = suffix.chars().count();
+            if current.chars().count() <= suffix_char_len + 2 {
+                continue;
+            }
+
+            let candidate = &current[..current.len() - suffix.len()];
+
+            // Guard against aggressive stripping for short suffixes.
+            // This prevents cases like "masa" -> "mas" and "kiler" -> "kil"
+            // unless the candidate is a known lemma.
+            if suffix_char_len <= 2 && !is_known_lemma(candidate) {
+                continue;
+            }
+
+            current = candidate.to_string();
+            changed = true;
+            break;
         }
     }
     current
@@ -363,7 +270,7 @@ fn strip_suffixes_validated(
     let mut stripped_suffixes: Vec<&str> = Vec::new();
 
     // Phase 1: Try compound suffixes first (longest match)
-    for suffix in suffixes::COMPOUND_SUFFIXES {
+    for suffix in suffix_inventory::COMPOUND_SUFFIXES {
         if current.ends_with(suffix) {
             let candidate = &current[..current.len() - suffix.len()];
             let is_valid_root = validator.is_valid_root(candidate);
@@ -382,9 +289,9 @@ fn strip_suffixes_validated(
 
     // Phase 2: Strip individual suffixes with validation
     // Combine nominal and verbal suffixes, sorted by length (longest first)
-    let mut all_single_suffixes: Vec<&str> = suffixes::NOMINAL_SUFFIXES
+    let mut all_single_suffixes: Vec<&str> = suffix_inventory::NOMINAL_SUFFIXES
         .iter()
-        .chain(suffixes::VERBAL_SUFFIXES.iter())
+        .chain(suffix_inventory::VERBAL_SUFFIXES.iter())
         .cloned()
         .collect();
     all_single_suffixes.sort_by(|a, b| b.len().cmp(&a.len()));
@@ -402,16 +309,22 @@ fn strip_suffixes_validated(
         iterations += 1;
 
         // Check if current is in dictionary - if so, stop stripping
-        if dictionary.contains(&current.as_str()) {
+        if is_known_lemma(&current) {
             break;
         }
 
         for suffix in &all_single_suffixes {
             if current.ends_with(suffix) {
+                let suffix_char_len = suffix.chars().count();
                 let candidate = &current[..current.len() - suffix.len()];
 
                 // Skip if candidate would be too short
                 if candidate.chars().count() < min_root_length {
+                    continue;
+                }
+
+                // Prevent over-stripping short suffixes unless candidate is known.
+                if suffix_char_len <= 2 && !is_known_lemma(candidate) {
                     continue;
                 }
 
@@ -423,7 +336,7 @@ fn strip_suffixes_validated(
                 // Validate all conditions
                 let is_valid_root = validator.is_valid_root(candidate);
                 let has_harmony = !check_harmony || {
-                    if suffixes::FIXED_MORPHEMES.contains(suffix) {
+                    if suffix_inventory::FIXED_MORPHEMES.contains(suffix) {
                         true
                     } else {
                         vowel_harmony::check_vowel_harmony(candidate, suffix)
@@ -434,7 +347,7 @@ fn strip_suffixes_validated(
                 // Only strip if ALL conditions are met
                 if is_valid_root && has_harmony && valid_morphotactics {
                     // If candidate is in dictionary, this is our answer - stop here
-                    if dictionary.contains(&candidate) {
+                    if is_known_lemma(candidate) {
                         return candidate.to_string();
                     }
 
@@ -449,7 +362,7 @@ fn strip_suffixes_validated(
     }
 
     // Final check: if current is in dictionary, prefer it
-    if dictionary.contains(&current.as_str()) {
+    if is_known_lemma(&current) {
         return current;
     }
 

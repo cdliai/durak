@@ -15,21 +15,15 @@ from durak.cleaning import (
     remove_urls,
     strip_html,
 )
+from durak.context import ProcessingContext
+from durak.core.interfaces import PipelineStepLike
 from durak.exceptions import ConfigurationError, PipelineError
-from durak.normalizer import Normalizer
+from durak.stages import STEP_REGISTRY
 from durak.stopwords import remove_stopwords as remove_stopwords_fn
 from durak.suffixes import attach_detached_suffixes
 from durak.tokenizer import PUNCT_TOKEN, tokenize
 
-STEP_REGISTRY: dict[str, Callable[..., Any]] = {
-    "clean": clean_text,
-    "normalize": Normalizer(),
-    "tokenize": tokenize,
-    "remove_stopwords": remove_stopwords_fn,
-    "attach_suffixes": attach_detached_suffixes,
-}
-
-StepType = Union[str, Callable[..., Any]]
+StepType = Union[str, PipelineStepLike]
 
 
 class Pipeline:
@@ -104,6 +98,34 @@ class Pipeline:
                 raise PipelineError(f"Pipeline step '{step_name}' failed: {e}") from e
         return doc
 
+    def run_with_context(self, text: str) -> ProcessingContext:
+        """Execute pipeline and return a populated ProcessingContext."""
+        if not isinstance(text, str):
+            raise PipelineError(
+                f"Pipeline input must be a string, got {type(text).__name__}"
+            )
+
+        context = ProcessingContext(text=text)
+        doc: Any = text
+
+        for step_name, step in zip(self.step_names, self.steps):
+            try:
+                doc = step(doc)
+            except Exception as e:
+                raise PipelineError(f"Pipeline step '{step_name}' failed: {e}") from e
+
+            context.add_metadata(step_name)
+
+            if isinstance(doc, str):
+                context.text = doc
+                continue
+
+            if isinstance(doc, list) and all(isinstance(item, str) for item in doc):
+                context.tokens = doc
+                context.normalized_tokens = doc.copy()
+
+        return context
+
     def __repr__(self) -> str:
         return f"Pipeline([{', '.join(repr(name) for name in self.step_names)}])"
 
@@ -125,6 +147,12 @@ def process_text_with_steps(text: str, steps: list[StepType]) -> str | list[str]
     """
     pipeline = Pipeline(steps)
     return pipeline(text)
+
+
+def process_text_with_context(text: str, steps: list[StepType]) -> ProcessingContext:
+    """Convenience wrapper for one-off execution with ProcessingContext output."""
+    pipeline = Pipeline(steps)
+    return pipeline.run_with_context(text)
 
 
 def process_text(
@@ -203,7 +231,11 @@ def process_text(
         tokens = [t for t in tokens if not re.fullmatch(PUNCT_TOKEN, t)]
 
     if rejoin_suffixes:
-        tokens = attach_detached_suffixes(tokens)
+        tokens = attach_detached_suffixes(
+            tokens,
+            allow_without_apostrophe=False,
+            safe_mode=True,
+        )
 
     if remove_stopwords:
         tokens = remove_stopwords_fn(tokens)

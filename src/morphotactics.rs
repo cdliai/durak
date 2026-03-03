@@ -22,6 +22,7 @@
 /// - yap+ıl+dı (do+PASS+PAST) ✓
 /// - *gel+m+di (Person before Tense) ✗
 use std::collections::HashMap;
+use crate::suffix_inventory;
 
 /// Morpheme slot types for Turkish nominal morphology
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
@@ -67,95 +68,67 @@ pub struct MorphotacticClassifier {
 }
 
 impl MorphotacticClassifier {
+    fn insert_nominal(
+        map: &mut HashMap<&'static str, NominalSlot>,
+        suffixes: &'static [&'static str],
+        slot: NominalSlot,
+    ) {
+        for suffix in suffixes {
+            map.insert(*suffix, slot);
+        }
+    }
+
+    fn insert_verbal(
+        map: &mut HashMap<&'static str, VerbalSlot>,
+        suffixes: &'static [&'static str],
+        slot: VerbalSlot,
+    ) {
+        for suffix in suffixes {
+            map.insert(*suffix, slot);
+        }
+    }
+
     /// Create a new morphotactic classifier with predefined suffix rules
     pub fn new() -> Self {
         let mut nominal_map = HashMap::new();
         let mut verbal_map = HashMap::new();
 
-        // Nominal Plural
-        nominal_map.insert("lar", NominalSlot::Plural);
-        nominal_map.insert("ler", NominalSlot::Plural);
+        Self::insert_nominal(
+            &mut nominal_map,
+            suffix_inventory::NOMINAL_PLURAL_SUFFIXES,
+            NominalSlot::Plural,
+        );
+        Self::insert_nominal(
+            &mut nominal_map,
+            suffix_inventory::NOMINAL_POSSESSIVE_SUFFIXES,
+            NominalSlot::Possessive,
+        );
+        Self::insert_nominal(
+            &mut nominal_map,
+            suffix_inventory::NOMINAL_CASE_SUFFIXES,
+            NominalSlot::Case,
+        );
 
-        // Nominal Possessive
-        nominal_map.insert("ım", NominalSlot::Possessive);
-        nominal_map.insert("im", NominalSlot::Possessive);
-        nominal_map.insert("um", NominalSlot::Possessive);
-        nominal_map.insert("üm", NominalSlot::Possessive);
-        nominal_map.insert("ımız", NominalSlot::Possessive);
-        nominal_map.insert("imiz", NominalSlot::Possessive);
-        nominal_map.insert("umuz", NominalSlot::Possessive);
-        nominal_map.insert("ümüz", NominalSlot::Possessive);
-
-        // Nominal Case (Locative, Ablative, Genitive, Dative, Accusative)
-        nominal_map.insert("da", NominalSlot::Case);
-        nominal_map.insert("de", NominalSlot::Case);
-        nominal_map.insert("ta", NominalSlot::Case);
-        nominal_map.insert("te", NominalSlot::Case);
-        nominal_map.insert("dan", NominalSlot::Case);
-        nominal_map.insert("den", NominalSlot::Case);
-        nominal_map.insert("tan", NominalSlot::Case);
-        nominal_map.insert("ten", NominalSlot::Case);
-        nominal_map.insert("ın", NominalSlot::Case);
-        nominal_map.insert("in", NominalSlot::Case);
-        nominal_map.insert("un", NominalSlot::Case);
-        nominal_map.insert("ün", NominalSlot::Case);
-        nominal_map.insert("nın", NominalSlot::Case);
-        nominal_map.insert("nin", NominalSlot::Case);
-        nominal_map.insert("nun", NominalSlot::Case);
-        nominal_map.insert("nün", NominalSlot::Case);
-        nominal_map.insert("a", NominalSlot::Case);
-        nominal_map.insert("e", NominalSlot::Case);
-        nominal_map.insert("ya", NominalSlot::Case);
-        nominal_map.insert("ye", NominalSlot::Case);
-        nominal_map.insert("ı", NominalSlot::Case);
-        nominal_map.insert("i", NominalSlot::Case);
-        nominal_map.insert("u", NominalSlot::Case);
-        nominal_map.insert("ü", NominalSlot::Case);
-
-        // Verbal Voice
-        verbal_map.insert("ıl", VerbalSlot::Voice);
-        verbal_map.insert("il", VerbalSlot::Voice);
-        verbal_map.insert("ul", VerbalSlot::Voice);
-        verbal_map.insert("ül", VerbalSlot::Voice);
-        verbal_map.insert("ın", VerbalSlot::Voice);
-        verbal_map.insert("in", VerbalSlot::Voice);
-        verbal_map.insert("un", VerbalSlot::Voice);
-        verbal_map.insert("ün", VerbalSlot::Voice);
-
-        // Verbal Negation
-        verbal_map.insert("ma", VerbalSlot::Negation);
-        verbal_map.insert("me", VerbalSlot::Negation);
-
-        // Verbal Tense/Aspect
-        verbal_map.insert("di", VerbalSlot::TenseAspect);
-        verbal_map.insert("dı", VerbalSlot::TenseAspect);
-        verbal_map.insert("du", VerbalSlot::TenseAspect);
-        verbal_map.insert("dü", VerbalSlot::TenseAspect);
-        verbal_map.insert("ti", VerbalSlot::TenseAspect);
-        verbal_map.insert("tı", VerbalSlot::TenseAspect);
-        verbal_map.insert("tu", VerbalSlot::TenseAspect);
-        verbal_map.insert("tü", VerbalSlot::TenseAspect);
-        verbal_map.insert("yor", VerbalSlot::TenseAspect);
-        verbal_map.insert("acak", VerbalSlot::TenseAspect);
-        verbal_map.insert("ecek", VerbalSlot::TenseAspect);
-        verbal_map.insert("mış", VerbalSlot::TenseAspect);
-        verbal_map.insert("miş", VerbalSlot::TenseAspect);
-        verbal_map.insert("muş", VerbalSlot::TenseAspect);
-        verbal_map.insert("müş", VerbalSlot::TenseAspect);
-
-        // Verbal Person
-        verbal_map.insert("m", VerbalSlot::Person);
-        verbal_map.insert("n", VerbalSlot::Person);
-        verbal_map.insert("k", VerbalSlot::Person);
-        verbal_map.insert("z", VerbalSlot::Person);
-        verbal_map.insert("ım", VerbalSlot::Person);
-        verbal_map.insert("im", VerbalSlot::Person);
-        verbal_map.insert("um", VerbalSlot::Person);
-        verbal_map.insert("üm", VerbalSlot::Person);
-        verbal_map.insert("nız", VerbalSlot::Person);
-        verbal_map.insert("niz", VerbalSlot::Person);
-        verbal_map.insert("nuz", VerbalSlot::Person);
-        verbal_map.insert("nüz", VerbalSlot::Person);
+        Self::insert_verbal(
+            &mut verbal_map,
+            suffix_inventory::VERBAL_VOICE_SUFFIXES,
+            VerbalSlot::Voice,
+        );
+        Self::insert_verbal(
+            &mut verbal_map,
+            suffix_inventory::VERBAL_NEGATION_SUFFIXES,
+            VerbalSlot::Negation,
+        );
+        Self::insert_verbal(
+            &mut verbal_map,
+            suffix_inventory::VERBAL_TENSE_ASPECT_SUFFIXES,
+            VerbalSlot::TenseAspect,
+        );
+        Self::insert_verbal(
+            &mut verbal_map,
+            suffix_inventory::VERBAL_PERSON_SUFFIXES,
+            VerbalSlot::Person,
+        );
 
         Self {
             nominal_map,

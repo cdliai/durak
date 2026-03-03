@@ -6,33 +6,33 @@ Durak follows the **industry-standard mixed Python/Rust extension layout** for h
 
 ```
 durak-nlp/
-├── src/                    # RUST SOURCE ONLY
-│   └── lib.rs              # Rust core: tokenization, normalization, resource embedding
-├── python/                 # PYTHON SOURCE ONLY
+├── src/                                      # RUST SOURCE ONLY
+│   └── lib.rs                                # Rust core: tokenization, normalization, resource embedding
+├── python/                                   # PYTHON SOURCE ONLY
 │   └── durak/
-│       ├── __init__.py     # Public API
-│       ├── _durak_core.pyi # Type stubs for Rust extension
-│       ├── cleaning.py     # Text cleaning utilities
-│       ├── lemmatizer.py   # Lemmatization logic
-│       ├── normalizer.py   # Text normalization
-│       ├── pipeline.py     # Processing pipelines
-│       ├── stopwords.py    # Stopword management
-│       ├── suffixes.py     # Turkish suffix handling
-│       └── tokenizer.py    # Tokenization (wraps Rust)
-├── resources/              # STATIC DATA FILES
-│   └── tr/                 # Turkish resources
-│       ├── labels/         # Linguistic labels
+│       ├── __init__.py                       # Public API
+│       ├── _durak_core.pyi                   # Type stubs for Rust extension
+│       ├── cleaning.py                       # Text cleaning utilities
+│       ├── lemmatizer.py                     # Lemmatization logic
+│       ├── normalizer.py                     # Text normalization
+│       ├── pipeline.py                       # Processing pipelines
+│       ├── stopwords.py                      # Stopword management
+│       ├── suffixes.py                       # Turkish suffix handling
+│       └── tokenizer.py                      # Tokenization (wraps Rust)
+├── resources/                                # STATIC DATA FILES
+│   └── tr/                                   # Turkish resources
+│       ├── labels/                           # Linguistic labels
 │       │   └── DETACHED_SUFFIXES.txt
-│       └── stopwords/      # Stopword lists
+│       └── stopwords/                        # Stopword lists
 │           ├── base/turkish.txt
 │           ├── domains/social_media.txt
 │           └── metadata.json
-├── tests/                  # Integration tests
-├── benchmarks/             # Performance benchmarks
-├── examples/               # Usage examples
-├── scripts/                # Utility scripts
-├── Cargo.toml              # Rust dependencies
-└── pyproject.toml          # Python & build config
+├── tests/                                    # Integration tests
+├── benchmarks/                               # Performance benchmarks
+├── examples/                                 # Usage examples
+├── scripts/                                  # Utility scripts
+├── Cargo.toml                                # Rust dependencies
+└── pyproject.toml                            # Python & build config
 ```
 
 ## Design Principles
@@ -139,7 +139,7 @@ Benefits:
 ├─────────────────────────────────────┤
 │ Rust Extension Import               │
 │  • from . import _durak_core        │
-│  • Graceful fallback if unavailable│
+│  • Graceful fallback if unavailable │
 └─────────────────────────────────────┘
 ```
 

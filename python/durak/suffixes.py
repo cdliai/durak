@@ -3,34 +3,49 @@
 from __future__ import annotations
 
 from collections.abc import Iterable, Sequence
-from pathlib import Path
-
 from durak.exceptions import ResourceError
+from durak.resources_provider import DEFAULT_RESOURCE_PROVIDER
 
-APOSTROPHE_TOKENS: tuple[str, ...] = ("'", "'")
+try:
+    APOSTROPHE_TOKENS: tuple[str, ...] = DEFAULT_RESOURCE_PROVIDER.load_apostrophes()
+except ResourceError:
+    # Conservative fallback to keep suffix attachment usable if config is missing.
+    APOSTROPHE_TOKENS = ("'",)
 
 
 def _load_detached_suffixes() -> tuple[str, ...]:
-    """Load the detached suffix list from the resource directory."""
-    # Resource directory is now at project root: resources/tr/labels
-    resource_path = (
-        Path(__file__).resolve().parent.parent.parent
-        / "resources"
-        / "tr"
-        / "labels"
-        / "DETACHED_SUFFIXES.txt"
-    )
-    try:
-        with resource_path.open(encoding="utf-8") as handle:
-            return tuple(line.strip() for line in handle if line.strip())
-    except FileNotFoundError as exc:
-        raise ResourceError(
-            f"durak data file DETACHED_SUFFIXES.txt is missing from "
-            f"{resource_path.parent}."
-        ) from exc
+    """Load detached suffixes through the centralized resource provider."""
+    return DEFAULT_RESOURCE_PROVIDER.load_detached_suffixes()
 
 
 DEFAULT_DETACHED_SUFFIXES = _load_detached_suffixes()
+
+# Joining detached suffixes is intentionally conservative:
+# these tokens are often function words or quoted particles, not suffix bases.
+NON_JOINABLE_BASES: frozenset[str] = frozenset(
+    {
+        "ve",
+        "de",
+        "da",
+        "ki",
+        "mi",
+        "mı",
+        "mu",
+        "mü",
+        "ile",
+        "ama",
+        "fakat",
+        "lakin",
+        "ben",
+        "sen",
+        "o",
+        "bu",
+        "şu",
+        "biz",
+        "siz",
+        "onlar",
+    }
+)
 
 
 def _has_alpha(token: str | None) -> bool:
@@ -44,11 +59,25 @@ def _matches_suffix(token: str | None, suffixes: set[str]) -> bool:
     return normalized in suffixes
 
 
+def _is_joinable_base(token: str | None, *, safe_mode: bool) -> bool:
+    if not _has_alpha(token):
+        return False
+    if not safe_mode:
+        return True
+    assert token is not None
+    normalized = token.lower()
+    if normalized in NON_JOINABLE_BASES:
+        return False
+    # Very short tokens are frequently particles/abbreviations in noisy corpora.
+    return len(normalized) >= 3
+
+
 def attach_detached_suffixes(
     tokens: Sequence[str] | None,
     *,
     suffixes: Iterable[str] | None = None,
-    allow_without_apostrophe: bool = True,
+    allow_without_apostrophe: bool = False,
+    safe_mode: bool = True,
     apostrophes: Iterable[str] | None = None,
 ) -> list[str]:
     """Join detached suffix tokens with their preceding base token.
@@ -56,7 +85,7 @@ def attach_detached_suffixes(
     Examples:
         >>> attach_detached_suffixes(["ankara", "'", "da"])
         ["ankara'da"]
-        >>> attach_detached_suffixes(["ankara", "da"])
+        >>> attach_detached_suffixes(["ankara", "da"], allow_without_apostrophe=True)
         ['ankarada']
     """
     if not tokens:
@@ -84,6 +113,7 @@ def attach_detached_suffixes(
 
         if (
             next_index < len(tokens)
+            and _is_joinable_base(current, safe_mode=safe_mode)
             and tokens[next_index] in apostrophe_set
             and apostrophe_index < len(tokens)
             and _matches_suffix(tokens[apostrophe_index], suffix_set)
@@ -96,6 +126,7 @@ def attach_detached_suffixes(
         if (
             allow_without_apostrophe
             and next_index < len(tokens)
+            and _is_joinable_base(current, safe_mode=safe_mode)
             and _matches_suffix(tokens[next_index], suffix_set)
         ):
             combined = f"{current}{tokens[next_index]}"

@@ -10,6 +10,15 @@ from .info import (
     get_build_info,
     get_resource_info,
     print_reproducibility_report,
+)
+
+from .control import (
+    BackendCapabilities,
+    BackendName,
+    DurakController,
+    capability_matrix,
+    resolve_backend,
+)
 from .exceptions import (
     ConfigurationError,
     DurakError,
@@ -24,7 +33,12 @@ from .exceptions import (
 )
 from .lemmatizer import Lemmatizer
 from .normalizer import Normalizer
-from .pipeline import Pipeline, process_text, process_text_with_steps
+from .pipeline import (
+    Pipeline,
+    process_text,
+    process_text_with_context,
+    process_text_with_steps,
+)
 from .stopwords import (
     BASE_STOPWORDS,
     DEFAULT_STOPWORD_RESOURCE,
@@ -59,6 +73,9 @@ __all__ = [
     "DEFAULT_STOPWORD_RESOURCE",
     "DEFAULT_DETACHED_SUFFIXES",
     # Modules
+    "BackendCapabilities",
+    "BackendName",
+    "DurakController",
     "Lemmatizer",
     "Normalizer",
     "Pipeline",
@@ -93,8 +110,10 @@ __all__ = [
     "print_reproducibility_report",
     "normalize_unicode",
     "process_text",
+    "process_text_with_context",
     "process_text_with_steps",
     "remove_stopwords",
+    "resolve_backend",
     "split_sentences",
     "tokenize",
     "tokenize_text",
@@ -102,6 +121,7 @@ __all__ = [
     "tokenize_with_normalized_offsets",
     "Tokenizer",
     "TokenizationError",
+    "capability_matrix",
 ]
 
 try:

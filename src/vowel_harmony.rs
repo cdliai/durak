@@ -101,8 +101,21 @@ pub fn check_vowel_harmony(root: &str, suffix: &str) -> bool {
         None => return false, // No vowels in root = cannot validate
     };
 
+    let suffix_lower = suffix.to_lowercase();
+
+    // Progressive suffix family (-yor and its person-marked forms) contains a
+    // fixed "o" that should not be interpreted as a harmony violation.
+    // Example: gel + iyorum is valid Turkish despite mixed vowels in the full tail.
+    if suffix_lower.contains("yor") {
+        return suffix_lower
+            .chars()
+            .find_map(get_vowel_class)
+            .map(|v| check_harmony(root_vowel, v))
+            .unwrap_or(true);
+    }
+
     // Check all vowels in the suffix
-    let suffix_vowels: Vec<VowelClass> = suffix.chars().filter_map(get_vowel_class).collect();
+    let suffix_vowels: Vec<VowelClass> = suffix_lower.chars().filter_map(get_vowel_class).collect();
 
     // Empty suffix or suffix with no vowels = always valid
     if suffix_vowels.is_empty() {

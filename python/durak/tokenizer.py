@@ -92,7 +92,7 @@ register_sentence_splitter("regex", regex_sentence_split)
 def tokenize(
     text: str | None,
     *,
-    strategy: str = "regex",
+    strategy: str = "auto",
     strip_punct: bool = False,
 ) -> list[str]:
     """Tokenize text with optional punctuation stripping.
@@ -114,7 +114,7 @@ def tokenize(
 
 def tokenize_text(
     text: str | None,
-    strategy: str = "regex",
+    strategy: str = "auto",
     *,
     strip_punct: bool = False,
 ) -> list[str]:
@@ -134,18 +134,35 @@ def split_sentences(text: str, strategy: str = "regex") -> list[str]:
     return splitter(text)
 
 
-
-
+RUST_TOKENIZER_AVAILABLE = False
 
 try:
     from . import _durak_core
     tokenize_with_offsets = _durak_core.tokenize_with_offsets
     tokenize_with_normalized_offsets = _durak_core.tokenize_with_normalized_offsets
+    RUST_TOKENIZER_AVAILABLE = True
 except ImportError:
     def tokenize_with_normalized_offsets(text: str) -> list[tuple[str, int, int]]:
         raise RustExtensionError(
             "Rust extension not installed. Run: maturin develop"
         )
+
+
+def rust_tokenize(text: str) -> list[str]:
+    """Tokenize text via Rust tokenizer offsets."""
+    return [token for token, _, _ in tokenize_with_offsets(text)]
+
+
+def auto_tokenize(text: str) -> list[str]:
+    """Prefer Rust tokenizer when available, otherwise fallback to regex."""
+    if RUST_TOKENIZER_AVAILABLE:
+        return rust_tokenize(text)
+    return regex_tokenize(text)
+
+
+register_tokenizer("auto", auto_tokenize)
+if RUST_TOKENIZER_AVAILABLE:
+    register_tokenizer("rust", rust_tokenize)
 
 
 def normalize_tokens(

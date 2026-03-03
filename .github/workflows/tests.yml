@@ -24,6 +24,9 @@ jobs:
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
 
+      - name: Validate Rust core compiles
+        run: cargo check
+
       - name: Install dependencies and build package
         run: |
           python -m pip install --upgrade pip
