@@ -1,0 +1,187 @@
+# Gold Standard Lemmatization Test Set
+# Format: inflected<TAB>lemma<TAB>source
+# Source: manual (hand-curated), dict (from dictionary), test (from existing tests)
+#
+# This test set covers:
+# - Common nouns with case/plural/possessive suffixes
+# - Verb conjugations (present, past, future)
+# - Pronouns with case markers
+# - Edge cases (short words, vowel harmony, apostrophes)
+#
+# Total entries: 120+
+
+# ===== NOUNS - PLURAL =====
+evler	ev	dict
+insanlar	insan	dict
+çocuklar	çocuk	dict
+kadınlar	kadın	dict
+erkekler	erkek	dict
+kitaplar	kitap	dict
+masalar	masa	manual
+arabalar	araba	manual
+adamlar	adam	dict
+arkadaşlar	arkadaş	dict
+aylar	ay	dict
+bunlar	bu	dict
+şunlar	şu	dict
+güzeller	güzel	manual
+iyiler	iyi	manual
+büyükler	büyük	manual
+
+# ===== NOUNS - ACCUSATIVE (Direct Object) =====
+kitabı	kitap	test
+kitapları	kitap	test
+evleri	ev	test
+adamı	adam	dict
+anaı	ana	dict
+arabaı	araba	dict
+beni	ben	test
+seni	sen	test
+onu	o	test
+bizi	biz	test
+sizi	siz	test
+
+# ===== NOUNS - DATIVE (To/For) =====
+kitaba	kitap	test
+adama	adam	dict
+anaa	ana	dict
+arabaa	araba	dict
+bana	ben	test
+sana	sen	test
+ona	o	test
+bize	biz	test
+size	siz	test
+aya	ay	dict
+arkadaşa	arkadaş	dict
+
+# ===== NOUNS - LOCATIVE (At/In) =====
+kitapta	kitap	test
+evde	ev	manual
+okulda	okul	manual
+adamda	adam	dict
+anada	ana	dict
+arabada	araba	dict
+bende	ben	test
+ayda	ay	dict
+arkadaşda	arkadaş	dict
+
+# ===== NOUNS - ABLATIVE (From) =====
+kitaptan	kitap	test
+evden	ev	manual
+okuldan	okul	manual
+adamdan	adam	dict
+anadan	ana	dict
+arabadan	araba	dict
+benden	ben	test
+senden	sen	test
+aydan	ay	dict
+arkadaşdan	arkadaş	dict
+
+# ===== NOUNS - POSSESSIVE =====
+evim	ev	test
+evimiz	ev	test
+kitabım	kitap	manual
+kitabımız	kitap	manual
+adamım	adam	dict
+adamımız	adam	dict
+anaım	ana	dict
+anaımız	ana	dict
+arabaım	araba	dict
+arabaımız	araba	dict
+ayım	ay	dict
+ayımız	ay	dict
+arkadaşım	arkadaş	dict
+arkadaşımız	arkadaş	dict
+
+# ===== NOUNS - GENITIVE (Of) =====
+kitabın	kitap	manual
+evin	ev	manual
+adamın	adam	dict
+anaın	ana	dict
+arabaın	araba	dict
+ayın	ay	dict
+arkadaşın	arkadaş	dict
+
+# ===== VERBS - PRESENT CONTINUOUS =====
+geliyorum	gel	test
+geliyorsun	gel	test
+geliyor	gel	test
+geliyoruz	gel	test
+gidiyorum	git	test
+yapıyorum	yap	test
+okuyorum	oku	test
+yazıyorum	yaz	test
+görüyorum	gör	test
+alıyorum	al	dict
+alıyorsun	al	dict
+alıyor	al	dict
+alıyoruz	al	dict
+alıyorlar	al	dict
+anlaiyor	anla	dict
+anlaiyorum	anla	dict
+
+# ===== VERBS - PAST TENSE =====
+geldim	gel	test
+geldin	gel	test
+geldi	gel	test
+geldik	gel	test
+gittim	git	test
+aldim	al	dict
+aldin	al	dict
+aldi	al	dict
+aldik	al	dict
+aldı	al	dict
+aldık	al	dict
+aldılar	al	dict
+aldım	al	dict
+aldın	al	dict
+aldınız	al	dict
+anladim	anla	dict
+anladin	anla	dict
+anladi	anla	dict
+anladik	anla	dict
+ağladim	ağla	dict
+ağladi	ağla	dict
+ağladik	ağla	dict
+
+# ===== VERBS - FUTURE TENSE =====
+geleceğim	gel	test
+geleceksin	gel	test
+gelecek	gel	test
+alacak	al	dict
+alacaklar	al	dict
+alacaksın	al	dict
+alacaksınız	al	dict
+alacağım	al	dict
+alacağız	al	dict
+anlaecek	anla	dict
+anlaeceğim	anla	dict
+alecek	al	dict
+aleceğim	al	dict
+
+# ===== VERBS - INFINITIVE =====
+almak	al	dict
+almek	al	dict
+anlamak	anla	dict
+anlamek	anla	dict
+gelmek	gel	manual
+gitmek	git	manual
+yapmak	yap	manual
+okumak	oku	manual
+yazmak	yaz	manual
+
+# ===== VERBS - SIMPLE PRESENT =====
+alir	al	dict
+alirim	al	dict
+anlair	anla	dict
+anlairim	anla	dict
+alar	al	dict
+alarım	al	dict
+anlaar	anla	dict
+anlaarım	anla	dict
+ağlaar	ağla	dict
+ağlaarım	ağla	dict
+
+# ===== EDGE CASES =====
+kiler	kiler	test
+gelmeden	gel	manual
