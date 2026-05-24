@@ -10,6 +10,7 @@ from .info import (
     get_build_info,
     get_resource_info,
     print_reproducibility_report,
+)
 from .exceptions import (
     ConfigurationError,
     DurakError,
