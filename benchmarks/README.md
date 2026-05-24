@@ -12,6 +12,30 @@ Compare Rust-accelerated functions against pure Python implementations:
 python benchmarks/benchmark_rust_vs_python.py
 ```
 
+### Dataset Quality + Throughput Benchmark
+
+Run a real corpus benchmark on Hugging Face datasets:
+
+```bash
+python benchmarks/benchmark_dataset_quality.py \
+  --dataset fatihburakkaragoz/old-nogay-turkish-ocr-corpus \
+  --splits train validation test
+```
+
+Optional flags:
+
+```bash
+python benchmarks/benchmark_dataset_quality.py \
+  --dataset <hf_dataset_id> \
+  --text-column <column_name> \
+  --max-rows-per-split <n>
+```
+
+This script checks:
+- Character-offset mapping correctness for normalized token offsets
+- Token shape parity (Python regex baseline vs Rust implementation)
+- Throughput and error ratio per split
+
 This benchmark measures:
 - Text normalization (Turkish character handling)
 - Tokenization with offsets

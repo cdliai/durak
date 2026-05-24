@@ -1,6 +1,7 @@
 import pytest
 
 from durak.tokenizer import tokenize_with_offsets, tokenize_with_normalized_offsets
+import durak
 
 
 def test_offset_mapping():
@@ -151,8 +152,8 @@ def test_normalized_offsets_sentence():
         
         # Verify offset points to original text (case-sensitive check)
         original_slice = text[start:end]
-        # Token is normalized but offset references original
-        assert original_slice.lower() == tok or original_slice == tok
+        # Token is normalized but offset references original (with Turkish-I aware normalization)
+        assert durak.normalize_case(original_slice) == tok
 
 def test_normalized_offsets_ner_use_case():
     """Simulate NER use case: labels reference original text, tokens are normalized."""

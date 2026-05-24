@@ -86,6 +86,7 @@ fn get_token_regex() -> &'static Regex {
 /// * `lowercase` - If true, convert text to lowercase
 /// * `handle_turkish_i` - If true, handle Turkish İ/I conversion (İ→i, I→ı)
 #[pyfunction]
+#[pyo3(signature = (text, lowercase = true, handle_turkish_i = true))]
 fn fast_normalize(text: &str, lowercase: bool, handle_turkish_i: bool) -> String {
     // Rust handles Turkish I/ı conversion correctly and instantly
     // "Single Pass" allocation for maximum speed
@@ -164,7 +165,7 @@ fn tokenize_with_normalized_offsets(text: &str) -> Vec<(String, usize, usize)> {
     for caps in re.captures_iter(text) {
         if let Some(mat) = caps.get(0) {
             let token = mat.as_str();
-            let normalized_token = fast_normalize(token);
+            let normalized_token = fast_normalize(token, true, true);
             
             let byte_start = mat.start();
             let byte_end = mat.end();
@@ -356,6 +357,8 @@ fn strip_suffixes_validated(
         }
     }
 
+    let dictionary = get_lemma_dict();
+
     let validator = RootValidator::new(min_root_length, strict);
     let morphotactics = morphotactics::MorphotacticClassifier::new();
     let mut current = word.to_string();
@@ -402,7 +405,7 @@ fn strip_suffixes_validated(
         iterations += 1;
 
         // Check if current is in dictionary - if so, stop stripping
-        if dictionary.contains(&current.as_str()) {
+        if dictionary.contains_key(&current.as_str()) {
             break;
         }
 
@@ -434,7 +437,7 @@ fn strip_suffixes_validated(
                 // Only strip if ALL conditions are met
                 if is_valid_root && has_harmony && valid_morphotactics {
                     // If candidate is in dictionary, this is our answer - stop here
-                    if dictionary.contains(&candidate) {
+                    if dictionary.contains_key(&candidate) {
                         return candidate.to_string();
                     }
 
@@ -449,7 +452,7 @@ fn strip_suffixes_validated(
     }
 
     // Final check: if current is in dictionary, prefer it
-    if dictionary.contains(&current.as_str()) {
+    if dictionary.contains_key(&current.as_str()) {
         return current;
     }
 
