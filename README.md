@@ -282,3 +282,4 @@ Durak is distributed under the [Durak License v1.2](LICENSE). Commercial or inst
 
 **Homepage**: [karagoz.io](https://karagoz.io)
 **Repository**: [github.com/fbkaragoz/durak](https://github.com/fbkaragoz/durak)
+**Documentation**: Full API reference is generated from in-source docstrings — see [github.com/fbkaragoz/durak#readme](https://github.com/fbkaragoz/durak#readme)
