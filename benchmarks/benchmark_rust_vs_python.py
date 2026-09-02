@@ -106,10 +106,9 @@ def main():
     print("\n4. Complete Processing Pipeline")
     print("-" * 70)
 
-    # Keep data types compatible across steps: normalize keeps string, tokenize returns list.
-    pipeline = durak.Pipeline(
-        ["clean", "normalize", "tokenize", "remove_stopwords"]
-    )
+    # Keep data types compatible across steps: normalize keeps string,
+    # tokenize returns list.
+    pipeline = durak.Pipeline(["clean", "normalize", "tokenize", "remove_stopwords"])
 
     pipeline_time = benchmark(pipeline, large_text, iterations=100)
     print(f"Full pipeline: {pipeline_time:.4f} ms per call")

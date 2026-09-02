@@ -72,16 +72,16 @@ def main():
     print("  strip_suffixes_validated(word, check_harmony=True)\n")
 
     test_words = [
-        "kitaplar",      # kitap + lar (valid)
-        "evler",         # ev + ler (valid)
-        "masalar",       # masa + lar (valid)
-        "gözler",        # göz + ler (valid)
-        "kitaplardan",   # kitap + lar + dan (multiple suffixes)
-        "evlerden",      # ev + ler + den (multiple suffixes)
+        "kitaplar",  # kitap + lar (valid)
+        "evler",  # ev + ler (valid)
+        "masalar",  # masa + lar (valid)
+        "gözler",  # göz + ler (valid)
+        "kitaplardan",  # kitap + lar + dan (multiple suffixes)
+        "evlerden",  # ev + ler + den (multiple suffixes)
     ]
 
     print(f"  {'Word':<20s} {'Lemma':<15s} {'Harmony Valid'}")
-    print(f"  { '-' * 20} { '-' * 15} { '-' * 13}")
+    print(f"  {'-' * 20} {'-' * 15} {'-' * 13}")
 
     for word in test_words:
         # Strip with harmony checking (default behavior)
@@ -134,7 +134,8 @@ Vowel harmony is a research-critical feature for Turkish NLP:
 
 • **Morphological Analysis**: Essential for accurate morpheme segmentation
 • **Language Modeling**: Captures phonological regularities in Turkish
-• **Cross-Lingual Transfer**: Demonstrates language-specific rules in multilingual models
+• **Cross-Lingual Transfer**: Demonstrates language-specific rules in
+  multilingual models
 • **Linguistic Studies**: Enables computational exploration of Turkish phonology
 
 Reference Implementation:

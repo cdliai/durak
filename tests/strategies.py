@@ -1,7 +1,8 @@
 """
 Hypothesis strategies for generating Turkish text test cases.
 
-Provides specialized text generators for property-based testing of Turkish NLP functions.
+Provides specialized text generators for property-based testing of Turkish NLP
+functions.
 """
 
 from hypothesis import strategies as st
@@ -58,7 +59,9 @@ TURKISH_STOPWORDS = [
 @st.composite
 def turkish_word(draw, min_size=1, max_size=50):
     """Generate a random Turkish word."""
-    return draw(st.text(alphabet=TURKISH_ALPHABET, min_size=min_size, max_size=max_size))
+    return draw(
+        st.text(alphabet=TURKISH_ALPHABET, min_size=min_size, max_size=max_size)
+    )
 
 
 @st.composite
@@ -93,7 +96,9 @@ def turkish_sentence(draw, min_words=1, max_words=20):
 
 @st.composite
 def turkish_text_with_unicode_edge_cases(draw):
-    """Generate Turkish text with Unicode edge cases (zero-width chars, combining diacritics)."""
+    """Generate Turkish text with Unicode edge cases
+    (zero-width chars, combining diacritics).
+    """
     base_text = draw(turkish_sentence())
 
     # Randomly insert Unicode edge cases

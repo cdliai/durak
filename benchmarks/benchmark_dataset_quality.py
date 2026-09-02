@@ -10,11 +10,11 @@ from __future__ import annotations
 
 import argparse
 import time
+from collections.abc import Iterable
 from dataclasses import dataclass
-from typing import Iterable, List, Tuple
 
-from durak.tokenizer import REGEX_TOKEN_PATTERN, normalize_tokens
 import durak
+from durak.tokenizer import REGEX_TOKEN_PATTERN, normalize_tokens
 
 try:
     from datasets import load_dataset
@@ -45,7 +45,7 @@ def _candidate_text_field(sample: object) -> str | None:
     return None
 
 
-def _python_tokenize_with_normalized_offsets(text: str) -> List[Tuple[str, int, int]]:
+def _python_tokenize_with_normalized_offsets(text: str) -> list[tuple[str, int, int]]:
     tokens = []
     for match in REGEX_TOKEN_PATTERN.finditer(text):
         token = match.group(0)
@@ -54,7 +54,9 @@ def _python_tokenize_with_normalized_offsets(text: str) -> List[Tuple[str, int, 
     return tokens
 
 
-def _iter_split_texts(split_obj, text_column: str | None, max_rows: int) -> Iterable[str]:
+def _iter_split_texts(
+    split_obj, text_column: str | None, max_rows: int
+) -> Iterable[str]:
     count = 0
     for row in split_obj:
         if max_rows > 0 and count >= max_rows:
@@ -96,9 +98,7 @@ class SplitReport:
         return self.offset_errors + self.token_shape_errors
 
 
-def _benchmark_function(
-    fn, texts: List[str]
-) -> Tuple[float, int]:
+def _benchmark_function(fn, texts: list[str]) -> tuple[float, int]:
     start = time.perf_counter()
     total_tokens = 0
     for text in texts:
@@ -116,15 +116,13 @@ def run_split_benchmark(
     if load_dataset is None:
         raise RuntimeError("`datasets` package required for this benchmark.")
 
-    rust_ok = hasattr(durak, "_durak_core")
+    hasattr(durak, "_durak_core")
     rust_tokenize = getattr(durak, "tokenize_with_normalized_offsets", None)
     if not callable(rust_tokenize):
-        raise RuntimeError(
-            "Rust extension is required for dataset quality benchmark."
-        )
+        raise RuntimeError("Rust extension is required for dataset quality benchmark.")
 
     report = SplitReport(split=split_name)
-    texts: List[str] = []
+    texts: list[str] = []
 
     for text in _iter_split_texts(split_obj, text_column, max_rows):
         report.rows += 1
@@ -153,8 +151,12 @@ def run_split_benchmark(
         _python_tokenize_with_normalized_offsets, texts
     )
     rust_elapsed, rust_tokens = _benchmark_function(rust_tokenize, texts)
-    report.speed_texts_per_s = len(texts) / (rust_elapsed / 1000) if rust_elapsed > 0 else 0.0
-    report.speed_tokens_per_s = rust_tokens / (rust_elapsed / 1000) if rust_elapsed > 0 else 0.0
+    report.speed_texts_per_s = (
+        len(texts) / (rust_elapsed / 1000) if rust_elapsed > 0 else 0.0
+    )
+    report.speed_tokens_per_s = (
+        rust_tokens / (rust_elapsed / 1000) if rust_elapsed > 0 else 0.0
+    )
     report.elapsed_ms = rust_elapsed
     _ = py_elapsed
     _ = py_tokens
@@ -192,7 +194,9 @@ def main() -> None:
     args = parse_args()
 
     if load_dataset is None:
-        print("`datasets` package is not installed. Install with `pip install datasets`.")
+        print(
+            "`datasets` package is not installed. Install with `pip install datasets`."
+        )
         return
 
     dataset = load_dataset(args.dataset)
@@ -221,11 +225,17 @@ def main() -> None:
             f"split={report.split}",
             f"rows={report.rows}",
             f"tokens={report.total_tokens}",
-            f"errors(offset={report.offset_errors}, mismatch={report.token_shape_errors})",
+            (
+                f"errors(offset={report.offset_errors}, "
+                f"mismatch={report.token_shape_errors})"
+            ),
             f"rust_time_ms={report.elapsed_ms:.2f}",
             f"throughput_tokens_s={report.speed_tokens_per_s:.1f}",
             f"throughput_rows_s={report.speed_texts_per_s:.1f}",
-            f"errors_per_million_rows={report.total_errors()/max(report.rows,1)*1_000_000:.2f}",
+            (
+                f"errors_per_million_rows="
+                f"{report.total_errors() / max(report.rows, 1) * 1_000_000:.2f}"
+            ),
         ]
         print(" | ".join(lines))
 

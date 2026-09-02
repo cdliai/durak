@@ -52,6 +52,18 @@ pub fn get_last_vowel_class(word: &str) -> Option<VowelClass> {
     word.chars().rev().find_map(get_vowel_class)
 }
 
+fn is_present_continuous_suffix(suffix: &str) -> bool {
+    const PRESENT_CONTINUOUS_PREFIXES: [&str; 4] = ["iyor", "ıyor", "uyor", "üyor"];
+
+    for prefix in &PRESENT_CONTINUOUS_PREFIXES {
+        if suffix.starts_with(prefix) {
+            return true;
+        }
+    }
+
+    false
+}
+
 /// Check if a suffix harmonizes with the given root vowel class
 ///
 /// # Turkish Vowel Harmony Rules:
@@ -95,6 +107,10 @@ pub fn check_harmony(root_vowel: VowelClass, suffix_vowel: VowelClass) -> bool {
 /// * `false` if harmony is violated
 /// * `false` if root has no vowels (cannot determine harmony)
 pub fn check_vowel_harmony(root: &str, suffix: &str) -> bool {
+    if is_present_continuous_suffix(suffix) {
+        return !suffix.is_empty();
+    }
+
     // Get the last vowel in the root
     let root_vowel = match get_last_vowel_class(root) {
         Some(v) => v,

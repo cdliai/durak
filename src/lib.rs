@@ -320,7 +320,31 @@ fn strip_suffixes(word: &str) -> String {
         sorted.sort_by(|a, b| b.len().cmp(&a.len()));
 
         for suffix in sorted {
-            if current.ends_with(suffix) && current.chars().count() > suffix.chars().count() + 2 {
+            if suffix.chars().count() <= 1 {
+                continue;
+            }
+
+            let suffix_len = suffix.chars().count();
+            let current_len = current.chars().count();
+
+            if current.ends_with(suffix) {
+                // Avoid stripping very short two-letter suffixes from short tokens:
+                // this prevents common over-stripping such as `kiler` -> `kil`.
+                if suffix_len <= 2 && current_len <= 5 {
+                    continue;
+                }
+
+                // Keep at least two-character root margin, and allow equal length when
+                // we need to preserve known short roots (e.g. "evler" -> "ev").
+                if current_len < suffix_len + 2 {
+                    continue;
+                }
+
+                let candidate = &current[..current.len() - suffix.len()];
+                if candidate.chars().count() <= 2 && !is_known_lemma(candidate) {
+                    continue;
+                }
+
                 current = current[..current.len() - suffix.len()].to_string();
                 changed = true;
                 break;
@@ -404,17 +428,39 @@ fn strip_suffixes_validated(
         changed = false;
         iterations += 1;
 
-        // Check if current is in dictionary - if so, stop stripping
-        if dictionary.contains_key(&current.as_str()) {
+        // In strict mode, dictionary hits are treated as final roots.
+        if strict && dictionary.contains_key(&current.as_str()) {
             break;
         }
 
         for suffix in &all_single_suffixes {
+            if suffix.chars().count() <= 1 {
+                continue;
+            }
+
+            let suffix_len = suffix.chars().count();
+            let current_len = current.chars().count();
+
             if current.ends_with(suffix) {
+                // Match the behavior of the non-validated stripper for short suffixes:
+                // keep conservative stripping for very short words.
+                if suffix_len <= 2 && current_len <= 5 {
+                    continue;
+                }
+
+                // Keep at least a two-character root margin.
+                if current_len < suffix_len + 2 {
+                    continue;
+                }
+
                 let candidate = &current[..current.len() - suffix.len()];
 
                 // Skip if candidate would be too short
                 if candidate.chars().count() < min_root_length {
+                    continue;
+                }
+
+                if candidate.chars().count() <= 2 && !is_known_lemma(candidate) {
                     continue;
                 }
 
@@ -452,7 +498,7 @@ fn strip_suffixes_validated(
     }
 
     // Final check: if current is in dictionary, prefer it
-    if dictionary.contains_key(&current.as_str()) {
+    if strict && dictionary.contains_key(&current.as_str()) {
         return current;
     }
 

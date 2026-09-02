@@ -5,6 +5,7 @@
 Bu betik, `durak` kütüphanesinin temel temizleme ve işleme fonksiyonlarının
 `sample_story.txt` üzerindeki etkisini göstermek için hazırlanmıştır.
 """
+
 import json
 from pathlib import Path
 
@@ -18,7 +19,7 @@ def main() -> None:
     cleaned_text = clean_text(original_text)
     output_clean_text = Path(__file__).parent / ".." / "tmp" / "output_clean_text.txt"
     output_clean_text.write_text(cleaned_text, encoding="utf-8")
-    
+
     processed_tokens = process_text(original_text, remove_stopwords=True)
     otuput_processed_tokens = (
         Path(__file__).parent / ".." / "tmp" / "output_tokens.json"

@@ -18,6 +18,4 @@ def test_attach_detached_suffixes_requires_alpha_base() -> None:
 
 def test_attach_detached_suffixes_disable_without_apostrophe() -> None:
     tokens = ["ankara", "da"]
-    assert attach_detached_suffixes(
-        tokens, allow_without_apostrophe=False
-    ) == tokens
+    assert attach_detached_suffixes(tokens, allow_without_apostrophe=False) == tokens

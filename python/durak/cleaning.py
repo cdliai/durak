@@ -39,37 +39,37 @@ TRAILING_PUNCTUATION = {".", ",", "!", "?", ";", ":"}
 # Note: No '+' quantifier to match individual emojis, not consecutive groups
 EMOJI_PATTERN = re.compile(
     "["
-    "\U0001F600-\U0001F64F"  # emoticons
-    "\U0001F300-\U0001F5FF"  # symbols & pictographs
-    "\U0001F680-\U0001F6FF"  # transport & map symbols
-    "\U0001F1E0-\U0001F1FF"  # flags (iOS)
-    "\U00002702-\U000027B0"  # dingbats
-    "\U000024C2-\U0001F251"  # enclosed characters
-    "\U0001F900-\U0001F9FF"  # supplemental symbols and pictographs
-    "\U0001FA00-\U0001FA6F"  # chess symbols
-    "\U0001FA70-\U0001FAFF"  # symbols and pictographs extended-a
-    "\U00002600-\U000026FF"  # miscellaneous symbols
-    "\U00002700-\U000027BF"  # dingbats
+    "\U0001f600-\U0001f64f"  # emoticons
+    "\U0001f300-\U0001f5ff"  # symbols & pictographs
+    "\U0001f680-\U0001f6ff"  # transport & map symbols
+    "\U0001f1e0-\U0001f1ff"  # flags (iOS)
+    "\U00002702-\U000027b0"  # dingbats
+    "\U000024c2-\U0001f251"  # enclosed characters
+    "\U0001f900-\U0001f9ff"  # supplemental symbols and pictographs
+    "\U0001fa00-\U0001fa6f"  # chess symbols
+    "\U0001fa70-\U0001faff"  # symbols and pictographs extended-a
+    "\U00002600-\U000026ff"  # miscellaneous symbols
+    "\U00002700-\U000027bf"  # dingbats
     "]"
-    "(?:\uFE0F)?",  # Optional variation selector (e.g., ❤️ vs ❤)
+    "(?:\ufe0f)?",  # Optional variation selector (e.g., ❤️ vs ❤)
     flags=re.UNICODE,
 )
 
 # Pattern for removing emojis (allows consecutive groups)
 EMOJI_REMOVE_PATTERN = re.compile(
     "["
-    "\U0001F600-\U0001F64F"
-    "\U0001F300-\U0001F5FF"
-    "\U0001F680-\U0001F6FF"
-    "\U0001F1E0-\U0001F1FF"
-    "\U00002702-\U000027B0"
-    "\U000024C2-\U0001F251"
-    "\U0001F900-\U0001F9FF"
-    "\U0001FA00-\U0001FA6F"
-    "\U0001FA70-\U0001FAFF"
-    "\U00002600-\U000026FF"
-    "\U00002700-\U000027BF"
-    "\uFE0F"  # Include variation selector for removal
+    "\U0001f600-\U0001f64f"
+    "\U0001f300-\U0001f5ff"
+    "\U0001f680-\U0001f6ff"
+    "\U0001f1e0-\U0001f1ff"
+    "\U00002702-\U000027b0"
+    "\U000024c2-\U0001f251"
+    "\U0001f900-\U0001f9ff"
+    "\U0001fa00-\U0001fa6f"
+    "\U0001fa70-\U0001faff"
+    "\U00002600-\U000026ff"
+    "\U00002700-\U000027bf"
+    "\ufe0f"  # Include variation selector for removal
     "]+",
     flags=re.UNICODE,
 )
@@ -181,15 +181,15 @@ def remove_repeated_chars(text: str, *, max_repeats: int = 2) -> str:
 
 def remove_emojis(text: str) -> str:
     """Remove all emoji characters from text.
-    
+
     Useful for formal corpus processing where emojis are noise.
-    
+
     Args:
         text: Input text potentially containing emojis
-        
+
     Returns:
         Text with all emojis removed
-        
+
     Examples:
         >>> remove_emojis("Harika! 🎉🎊 Çok güzel olmuş 😍")
         'Harika!  Çok güzel olmuş '
@@ -204,15 +204,15 @@ def remove_emojis(text: str) -> str:
 
 def extract_emojis(text: str) -> list[str]:
     """Extract all emoji characters from text as a list.
-    
+
     Useful for sentiment/emotion analysis as features before text cleaning.
-    
+
     Args:
         text: Input text potentially containing emojis
-        
+
     Returns:
         List of emoji characters found in the text (preserves order and duplicates)
-        
+
     Examples:
         >>> extract_emojis("Müthiş gün! 🌞☀️🔥")
         ['🌞', '☀️', '🔥']
@@ -245,7 +245,7 @@ def clean_text(
     emoji_mode: str = "keep",
 ) -> str | tuple[str, list[str]]:
     """Apply the configured cleaning steps sequentially with emoji handling.
-    
+
     Args:
         text: Input text to clean
         steps: Custom cleaning pipeline (if None, uses DEFAULT_CLEANING_STEPS)
@@ -253,14 +253,14 @@ def clean_text(
             - "keep": Preserve emojis in the output (default)
             - "remove": Strip all emojis from the text
             - "extract": Return tuple of (cleaned_text, emoji_list)
-            
+
     Returns:
         - str: Cleaned text (if emoji_mode is "keep" or "remove")
         - tuple[str, list[str]]: (cleaned_text, emoji_list) if emoji_mode is "extract"
-        
+
     Raises:
         ValueError: If emoji_mode is not one of "keep", "remove", "extract"
-        
+
     Examples:
         >>> clean_text("Harika! 🎉", emoji_mode="keep")
         'harika! 🎉'
@@ -271,34 +271,34 @@ def clean_text(
     """
     if not text:
         return ("", []) if emoji_mode == "extract" else ""
-        
+
     if emoji_mode not in {"keep", "remove", "extract"}:
         raise ValueError(
             f"emoji_mode must be 'keep', 'remove', or 'extract', got '{emoji_mode}'"
         )
-    
+
     # Extract emojis first if needed (before cleaning modifies the text)
     extracted_emojis: list[str] = []
     if emoji_mode == "extract":
         extracted_emojis = extract_emojis(text)
-    
+
     # Apply cleaning pipeline
     pipeline = tuple(steps) if steps is not None else DEFAULT_CLEANING_STEPS
     cleaned = text
     for step in pipeline:
         cleaned = step(cleaned)
-    
+
     # Always collapse whitespace at the end for consistent output
     if steps is not None:
         cleaned = collapse_whitespace(cleaned)
-    
+
     # Handle emoji mode
     if emoji_mode == "remove":
         cleaned = remove_emojis(cleaned)
     elif emoji_mode == "extract":
         cleaned = remove_emojis(cleaned)
         return (cleaned, extracted_emojis)
-    
+
     return cleaned
 
 

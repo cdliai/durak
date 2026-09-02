@@ -1,7 +1,5 @@
 """Tests for the context module."""
 
-import pytest
-
 from durak.context import ProcessingContext
 
 

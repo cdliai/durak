@@ -5,15 +5,15 @@ Uses Hypothesis to generate thousands of Turkish text variants and verify
 mathematical properties hold across all inputs.
 """
 
-import pytest
-from hypothesis import given, settings, assume
-
 import durak
+import pytest
+from hypothesis import assume, given, settings
+
 from tests.strategies import (
     turkish_sentence,
+    turkish_text_with_unicode_edge_cases,
     turkish_word,
     turkish_word_with_suffix,
-    turkish_text_with_unicode_edge_cases,
 )
 
 
@@ -87,7 +87,7 @@ class TestTokenizerProperties:
         rejoined = "".join(tokens)
 
         # Remove all whitespace for comparison
-        text_no_ws = "".join(text.split())
+        "".join(text.split())
         rejoined_no_ws = "".join(rejoined.split())
 
         # All non-whitespace chars should be preserved (modulo normalization)
@@ -110,7 +110,7 @@ class TestTokenizerProperties:
 
         tokens_with_offsets = durak.tokenize_with_offsets(text)
 
-        for token, start, end in tokens_with_offsets:
+        for _token, start, end in tokens_with_offsets:
             # Offset must be within bounds
             assert 0 <= start < end <= len(text), (
                 f"Invalid offset [{start}:{end}] for text of length {len(text)}"

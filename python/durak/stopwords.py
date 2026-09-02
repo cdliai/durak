@@ -416,8 +416,10 @@ class StopwordManager:
         Args:
             base: Base stopwords to use. Defaults to BASE_STOPWORDS if not provided.
             additions: Additional stopwords to add to the base set.
-            keep: Words that should never be treated as stopwords (overrides both base and additions).
-            case_sensitive: If True, stopword matching is case-sensitive. Defaults to False.
+            keep: Words that should never be treated as stopwords.
+                Overrides both base and additions.
+            case_sensitive: If True, stopword matching is case-sensitive.
+                Defaults to False.
         """
         self.case_sensitive = case_sensitive
         base_words = set(base) if base is not None else set(BASE_STOPWORDS)
@@ -443,7 +445,8 @@ class StopwordManager:
         """Create an immutable snapshot of the current stopword configuration.
 
         Returns:
-            A StopwordSnapshot containing the current stopwords, keep_words, and case_sensitive setting.
+            A StopwordSnapshot containing the current stopwords,
+            keep_words, and case_sensitive setting.
         """
         return StopwordSnapshot(self.stopwords, self.keep_words, self.case_sensitive)
 
@@ -507,7 +510,8 @@ class StopwordManager:
 
         Args:
             path: Destination file path.
-            fmt: Export format, either 'txt' (newline-delimited) or 'json'. Defaults to 'txt'.
+            fmt: Export format, either 'txt' (newline-delimited) or 'json'.
+                Defaults to 'txt'.
 
         Raises:
             ValueError: If fmt is not 'txt' or 'json'.
@@ -547,8 +551,10 @@ class StopwordManager:
 
         Args:
             additions: Iterable of file paths containing additional stopwords to load.
-            keep: Iterable of file paths containing keep-words (words to never treat as stopwords).
-            case_sensitive: If True, stopword matching is case-sensitive. Defaults to False.
+            keep: Iterable of file paths containing keep-words (words never
+                treated as stopwords).
+            case_sensitive: If True, stopword matching is case-sensitive.
+                Defaults to False.
 
         Returns:
             A new StopwordManager instance with loaded stopwords.
@@ -573,9 +579,7 @@ class StopwordManager:
     ) -> StopwordManager:
         """Factory that loads base words from metadata-defined resources."""
         names = (
-            tuple(resource_names)
-            if resource_names
-            else (DEFAULT_STOPWORD_RESOURCE,)
+            tuple(resource_names) if resource_names else (DEFAULT_STOPWORD_RESOURCE,)
         )
         base_words = load_stopword_resources(
             names,

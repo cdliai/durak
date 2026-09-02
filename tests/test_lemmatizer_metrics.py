@@ -2,7 +2,7 @@
 
 import pytest
 from durak.exceptions import ConfigurationError
-from durak.lemmatizer import Lemmatizer, LemmatizerMetrics
+from durak.lemmatizer import Lemmatizer
 
 
 def test_metrics_disabled_by_default():
@@ -15,10 +15,10 @@ def test_metrics_disabled_by_default():
 def test_metrics_raises_when_disabled():
     """Should raise ConfigurationError when accessing metrics if not enabled."""
     lemmatizer = Lemmatizer(strategy="hybrid", collect_metrics=False)
-    
+
     with pytest.raises(ConfigurationError, match="Metrics not enabled"):
         lemmatizer.get_metrics()
-    
+
     with pytest.raises(ConfigurationError, match="Metrics not enabled"):
         lemmatizer.reset_metrics()
 
@@ -29,18 +29,18 @@ def test_metrics_basic_tracking():
         from durak import _durak_core  # noqa: F401
     except ImportError:
         pytest.skip("Rust extension not installed")
-    
+
     lemmatizer = Lemmatizer(strategy="lookup", collect_metrics=True)
-    
+
     # Initial state
     metrics = lemmatizer.get_metrics()
     assert metrics.total_calls == 0
     assert metrics.lookup_hits == 0
     assert metrics.lookup_misses == 0
-    
+
     # Process a known word (in dictionary)
     lemmatizer("kitaplar")  # Should hit dictionary
-    
+
     metrics = lemmatizer.get_metrics()
     assert metrics.total_calls == 1
     assert metrics.lookup_hits == 1
@@ -54,12 +54,12 @@ def test_metrics_lookup_miss():
         from durak import _durak_core  # noqa: F401
     except ImportError:
         pytest.skip("Rust extension not installed")
-    
+
     lemmatizer = Lemmatizer(strategy="lookup", collect_metrics=True)
-    
+
     # Process unknown word (not in dictionary)
     lemmatizer("unknownxyzword")
-    
+
     metrics = lemmatizer.get_metrics()
     assert metrics.total_calls == 1
     assert metrics.lookup_hits == 0
@@ -73,13 +73,13 @@ def test_metrics_heuristic_strategy():
         from durak import _durak_core  # noqa: F401
     except ImportError:
         pytest.skip("Rust extension not installed")
-    
+
     lemmatizer = Lemmatizer(strategy="heuristic", collect_metrics=True)
-    
+
     # Process words (should use heuristic)
     lemmatizer("masalar")
     lemmatizer("arabalar")
-    
+
     metrics = lemmatizer.get_metrics()
     assert metrics.total_calls == 2
     assert metrics.heuristic_calls == 2
@@ -92,16 +92,16 @@ def test_metrics_hybrid_fallback():
         from durak import _durak_core  # noqa: F401
     except ImportError:
         pytest.skip("Rust extension not installed")
-    
+
     lemmatizer = Lemmatizer(strategy="hybrid", collect_metrics=True)
-    
+
     # Known word (should hit dictionary)
     lemmatizer("kitaplar")
-    
+
     # Unknown word (should fall back to heuristic)
     # Use a word unlikely to be in dictionary
     lemmatizer("unknownxyzwordlar")
-    
+
     metrics = lemmatizer.get_metrics()
     assert metrics.total_calls == 2
     assert metrics.lookup_hits == 1  # First word
@@ -115,14 +115,14 @@ def test_metrics_cache_hit_rate():
         from durak import _durak_core  # noqa: F401
     except ImportError:
         pytest.skip("Rust extension not installed")
-    
+
     lemmatizer = Lemmatizer(strategy="hybrid", collect_metrics=True)
-    
+
     # Process mix of known and unknown words
     words = ["kitaplar", "evler", "unknownword1", "geliyorum", "unknownword2"]
     for word in words:
         lemmatizer(word)
-    
+
     metrics = lemmatizer.get_metrics()
     assert metrics.total_calls == 5
     # kitaplar, evler, geliyorum should hit (3/5 = 60%)
@@ -135,21 +135,21 @@ def test_metrics_timing():
         from durak import _durak_core  # noqa: F401
     except ImportError:
         pytest.skip("Rust extension not installed")
-    
+
     lemmatizer = Lemmatizer(strategy="hybrid", collect_metrics=True)
-    
+
     # Process words - mix of lookup hits and heuristic fallbacks
     for _ in range(100):
         lemmatizer("kitaplar")  # Known word
         lemmatizer("unknownxyzwordlar")  # Unknown word
-    
+
     metrics = lemmatizer.get_metrics()
-    
+
     # Timing should be positive
     assert metrics.total_time > 0
     assert metrics.lookup_time > 0
     assert metrics.heuristic_time > 0
-    
+
     # Average call time should be reasonable (<1ms per call typically)
     assert metrics.avg_call_time_ms > 0
     assert metrics.avg_call_time_ms < 10  # Sanity check
@@ -161,19 +161,19 @@ def test_metrics_reset():
         from durak import _durak_core  # noqa: F401
     except ImportError:
         pytest.skip("Rust extension not installed")
-    
+
     lemmatizer = Lemmatizer(strategy="hybrid", collect_metrics=True)
-    
+
     # Process some words
     lemmatizer("kitaplar")
     lemmatizer("evler")
-    
+
     metrics = lemmatizer.get_metrics()
     assert metrics.total_calls == 2
-    
+
     # Reset
     lemmatizer.reset_metrics()
-    
+
     metrics = lemmatizer.get_metrics()
     assert metrics.total_calls == 0
     assert metrics.lookup_hits == 0
@@ -186,16 +186,16 @@ def test_metrics_to_dict():
         from durak import _durak_core  # noqa: F401
     except ImportError:
         pytest.skip("Rust extension not installed")
-    
+
     lemmatizer = Lemmatizer(strategy="hybrid", collect_metrics=True)
-    
+
     # Process words
     lemmatizer("kitaplar")  # Known word
     lemmatizer("unknownxyzwordlar")  # Unknown word
-    
+
     metrics = lemmatizer.get_metrics()
     metrics_dict = metrics.to_dict()
-    
+
     # Check all keys present
     assert "total_calls" in metrics_dict
     assert "lookup_hits" in metrics_dict
@@ -206,7 +206,7 @@ def test_metrics_to_dict():
     assert "total_time" in metrics_dict
     assert "lookup_time" in metrics_dict
     assert "heuristic_time" in metrics_dict
-    
+
     # Check values
     assert metrics_dict["total_calls"] == 2
     assert metrics_dict["lookup_hits"] == 1
@@ -219,16 +219,16 @@ def test_metrics_str_format():
         from durak import _durak_core  # noqa: F401
     except ImportError:
         pytest.skip("Rust extension not installed")
-    
+
     lemmatizer = Lemmatizer(strategy="hybrid", collect_metrics=True)
-    
+
     # Process words
     lemmatizer("kitaplar")  # Known word
     lemmatizer("unknownxyzwordlar")  # Unknown word
-    
+
     metrics = lemmatizer.get_metrics()
     metrics_str = str(metrics)
-    
+
     # Check formatting includes key info
     assert "Total Calls: 2" in metrics_str
     assert "Lookup Hits: 1" in metrics_str
@@ -239,11 +239,11 @@ def test_metrics_str_format():
 def test_metrics_empty_input():
     """Test metrics handle empty string correctly."""
     lemmatizer = Lemmatizer(strategy="hybrid", collect_metrics=True)
-    
+
     # Empty strings should return early (not counted)
     result = lemmatizer("")
     assert result == ""
-    
+
     metrics = lemmatizer.get_metrics()
     assert metrics.total_calls == 0  # Should not increment
 
@@ -251,7 +251,7 @@ def test_metrics_empty_input():
 def test_metrics_repr():
     """Test Lemmatizer repr includes collect_metrics."""
     lemmatizer = Lemmatizer(strategy="hybrid", collect_metrics=True)
-    
+
     repr_str = repr(lemmatizer)
     assert "collect_metrics=True" in repr_str
 
@@ -259,25 +259,26 @@ def test_metrics_repr():
 def test_metrics_no_overhead_when_disabled():
     """Verify metrics=False has minimal overhead."""
     try:
-        from durak import _durak_core  # noqa: F401
         import time
+
+        from durak import _durak_core  # noqa: F401
     except ImportError:
         pytest.skip("Rust extension not installed")
-    
+
     # Benchmark without metrics
     lemmatizer_fast = Lemmatizer(strategy="hybrid", collect_metrics=False)
     start = time.perf_counter()
     for _ in range(1000):
         lemmatizer_fast("kitaplar")
     time_without = time.perf_counter() - start
-    
+
     # Benchmark with metrics
     lemmatizer_slow = Lemmatizer(strategy="hybrid", collect_metrics=True)
     start = time.perf_counter()
     for _ in range(1000):
         lemmatizer_slow("kitaplar")
     time_with = time.perf_counter() - start
-    
+
     # Overhead should be reasonable (typically 10-50%, max 200%)
     overhead = (time_with - time_without) / time_without
     # Main point: metrics don't 10x slow things down

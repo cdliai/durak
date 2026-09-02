@@ -1,11 +1,16 @@
 """Tests for the pipeline module."""
 
-import pytest
+import importlib.util
 import warnings
 
+import pytest
+from durak.exceptions import ConfigurationError, PipelineError
 from durak.normalizer import Normalizer
 from durak.pipeline import Pipeline, process_text, process_text_with_steps
-from durak.exceptions import ConfigurationError, PipelineError
+
+
+def _rust_available() -> bool:
+    return importlib.util.find_spec("durak._durak_core") is not None
 
 
 class TestNormalizer:
@@ -55,9 +60,7 @@ class TestPipeline:
         assert "clean" in repr(pipe)
 
     def test_pipeline_execution_normalizer(self):
-        try:
-            from durak import _durak_core
-        except ImportError:
+        if not _rust_available():
             pytest.skip("Rust extension not installed")
 
         pipe = Pipeline([Normalizer()])
@@ -65,9 +68,7 @@ class TestPipeline:
         assert result == "istanbul ve ığdır"
 
     def test_pipeline_execution_clean_tokenize(self):
-        try:
-            from durak import _durak_core
-        except ImportError:
+        if not _rust_available():
             pytest.skip("Rust extension not installed")
 
         pipe = Pipeline(["clean", "tokenize"])
@@ -94,9 +95,7 @@ class TestProcessTextWithSteps:
     """Tests for process_text_with_steps function."""
 
     def test_basic_usage(self):
-        try:
-            from durak import _durak_core
-        except ImportError:
+        if not _rust_available():
             pytest.skip("Rust extension not installed")
 
         result = process_text_with_steps("Hello World!", ["clean", "tokenize"])
@@ -108,9 +107,7 @@ class TestProcessTextDeprecated:
     """Tests for deprecated process_text function."""
 
     def test_deprecation_warning(self):
-        try:
-            from durak import _durak_core
-        except ImportError:
+        if not _rust_available():
             pytest.skip("Rust extension not installed")
 
         with warnings.catch_warnings(record=True) as w:
@@ -121,9 +118,7 @@ class TestProcessTextDeprecated:
             assert "deprecated" in str(w[0].message).lower()
 
     def test_basic_processing(self):
-        try:
-            from durak import _durak_core
-        except ImportError:
+        if not _rust_available():
             pytest.skip("Rust extension not installed")
 
         with warnings.catch_warnings():
@@ -133,9 +128,7 @@ class TestProcessTextDeprecated:
             assert len(result) > 0
 
     def test_remove_stopwords(self):
-        try:
-            from durak import _durak_core
-        except ImportError:
+        if not _rust_available():
             pytest.skip("Rust extension not installed")
 
         with warnings.catch_warnings():
@@ -146,9 +139,7 @@ class TestProcessTextDeprecated:
             assert "test" in result
 
     def test_rejoin_suffixes(self):
-        try:
-            from durak import _durak_core
-        except ImportError:
+        if not _rust_available():
             pytest.skip("Rust extension not installed")
 
         with warnings.catch_warnings():
@@ -157,9 +148,7 @@ class TestProcessTextDeprecated:
             assert "ankara'da" in result
 
     def test_strip_punct(self):
-        try:
-            from durak import _durak_core
-        except ImportError:
+        if not _rust_available():
             pytest.skip("Rust extension not installed")
 
         with warnings.catch_warnings():

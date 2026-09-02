@@ -6,6 +6,11 @@ labels: enhancement
 assignees: ""
 ---
 
+<!--
+Lutfen problem, oneri ve kapsamini net sekilde yazin.
+Eksik ve cok genel girisler "needs-more-info" ile isaretlenebilir.
+-->
+
 ## Problem statement
 
 <!-- What gap are you trying to fill? -->

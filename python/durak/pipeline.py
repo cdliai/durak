@@ -4,16 +4,22 @@ from __future__ import annotations
 
 import re
 import warnings
+from functools import partial
 from typing import Any, Callable, Union
 
 from durak.cleaning import (
     clean_text,
     collapse_whitespace,
-    normalize_unicode,
     remove_mentions_hashtags,
     remove_repeated_chars,
     remove_urls,
     strip_html,
+)
+from durak.cleaning import (
+    normalize_case as normalize_case_fn,
+)
+from durak.cleaning import (
+    normalize_unicode as normalize_unicode_fn,
 )
 from durak.exceptions import ConfigurationError, PipelineError
 from durak.normalizer import Normalizer
@@ -53,7 +59,54 @@ class Pipeline:
         ['HELLO']
     """
 
-    def __init__(self, steps: list[StepType]):
+    def __init__(
+        self,
+        steps: list[StepType] | None = None,
+        *,
+        normalize_case: bool = False,
+        normalize_unicode: bool = False,
+        clean_text: bool = False,
+        tokenize: bool = False,
+        remove_stopwords: bool = False,
+        attach_suffixes: bool = False,
+    ):
+        """Create a pipeline.
+
+        New API:
+            Pipeline(steps)
+
+        Legacy compatibility:
+            Pipeline(
+                normalize_case=True,
+                normalize_unicode=True,
+                clean_text=True,
+                tokenize=True,
+                remove_stopwords=False,
+                attach_suffixes=False,
+            )
+        """
+
+        if steps is None:
+            legacy_steps: list[StepType] = []
+
+            if clean_text:
+                # Canonical cleaning step that already includes normalization.
+                legacy_steps.append("clean")
+            else:
+                if normalize_unicode:
+                    legacy_steps.append(normalize_unicode_fn)
+                if normalize_case:
+                    legacy_steps.append(partial(normalize_case_fn, mode="lower"))
+
+            if tokenize:
+                legacy_steps.append("tokenize")
+            if remove_stopwords:
+                legacy_steps.append("remove_stopwords")
+            if attach_suffixes:
+                legacy_steps.append("attach_suffixes")
+
+            steps = legacy_steps
+
         if not steps:
             raise ConfigurationError("Pipeline must have at least one step")
 
@@ -103,6 +156,11 @@ class Pipeline:
             except Exception as e:
                 raise PipelineError(f"Pipeline step '{step_name}' failed: {e}") from e
         return doc
+
+    def process(self, text: str) -> str | list[str]:
+        """Backward-compatible alias for :meth:`__call__`."""
+
+        return self(text)
 
     def __repr__(self) -> str:
         return f"Pipeline([{', '.join(repr(name) for name in self.step_names)}])"
@@ -188,7 +246,7 @@ def process_text(
     else:
         cleaned_result = collapse_whitespace(
             remove_mentions_hashtags(
-                remove_repeated_chars(remove_urls(strip_html(normalize_unicode(text))))
+                remove_repeated_chars(remove_urls(strip_html(normalize_unicode_fn(text))))
             )
         )
 
