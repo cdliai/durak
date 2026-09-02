@@ -48,16 +48,18 @@ class Normalizer:
 
         if not text:
             return ""
-        
-        # Pass configuration parameters to Rust core
-        return fast_normalize(text, self.lowercase, self.handle_turkish_i)
+
         try:
+            # Pass configuration parameters to Rust core in positional form.
+            # Some tests patch the backend with positional-only callables.
             return fast_normalize(
                 text,
-                lowercase=self.lowercase,
-                handle_turkish_i=self.handle_turkish_i,
+                self.lowercase,
+                self.handle_turkish_i,
             )
         except RustExtensionError:
+            raise
+        except ImportError:
             raise
         except Exception as e:
             raise NormalizerError(f"Normalization failed: {e}") from e

@@ -125,7 +125,6 @@ def test_extract_emojis_handles_various_emoji_categories() -> None:
         # Keep mode: preserve emojis
         ("keep", "Harika! 🎉", "harika! 🎉"),
         ("keep", "Emoji yok", "emoji yok"),
-        
         # Remove mode: strip emojis
         ("remove", "Harika! 🎉", "harika!"),
         ("remove", "Çok güzel 😍🎊", "çok güzel"),
@@ -142,20 +141,20 @@ def test_clean_text_emoji_mode_keep_and_remove(
 def test_clean_text_emoji_mode_extract_returns_tuple() -> None:
     text = "Harika! 🎉 Çok güzel 😍"
     result = cleaning.clean_text(text, emoji_mode="extract")
-    
+
     # Should return tuple
     assert isinstance(result, tuple)
     assert len(result) == 2
-    
+
     cleaned_text, emojis = result
     assert isinstance(cleaned_text, str)
     assert isinstance(emojis, list)
-    
+
     # Verify cleaned text has no emojis
     assert "🎉" not in cleaned_text
     assert "😍" not in cleaned_text
     assert "harika" in cleaned_text.lower()
-    
+
     # Verify emojis were extracted
     assert "🎉" in emojis
     assert "😍" in emojis
@@ -164,7 +163,7 @@ def test_clean_text_emoji_mode_extract_returns_tuple() -> None:
 def test_clean_text_emoji_mode_extract_empty_emoji_list() -> None:
     text = "Emoji yok burada"
     cleaned_text, emojis = cleaning.clean_text(text, emoji_mode="extract")
-    
+
     assert "emoji yok burada" in cleaned_text.lower()
     assert emojis == []
 
@@ -182,7 +181,7 @@ def test_clean_text_emoji_mode_invalid_raises() -> None:
 def test_clean_text_emoji_mode_with_custom_steps() -> None:
     text = "HARIKA! 🎉 GÜZEL 😍"
     steps = (cleaning.normalize_case, cleaning.remove_emojis)
-    
+
     # Should apply custom steps first, then emoji mode
     result = cleaning.clean_text(text, steps=steps, emoji_mode="remove")
     # Note: Turkish I normalization: HARIKA → harıka (I→ı)
@@ -199,11 +198,11 @@ def test_emoji_integration_with_social_media_cleaning() -> None:
     https://example.com/foto.jpg 😍😍😍
     Çok mutluyummm!!!
     """
-    
+
     # Extract emojis first
     emojis = cleaning.extract_emojis(tweet)
     assert len(emojis) >= 5  # At least 5 emojis
-    
+
     # Clean with emoji removal
     cleaned = cleaning.clean_text(tweet, emoji_mode="remove")
     # Note: Turkish I normalization (HARIKA → harıka)
@@ -213,7 +212,7 @@ def test_emoji_integration_with_social_media_cleaning() -> None:
     assert "🌞" not in cleaned
     assert "😍" not in cleaned
     assert "http" not in cleaned  # URLs removed
-    
+
     # Clean and extract in one go
     cleaned_with_extract, extracted_emojis = cleaning.clean_text(
         tweet, emoji_mode="extract"

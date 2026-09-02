@@ -66,6 +66,17 @@ def tokenize_with_offsets(text: str) -> list[tuple[str, int, int]]:
     """
     ...
 
+
+def tokenize_with_normalized_offsets(text: str) -> list[tuple[str, int, int]]:
+    """Tokenize text and return normalized tokens with character offsets.
+
+    Uses the same tokenization rules as :func:`tokenize_with_offsets`, but returns
+    normalized token strings for consistency with the Python API that expects
+    lowercased token output.
+    """
+    ...
+
+
 def lookup_lemma(word: str) -> str | None:
     """Perform exact dictionary lookup for lemmatization.
 
@@ -119,7 +130,7 @@ def strip_suffixes_validated(
     word: str,
     strict: bool = False,
     min_root_length: int = 2,
-    check_harmony: bool = True
+    check_harmony: bool = True,
 ) -> str:
     """Strip suffixes with root validation and morphotactic constraints.
 
@@ -242,6 +253,7 @@ def get_stopwords_social_media() -> list[str]:
 __all__ = [
     "fast_normalize",
     "tokenize_with_offsets",
+    "tokenize_with_normalized_offsets",
     "lookup_lemma",
     "strip_suffixes",
     "strip_suffixes_validated",
@@ -256,15 +268,15 @@ __all__ = [
     "get_resource_info",
 ]
 
-def get_build_info() -> Dict[str, str]:
+def get_build_info() -> dict[str, str]:
     """Get Durak build information for reproducibility.
-    
+
     Returns build metadata including package version, build date, and
     package name for research reproducibility tracking.
-    
+
     Returns:
         Dictionary with keys: durak_version, build_date, package_name
-    
+
     Examples:
         >>> info = get_build_info()
         >>> print(info['durak_version'])
@@ -272,15 +284,15 @@ def get_build_info() -> Dict[str, str]:
     """
     ...
 
-def get_resource_info() -> Dict[str, Dict[str, str]]:
+def get_resource_info() -> dict[str, dict[str, str]]:
     """Get embedded resource versions and checksums.
-    
+
     Returns metadata for all linguistic resources embedded in the binary,
     including versions, SHA256 checksums, item counts, and update dates.
-    
+
     Returns:
         Dictionary mapping resource names to their metadata
-    
+
     Examples:
         >>> resources = get_resource_info()
         >>> print(resources['stopwords_base']['checksum'][:12])

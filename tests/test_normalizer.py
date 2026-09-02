@@ -9,8 +9,8 @@ from typing import NoReturn
 from unittest.mock import patch
 
 import pytest
-from durak.normalizer import Normalizer
 from durak.exceptions import NormalizerError
+from durak.normalizer import Normalizer
 
 
 @pytest.fixture

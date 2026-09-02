@@ -5,12 +5,6 @@ from __future__ import annotations
 from importlib import metadata
 
 from .cleaning import clean_text, collapse_whitespace, normalize_case, normalize_unicode
-from .info import (
-    get_bibtex_citation,
-    get_build_info,
-    get_resource_info,
-    print_reproducibility_report,
-)
 from .exceptions import (
     ConfigurationError,
     DurakError,
@@ -22,6 +16,12 @@ from .exceptions import (
     StopwordError,
     StopwordMetadataError,  # Backward compatibility alias
     TokenizationError,
+)
+from .info import (
+    get_bibtex_citation,
+    get_build_info,
+    get_resource_info,
+    print_reproducibility_report,
 )
 from .lemmatizer import Lemmatizer
 from .normalizer import Normalizer
@@ -49,8 +49,8 @@ from .tokenizer import (
     split_sentences,
     tokenize,
     tokenize_text,
-    tokenize_with_offsets,
     tokenize_with_normalized_offsets,
+    tokenize_with_offsets,
 )
 
 __all__ = [

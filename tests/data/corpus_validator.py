@@ -53,9 +53,7 @@ def validate_corpus(sentences: Iterable[str]) -> list[str]:
                 continue
             for particle in PARTICLE_TOKENS:
                 if token.endswith(particle) and manager.is_stopword(token):
-                    issues.append(
-                        f"Sentence {index}: token '{token}' -> '{particle}'."
-                    )
+                    issues.append(f"Sentence {index}: token '{token}' -> '{particle}'.")
                     break
 
     return issues

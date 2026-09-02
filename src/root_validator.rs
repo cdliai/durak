@@ -136,9 +136,10 @@ impl RootValidator {
             return self.has_valid_syllable_structure(&lower_chars);
         }
 
-        // Voiceless stops at word end are valid in Turkish
+        // Voiceless stops at word end are valid in Turkish, including
+        // monosyllabic CVC roots such as "at", "it", "ot", "et".
         if VOICELESS_STOPS.contains(last_char) {
-            return lower_chars.len() >= 3 && self.has_valid_syllable_structure(&lower_chars);
+            return lower_chars.len() >= 2 && self.has_valid_syllable_structure(&lower_chars);
         }
 
         true

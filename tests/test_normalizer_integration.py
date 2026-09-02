@@ -1,13 +1,9 @@
-import pytest
+import importlib.util
 
+import pytest
 from durak.normalizer import Normalizer
 
-try:
-    from durak._durak_core import fast_normalize
-
-    RUST_AVAILABLE = True
-except ImportError:
-    RUST_AVAILABLE = False
+RUST_AVAILABLE = importlib.util.find_spec("durak._durak_core") is not None
 
 
 @pytest.mark.skipif(not RUST_AVAILABLE, reason="Rust extension not installed")

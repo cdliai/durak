@@ -4,6 +4,8 @@ Demonstrates creating custom text processing pipelines with
 domain-specific stopwords, suffix attachment, and lemmatization.
 """
 
+from dataclasses import dataclass, field
+
 from durak import (
     StopwordManager,
     attach_detached_suffixes,
@@ -14,17 +16,15 @@ from durak import (
     tokenize,
 )
 
-from dataclasses import dataclass, field
 
-@dataclass 
+@dataclass
 class ProcessingContext:
     text: str
     metadata: list[str] = field(default_factory=list)
     tokens: list[str] = field(default_factory=list)
 
-    def add_metadata(self, info:str):
+    def add_metadata(self, info: str):
         self.metadata.append(info)
-
 
 
 def main():
@@ -50,7 +50,6 @@ def main():
         keep=["var", "git"],  # Keep these even if they're stopwords
     )
 
-    
     tokens = tokenize(clean_text(text))
     print(f"Tokens: {tokens}")
 
