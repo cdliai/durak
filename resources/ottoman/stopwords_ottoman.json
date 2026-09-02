@@ -1,0 +1,24 @@
+{
+  "name": "Ottoman Turkish Stopwords",
+  "version": "1.0.0",
+  "description": "Common stopwords in Ottoman Turkish (historical forms)",
+  "source": "Derived from historical corpora and scholarly resources",
+  "language": "ota",
+  "stopwords": [
+    "ve", "ile", "için", "bu", "şu", "o", "ki", "kim", "ne", "nerede",
+    "nasıl", "niçin", "kadar", "gibi", "içinde", "üzerine", "hakkında",
+    "tarafından", "beri", "rağmen", "karşı", "doğru", "veya", "ama",
+    "fakat", "lakin", "çünkü", "zira", "eğer", "şayet", "ise", "de",
+    "da", "bile", "mi", "mı", "mu", "mü", "bir", "iki", "üç", "dört",
+    "beş", "altı", "yedi", "sekiz", "dokuz", "on", "yirmi", "otuz",
+    "kırk", "elli", "altmış", "yetmiş", "seksen", "doksan", "yüz",
+    "bin", "evvel", "sonra", "önce", "şimdi", "burada", "orada",
+    "şurada", "her", "bazı", "bazıları", "kimse", "hiçbir", "tüm",
+    "bütün", "çoğu", "hep", "hiç", "az", "çok", "daha", "en", "pek",
+    "oldukça", "hemen", "şöyle", "böyle", "öyle", "ben", "sen",
+    "biz", "siz", "onlar", "bana", "sana", "ona", "bize", "size",
+    "onlara", "beni", "seni", "onu", "bizi", "sizi", "onları",
+    "benim", "senin", "onun", "bizim", "sizin", "onların",
+    "kendi", "kendim", "kendin", "kendimiz", "kendiniz", "kendileri"
+  ]
+}
